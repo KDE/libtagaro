@@ -105,23 +105,25 @@ class KgvRendererPrivate : public QObject
 {
 	Q_OBJECT
 	public:
-		KgvRendererPrivate(const QString& defaultTheme, unsigned cacheSize, KgvRenderer* parent);
-		bool setTheme(const QString& theme);
+		KgvRendererPrivate(KgvThemeProvider* provider, unsigned cacheSize, KgvRenderer* parent);
+		void setTheme(const KgvTheme* theme);
+		bool setThemeInternal(const KgvTheme* theme);
 		inline QString spriteFrameKey(const QString& key, int frame, bool normalizeFrameNo = false) const;
 		void requestPixmap(const KGVRInternal::ClientSpec& spec, KgvRendererClient* client, QPixmap* synchronousResult = 0);
 	private:
 		inline void requestPixmap__propagateResult(const QPixmap& pixmap, KgvRendererClient* client, QPixmap* synchronousResult);
 	public Q_SLOTS:
+		void loadSelectedTheme();
 		void jobFinished(KGVRInternal::Job* job, bool isSynchronous); //NOTE: This is invoked from KGVRInternal::Worker::run.
 	public:
 		KgvRenderer* m_parent;
 
-		QString m_defaultTheme, m_currentTheme;
 		QString m_frameSuffix, m_sizePrefix, m_frameCountPrefix, m_boundsPrefix;
 		unsigned m_cacheSize;
 		KgvRenderer::Strategies m_strategies;
 		int m_frameBaseIndex;
-		KGameTheme m_theme;
+		KgvThemeProvider* m_themeProvider;
+		const KgvTheme* m_theme;
 
 		QThreadPool m_workerPool;
 		KGVRInternal::RendererPool m_rendererPool;

@@ -19,6 +19,8 @@
 #include "kgvrenderer.h"
 #include "kgvrenderer_p.h"
 #include "kgvrendererclient.h"
+#include "kgvtheme.h"
+#include "kgvthemeprovider.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
@@ -37,9 +39,8 @@ static const QString cacheName(QString theme)
 	return QString::fromLatin1("kgvrenderer-%1-%2").arg(appName).arg(theme);
 }
 
-KgvRendererPrivate::KgvRendererPrivate(const QString& defaultTheme, unsigned cacheSize, KgvRenderer* parent)
+KgvRendererPrivate::KgvRendererPrivate(KgvThemeProvider* provider, unsigned cacheSize, KgvRenderer* parent)
 	: m_parent(parent)
-	, m_defaultTheme(defaultTheme)
 	, m_frameSuffix(QString::fromLatin1("_%1"))
 	, m_sizePrefix(QString::fromLatin1("%1-%2-"))
 	, m_frameCountPrefix(QString::fromLatin1("fc-"))
@@ -48,14 +49,18 @@ KgvRendererPrivate::KgvRendererPrivate(const QString& defaultTheme, unsigned cac
 	, m_cacheSize((cacheSize == 0 ? 3 : cacheSize) << 20)
 	, m_strategies(KgvRenderer::UseDiskCache | KgvRenderer::UseRenderingThreads)
 	, m_frameBaseIndex(0)
+	, m_themeProvider(provider)
+	//theme will be loaded on first request (not immediately, because the calling context might want to disable some rendering strategies first)
+	, m_theme(0)
 	, m_rendererPool(&m_workerPool)
 	, m_imageCache(0)
 {
 	qRegisterMetaType<KGVRInternal::Job*>();
+	connect(m_themeProvider, SIGNAL(selectedIndexChanged(int)), SLOT(loadSelectedTheme()));
 }
 
-KgvRenderer::KgvRenderer(const QString& defaultTheme, unsigned cacheSize)
-	: d(new KgvRendererPrivate(defaultTheme, cacheSize, this))
+KgvRenderer::KgvRenderer(KgvThemeProvider* provider, unsigned cacheSize)
+	: d(new KgvRendererPrivate(provider, cacheSize, this))
 {
 }
 
@@ -108,70 +113,74 @@ void KgvRenderer::setStrategyEnabled(KgvRenderer::Strategy strategy, bool enable
 	}
 	if (strategy == KgvRenderer::UseDiskCache && oldEnabled != enabled)
 	{
-		//reload theme
-		const QString theme = d->m_currentTheme;
-		d->m_currentTheme.clear(); //or setTheme() will return immediately
-		setTheme(theme);
+		const KgvTheme* theme = d->m_theme;
+		d->m_theme = 0; //or setTheme() will return immediately
+		d->setTheme(theme);
 	}
 }
 
-QString KgvRenderer::theme() const
+KgvThemeProvider* KgvRenderer::themeProvider() const
 {
-	return d->m_currentTheme;
+	return d->m_themeProvider;
 }
 
-void KgvRenderer::setTheme(const QString& theme)
+const KgvTheme* KgvRenderer::theme() const
 {
-	const QString oldTheme = d->m_currentTheme;
+	return d->m_theme;
+}
+
+void KgvRendererPrivate::setTheme(const KgvTheme* theme)
+{
+	if (!theme)
+	{
+		return;
+	}
+	const KgvTheme* oldTheme = m_theme;
 	if (oldTheme == theme)
 	{
 		return;
 	}
-	kDebug() << "Setting theme:" << theme;
-	if (!d->setTheme(theme) && theme != d->m_defaultTheme)
+	kDebug() << "Setting theme:" << theme->identifier();
+	if (!setThemeInternal(theme))
 	{
-		kDebug() << "Falling back to default theme:" << d->m_defaultTheme;
-		d->setTheme(d->m_defaultTheme);
+		const KgvTheme* defaultTheme = m_themeProvider->theme(0);
+		if (theme != defaultTheme && defaultTheme)
+		{
+			kDebug() << "Falling back to default theme:" << defaultTheme->identifier();
+			setThemeInternal(defaultTheme);
+		}
 	}
 	//announce change to KgvRendererClients
-	QHash<KgvRendererClient*, QString>::iterator it1 = d->m_clients.begin(), it2 = d->m_clients.end();
+	QHash<KgvRendererClient*, QString>::iterator it1 = m_clients.begin(), it2 = m_clients.end();
 	for (; it1 != it2; ++it1)
 	{
 		it1.value().clear(); //because the pixmap is outdated
 		it1.key()->d->fetchPixmap();
 	}
 	//announce change publicly
-	if (oldTheme != d->m_currentTheme)
+	if (oldTheme != m_theme)
 	{
-		emit themeChanged(d->m_currentTheme);
+		emit m_parent->themeChanged(m_theme);
 	}
 }
 
-bool KgvRendererPrivate::setTheme(const QString& theme)
+void KgvRendererPrivate::loadSelectedTheme()
 {
-	if (theme.isEmpty())
-	{
-		return false;
-	}
-	//load desktop file
-	if (!m_theme.load(theme))
-	{
-		kDebug() << "Theme change failed: Desktop file broken";
-		m_theme.load(m_currentTheme);
-		return false;
-	}
+	setTheme(m_themeProvider->theme(m_themeProvider->selectedIndex()));
+}
+
+bool KgvRendererPrivate::setThemeInternal(const KgvTheme* theme)
+{
+	const QString svgPath = theme->data(KgvTheme::GraphicsFileRole).toString();
 	//open cache (and SVG file, if necessary)
 	if (m_strategies & KgvRenderer::UseDiskCache)
 	{
 		KImageCache* oldCache = m_imageCache;
-		const QString imageCacheName = cacheName(m_theme.fileName());
+		const QString imageCacheName = cacheName(m_theme->identifier());
 		m_imageCache = new KImageCache(imageCacheName, m_cacheSize);
 		m_imageCache->setPixmapCaching(false); //see big comment in KGVRPrivate class declaration
 		//check timestamp of cache vs. last write access to theme/SVG
-		const uint svgTimestamp = qMax(
-			QFileInfo(m_theme.graphics()).lastModified().toTime_t(),
-			QFileInfo(m_theme.path()).lastModified().toTime_t()
-		);
+		const uint svgTimestamp = theme->modificationTimestamp();
 		QByteArray buffer;
 		if (!m_imageCache->find(QString::fromLatin1("kgvr_timestamp"), &buffer))
 			buffer = "0";
@@ -181,10 +190,10 @@ bool KgvRendererPrivate::setTheme(const QString& theme)
 		if (cacheTimestamp < svgTimestamp)
 		{
 			kDebug() << "Theme newer than cache, checking SVG";
-			QSvgRenderer* renderer = new QSvgRenderer(m_theme.graphics());
+			QSvgRenderer* renderer = new QSvgRenderer(svgPath);
 			if (renderer->isValid())
 			{
-				m_rendererPool.setPath(m_theme.graphics(), renderer);
+				m_rendererPool.setPath(svgPath, renderer);
 				m_imageCache->insert(QString::fromLatin1("kgvr_timestamp"), QByteArray::number(svgTimestamp));
 			}
 			else
@@ -199,16 +208,18 @@ bool KgvRendererPrivate::setTheme(const QString& theme)
 			}
 		}
 		//theme is cached - just delete the old renderer after making sure that no worker threads are using it anymore
-		else if (m_currentTheme != theme)
-			m_rendererPool.setPath(m_theme.graphics());
+		else if (m_theme != theme)
+		{
+			m_rendererPool.setPath(svgPath);
+		}
 	}
 	else // !(m_strategies & KgvRenderer::UseDiskCache) -> no cache is used
 	{
 		//load SVG file
-		QSvgRenderer* renderer = new QSvgRenderer(m_theme.graphics());
+		QSvgRenderer* renderer = new QSvgRenderer(svgPath);
 		if (renderer->isValid())
 		{
-			m_rendererPool.setPath(m_theme.graphics(), renderer);
+			m_rendererPool.setPath(svgPath, renderer);
 		}
 		else
 		{
@@ -224,13 +235,8 @@ bool KgvRendererPrivate::setTheme(const QString& theme)
 	m_frameCountCache.clear();
 	m_boundsCache.clear();
 	//done
-	m_currentTheme = theme;
+	m_theme = theme;
 	return true;
-}
-
-const KGameTheme* KgvRenderer::gameTheme() const
-{
-	return &d->m_theme;
 }
 
 QString KgvRendererPrivate::spriteFrameKey(const QString& key, int frame, bool normalizeFrameNo) const
@@ -260,10 +266,10 @@ QString KgvRendererPrivate::spriteFrameKey(const QString& key, int frame, bool n
 int KgvRenderer::frameCount(const QString& key) const
 {
 	//ensure that some theme is loaded
-	if (d->m_currentTheme.isEmpty())
+	if (!d->m_theme)
 	{
-		const_cast<KgvRenderer*>(this)->setTheme(d->m_defaultTheme);
-		if (d->m_currentTheme.isEmpty())
+		d->loadSelectedTheme();
+		if (!d->m_theme)
 		{
 			return -1;
 		}
@@ -321,10 +327,10 @@ QRectF KgvRenderer::boundsOnSprite(const QString& key, int frame) const
 {
 	const QString elementKey = d->spriteFrameKey(key, frame);
 	//ensure that some theme is loaded
-	if (d->m_currentTheme.isEmpty())
+	if (!d->m_theme)
 	{
-		const_cast<KgvRenderer*>(this)->setTheme(d->m_defaultTheme);
-		if (d->m_currentTheme.isEmpty())
+		d->loadSelectedTheme();
+		if (!d->m_theme)
 		{
 			return QRectF();
 		}
@@ -416,10 +422,10 @@ void KgvRendererPrivate::requestPixmap(const KGVRInternal::ClientSpec& spec, Kgv
 		m_clients[client] = cacheKey;
 	}
 	//ensure that some theme is loaded
-	if (m_currentTheme.isEmpty())
+	if (!m_theme)
 	{
-		m_parent->setTheme(m_defaultTheme);
-		if (m_currentTheme.isEmpty())
+		loadSelectedTheme();
+		if (!m_theme)
 		{
 			return;
 		}

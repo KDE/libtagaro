@@ -28,27 +28,30 @@
 class KgvRendererPrivate;
 class KgvRendererClient;
 class KgvRendererClientPrivate;
-class KGameTheme;
+class KgvTheme;
+class KgvThemeProvider;
 
 /**
  * @class KgvRenderer kgvrenderer.h <KgvRenderer>
- * @since 4.6
- * @short Cache-enabled rendering of SVG themes.
+ * @brief Cache-enabled rendering of SVG themes.
  *
  * KgvRenderer is a light-weight rendering framework for the rendering of
- * SVG themes (as represented by KGameTheme) into pixmap caches.
+ * SVG themes into pixmap caches.
+ *
+ * @section theming Automatic theme loading
+ *
+ * KgvRenderer receives its themes from a KgvThemeProvider. The functionality
+ * made available by KgvThemeProvider can be used to select a theme. This
+ * selection will then automatically be picked up by all KgvRenderer instances
+ * using this theme provider.
  *
  * @section terminology Terminology
  *
- * @li Themes, in the context of KgvRenderer, are the same as in the context
- *     of the KGameTheme class: a pair of a .desktop file and a .svg file. See
- *     the KGameTheme documentation for details.
- * @li A sprite is either a single pixmap ("non-animated sprites") or a sequence
- *     of pixmaps which are shown consecutively to produce an animation
- *     ("animated sprites"). Non-animated sprites correspond to a single element
- *     with the same key in the SVG theme file. The element keys for the pixmaps
- *     of an animated sprite are produced by appending the frameSuffix() to the
- *     sprite key.
+ * A sprite is either a single pixmap ("non-animated sprites") or a sequence of
+ * pixmaps which are shown consecutively to produce an animation ("animated
+ * sprites"). Non-animated sprites correspond to a single element with the same
+ * key in the SVG theme file. The element keys for the pixmaps of an animated
+ * sprite are produced by appending the frameSuffix() to the sprite key.
  *
  * @section clients Access to the pixmaps
  *
@@ -85,7 +88,7 @@ class KGameTheme;
 class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QString theme READ theme WRITE setTheme NOTIFY themeChanged)
+	Q_PROPERTY(const KgvTheme* theme READ theme NOTIFY themeChanged)
 	public:
 		///Describes the various strategies which KgvRenderer can use to speed
 		///up rendering.
@@ -104,17 +107,12 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 		};
 		Q_DECLARE_FLAGS(Strategies, Strategy)
 
-		///Constructs a new KgvRenderer. The given @a defaultTheme will be
-		///used as the initial theme, and will also act as a fallback when an
-		///invalid theme is given.
-		///@note If you load the theme name from a configuration file, give that
-		///theme name as the first argument instead of calling setTheme() later.
-		///setTheme() clears the cache, while this constructor tries to reuse it.
-		///@param defaultTheme a theme name as used by KGameTheme::load
+		///Constructs a new KgvRenderer.
+		///@param provider the theme provider to be used by this renderer
 		///@param cacheSize the cache size in megabytes (if not given, a sane
 		///default is used)
 		///@warning This constructor may only be called from the main thread.
-		explicit KgvRenderer(const QString& defaultTheme, unsigned cacheSize = 0);
+		explicit KgvRenderer(KgvThemeProvider* provider, unsigned cacheSize = 0);
 		///Deletes this KgvRenderer instance, as well as all clients using it.
 		virtual ~KgvRenderer();
 
@@ -150,15 +148,14 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 		///are enabled. This is a sane default for 99% of all games. You might 
 		///only want to disable optimizations if the graphics are so simple that
 		///the optimisations create an overhead in your special case.
-		///
-		///If you disable UseDiskCache, you should do so before setTheme(),
-		///because changes to UseDiskCache cause a full theme reload.
 		void setStrategyEnabled(Strategy strategy, bool enabled = true);
-		///@return the theme currently in use (format as in KGameTheme::load())
-		QString theme() const;
 
-		///@return the KGameTheme instance used by this renderer
-		const KGameTheme* gameTheme() const;
+		///@return the theme provider for this renderer
+		KgvThemeProvider* themeProvider() const;
+		///@return the theme currently used by this renderer
+		///To change this theme, use the selection functionality in
+		///KgvThemeProvider.
+		const KgvTheme* theme() const;
 
 		///@return the bounding rectangle of the sprite with this @a key
 		///This is equal to QSvgRenderer::boundsOnElement() of the corresponding
@@ -186,16 +183,11 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 		///@param frame the number of the frame which you want
 		///@note  For non-animated frames, set @a frame to -1 or omit it.
 		QPixmap spritePixmap(const QString& key, const QSize& size, int frame = -1) const;
-	public Q_SLOTS:
-		///Load the given theme and update the pixmaps of all associated
-		///KgvRendererClient instances.
-		///@param theme a theme name as used by KGameTheme::load
-		void setTheme(const QString& theme);
 	Q_SIGNALS:
 		///This signal is emitted when a new theme has been loaded. You usually
 		///do not need to react on this signal if you use KgvRendererClient or
 		///KgvSpriteItem, because these update their pixmaps automatically.
-		void themeChanged(const QString& theme);
+		void themeChanged(const KgvTheme* theme);
 	private:
 		friend class KgvRendererPrivate;
 		friend class KgvRendererClient;

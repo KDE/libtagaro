@@ -12,6 +12,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/includes
 	${CMAKE_CURRENT_SOURCE_DIR}/visuals
 	${CMAKE_CURRENT_SOURCE_DIR}/visuals/rendering
+	${CMAKE_CURRENT_SOURCE_DIR}/visuals/theming
 )
 
 add_subdirectory(visuals)

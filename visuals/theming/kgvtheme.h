@@ -62,7 +62,10 @@ class KGAMEVISUALS_EXPORT KgvTheme
 		};
 
 		///Creates a new KgvTheme with the given @a identifier. The identifier
-		///must be unique among themes created by one KgvThemeProvider.
+		///must be application-unique.
+		///@warning The @a identifier is sometimes used as part of a file path,
+		///and should therefore not contain any characters which are not allowed
+		///in file paths. (The slash, or backslash on Windows, is allowed.)
 		KgvTheme(const QByteArray& identifier);
 		///Destroys this KgvTheme instance.
 		~KgvTheme();
@@ -78,6 +81,10 @@ class KGAMEVISUALS_EXPORT KgvTheme
 		void setData(const QByteArray& key, const QVariant& value);
 		///@return the internal identifier for this theme
 		QByteArray identifier() const;
+
+		///@return the time (as a UNIX timestamp) when the SVG file and other
+		///files associated with this time have been modified last
+		uint modificationTimestamp() const;
 	private:
 		class Private;
 		Private* const d;

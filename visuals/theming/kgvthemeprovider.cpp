@@ -209,14 +209,16 @@ struct KgvDesktopThemeProvider::Private
 KgvDesktopThemeProvider::KgvDesktopThemeProvider(const QByteArray& key)
 	: d(new Private(key, this))
 {
-	static const char defaultTheme[] = "default.desktop";
+	static const QString defaultTheme = QLatin1String("default.desktop");
 	//read my configuration
 	KConfigGroup mainConfig(KGlobal::config(), "KgvDesktopThemeProvider");
 	KConfigGroup myConfig(&mainConfig, key.constData());
 	const QByteArray resourceType = myConfig.readEntry("ResourceType", QByteArray("appdata"));
 	const char* const resourceType_ = resourceType.constData();
-	const QString directory = myConfig.readEntry("Directory", QString::fromLatin1("themes")) + QChar('/');
-	const QByteArray selectedTheme = myConfig.readEntry("Selected", QByteArray(defaultTheme));
+	QString directory = myConfig.readEntry("Directory", QString::fromLatin1("themes"));
+	if (!directory.endsWith(QChar('/')))
+		directory += QChar('/');
+	const QByteArray selectedTheme = myConfig.readEntry("Selected", (directory + defaultTheme).toUtf8());
 	//find themes
 	const QStringList themePaths = KGlobal::dirs()->findAllResources(
 		resourceType_, directory + "*.desktop",
@@ -226,7 +228,7 @@ KgvDesktopThemeProvider::KgvDesktopThemeProvider(const QByteArray& key)
 	{
 		const QString themeFile = QFileInfo(themePath).fileName();
 		//create theme from configuration
-		KgvTheme* theme = new KgvTheme(themeFile.toUtf8());
+		KgvTheme* theme = new KgvTheme((directory + themeFile).toUtf8());
 		KConfig themeConfigFile(themePath, KConfig::SimpleConfig);
 		KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
 		//read standard properties
@@ -248,7 +250,7 @@ KgvDesktopThemeProvider::KgvDesktopThemeProvider(const QByteArray& key)
 			theme->setData(it1.key().toUtf8(), it1.value());
 		}
 		//insert theme into list, place theme with hard-coded default name at the beginning
-		if (themeFile == QLatin1String(defaultTheme))
+		if (themeFile == defaultTheme)
 		{
 			d->m_themes.prepend(theme);
 		}

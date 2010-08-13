@@ -18,6 +18,9 @@
 
 #include "kgvtheme.h"
 
+#include <QtCore/QDateTime>
+#include <QtCore/QFileInfo>
+
 struct KgvTheme::Private
 {
 	QByteArray m_identifier;
@@ -60,4 +63,14 @@ void KgvTheme::setData(const QByteArray& key, const QVariant& value)
 QByteArray KgvTheme::identifier() const
 {
 	return d->m_identifier;
+}
+
+uint KgvTheme::modificationTimestamp() const
+{
+	const QFileInfo svgFile(d->m_values.value(KgvTheme::GraphicsFileRole).toString());
+	const QFileInfo themeFile(d->m_values.value(KgvTheme::ThemeFileRole).toString());
+	uint timestamp = svgFile.lastModified().toTime_t();
+	if (themeFile.exists())
+		timestamp = qMax(timestamp, themeFile.lastModified().toTime_t());
+	return timestamp;
 }
