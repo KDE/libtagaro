@@ -76,8 +76,8 @@ class KGAMEVISUALS_EXPORT KgvRendererClient
 		///@return the size of the pixmap requested from KgvRenderer
 		QSize renderSize() const;
 		///Defines the size of the pixmap that will be requested from
-		///KgvRenderer. For pixmaps rendered on the screen, you usually want 
-		///to set this size such that the pixmap does not have to be scaled when 
+		///KgvRenderer. For pixmaps rendered on the screen, you usually want
+		///to set this size such that the pixmap does not have to be scaled when
 		///it is rendered onto your primary view (for speed reasons).
 		///
 		///The default render size is very small (width = height = 3 pixels), so
@@ -85,7 +85,7 @@ class KGAMEVISUALS_EXPORT KgvRendererClient
 		void setRenderSize(const QSize& renderSize);
 	protected:
 		///This method is called when the KgvRenderer has provided a new
-		///pixmap for this client (esp. after theme changes and after calls to 
+		///pixmap for this client (esp. after theme changes and after calls to
 		///setFrame(), setRenderSize() and setSpriteKey()).
 		virtual void receivePixmap(const QPixmap& pixmap) = 0;
 	private:

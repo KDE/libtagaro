@@ -19,7 +19,6 @@
 #ifndef LIBKGAMEVISUALS_RENDERER_H
 #define LIBKGAMEVISUALS_RENDERER_H
 
-class QGraphicsView;
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtGui/QPixmap>
@@ -62,7 +61,7 @@ class KGameTheme;
  *
  * For QGraphicsView-based applications, the KgvSpriteItem class provides a
  * QGraphicsPixmapItem which is a KgvRendererClient and displays the pixmap
- * for a given sprite.
+ * for a given sprite. If you need a QGraphicsObject, use KgvSpriteObjectItem.
  *
  * @section strategies Rendering strategy
  *
@@ -119,15 +118,6 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 		///Deletes this KgvRenderer instance, as well as all clients using it.
 		virtual ~KgvRenderer();
 
-		///@return the primary view which is used by newly created
-		///KgvSpriteItem instances associated with this renderer
-		///@see KgvSpriteItem::setPrimaryView
-		QGraphicsView* defaultPrimaryView() const;
-		///Set the primary view which will be used by newly created
-		///KgvSpriteItem instances associated with this renderer.
-		///Calls to this method will have no effect on existing instances.
-		///@see KgvSpriteItem::setPrimaryView
-		void setDefaultPrimaryView(QGraphicsView* view);
 		///@return the frame base index. @see setFrameBaseIndex()
 		int frameBaseIndex() const;
 		///Sets the frame base index, i.e. the lowest frame index. Usually,

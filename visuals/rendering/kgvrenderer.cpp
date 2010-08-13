@@ -48,7 +48,6 @@ KgvRendererPrivate::KgvRendererPrivate(const QString& defaultTheme, unsigned cac
 	, m_cacheSize((cacheSize == 0 ? 3 : cacheSize) << 20)
 	, m_strategies(KgvRenderer::UseDiskCache | KgvRenderer::UseRenderingThreads)
 	, m_frameBaseIndex(0)
-	, m_defaultPrimaryView(0)
 	, m_rendererPool(&m_workerPool)
 	, m_imageCache(0)
 {
@@ -69,16 +68,6 @@ KgvRenderer::~KgvRenderer()
 	d->m_workerPool.waitForDone();
 	delete d->m_imageCache;
 	delete d;
-}
-
-QGraphicsView* KgvRenderer::defaultPrimaryView() const
-{
-	return d->m_defaultPrimaryView;
-}
-
-void KgvRenderer::setDefaultPrimaryView(QGraphicsView* view)
-{
-	d->m_defaultPrimaryView = view;
 }
 
 int KgvRenderer::frameBaseIndex() const

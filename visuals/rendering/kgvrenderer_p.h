@@ -122,7 +122,6 @@ class KgvRendererPrivate : public QObject
 		KgvRenderer::Strategies m_strategies;
 		int m_frameBaseIndex;
 		KGameTheme m_theme;
-		QGraphicsView* m_defaultPrimaryView;
 
 		QThreadPool m_workerPool;
 		KGVRInternal::RendererPool m_rendererPool;
