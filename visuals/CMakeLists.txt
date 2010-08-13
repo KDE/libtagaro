@@ -12,6 +12,8 @@ set(kgamevisuals_LIB_SRCS
 	rendering/kgvrenderer.cpp
 	rendering/kgvspriteitem.cpp
 	rendering/kgvspriteobjectitem.cpp
+	theming/kgvtheme.cpp
+	theming/kgvthemeprovider.cpp
 )
 
 kde4_add_library(kgamevisuals SHARED ${kgamevisuals_LIB_SRCS})
@@ -32,4 +34,6 @@ install(FILES
 	rendering/kgvrenderer.h
 	rendering/kgvspriteitem.h
 	rendering/kgvspriteobjectitem.h
+	theming/kgvtheme.h
+	theming/kgvthemeprovider.h
 DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
