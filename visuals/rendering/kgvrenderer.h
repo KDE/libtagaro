@@ -113,6 +113,9 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 		///default is used)
 		///@warning This constructor may only be called from the main thread.
 		explicit KgvRenderer(KgvThemeProvider* provider, unsigned cacheSize = 0);
+		///@overload
+		///The renderer will use the KgvDesktopThemeProvider with the given key.
+		explicit KgvRenderer(const QByteArray& providerKey, unsigned cacheSize = 0);
 		///Deletes this KgvRenderer instance, as well as all clients using it.
 		virtual ~KgvRenderer();
 

@@ -64,6 +64,11 @@ KgvRenderer::KgvRenderer(KgvThemeProvider* provider, unsigned cacheSize)
 {
 }
 
+KgvRenderer::KgvRenderer(const QByteArray& providerKey, unsigned cacheSize)
+	: d(new KgvRendererPrivate(KgvDesktopThemeProvider::instance(providerKey), cacheSize, this))
+{
+}
+
 KgvRenderer::~KgvRenderer()
 {
 	//cleanup clients (I explicitly take a copy instead of iterating over m_clients directly, because m_clients changes during the cleanup, when the clients deregister themselves from this renderer)
@@ -176,7 +181,7 @@ bool KgvRendererPrivate::setThemeInternal(const KgvTheme* theme)
 	if (m_strategies & KgvRenderer::UseDiskCache)
 	{
 		KImageCache* oldCache = m_imageCache;
-		const QString imageCacheName = cacheName(m_theme->identifier());
+		const QString imageCacheName = cacheName(theme->identifier());
 		m_imageCache = new KImageCache(imageCacheName, m_cacheSize);
 		m_imageCache->setPixmapCaching(false); //see big comment in KGVRPrivate class declaration
 		//check timestamp of cache vs. last write access to theme/SVG
