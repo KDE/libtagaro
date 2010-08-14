@@ -36,6 +36,7 @@ class KgvGraphicsDelegate : public QStyledItemDelegate
 
 		KgvGraphicsDelegate(QObject* parent = 0);
 		virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+		///@note The implementation is independent of @a option and @a index.
 		virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
 		QRect thumbnailRect(const QRect& baseRect) const;
 };

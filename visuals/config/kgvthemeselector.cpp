@@ -23,6 +23,7 @@
 
 #include <QtGui/QListWidget>
 #include <QtGui/QPushButton>
+#include <QtGui/QScrollBar>
 #include <QtGui/QVBoxLayout>
 #include <KDE/KLocale>
 
@@ -44,11 +45,15 @@ KgvThemeSelector::KgvThemeSelector(KgvThemeProvider* provider, KgvConfigDialog::
 		connect(knsButton, SIGNAL(clicked()), SLOT(openNewStuffDialog()));
 	}
 	//setup theme list
-	new KgvGraphicsDelegate(m_themeList);
 	themesInserted(0, m_provider->themeCount() - 1);
 	m_themeList->setSelectionMode(QAbstractItemView::SingleSelection);
 	setSelectedIndex(m_provider->selectedIndex());
 	connect(m_themeList, SIGNAL(itemSelectionChanged()), SIGNAL(selectedIndexChanged()));
+	//setup appearance of theme list (minimum size = 4 items)
+	KgvGraphicsDelegate* delegate = new KgvGraphicsDelegate(m_themeList);
+	const QSize itemSizeHint = delegate->sizeHint(QStyleOptionViewItem(), QModelIndex());
+	const QSize scrollBarSizeHint = m_themeList->verticalScrollBar()->sizeHint();
+	m_themeList->setMinimumSize(itemSizeHint.width() + 2 * scrollBarSizeHint.width(), 4 * itemSizeHint.height());
 }
 
 KgvThemeProvider* KgvThemeSelector::provider() const
