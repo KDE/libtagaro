@@ -1,4 +1,5 @@
 install(FILES
+	KgvConfigDialog
 	KgvDesktopThemeProvider
 	KgvRenderer
 	KgvRendererClient
