@@ -3,8 +3,6 @@ project(libkgamevisuals)
 
 kde4_no_enable_final(libkgamevisuals)
 
-find_package(LibKDEGames REQUIRED) # TODO: still required because of KGameTheme
-
 #################### compile ####################
 
 set(kgamevisuals_LIB_SRCS
@@ -17,8 +15,8 @@ set(kgamevisuals_LIB_SRCS
 )
 
 kde4_add_library(kgamevisuals SHARED ${kgamevisuals_LIB_SRCS})
-target_link_libraries(kgamevisuals ${KDE4_KDEUI_LIBS} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY} ${KDEGAMES_LIBRARY})
-target_link_libraries(kgamevisuals LINK_INTERFACE_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${KDEGAMES_LIBRARY})
+target_link_libraries(kgamevisuals ${KDE4_KDEUI_LIBS} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY})
+target_link_libraries(kgamevisuals LINK_INTERFACE_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
 set_target_properties(kgamevisuals PROPERTIES
 	VERSION 0.1.0
