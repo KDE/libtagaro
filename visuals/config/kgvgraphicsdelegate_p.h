@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2010 Stefan Majewsky <majewsky@gmx.net>                     *
+ *   Copyright 2009-2010 Stefan Majewsky <majewsky@gmx.net>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -16,28 +16,27 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_THEMESELECTOR_P_H
-#define LIBKGAMEVISUALS_THEMESELECTOR_P_H
+#ifndef LIBKGAMEVISUALS_GRAPHICSDELEGATE_P_H
+#define LIBKGAMEVISUALS_GRAPHICSDELEGATE_P_H
 
-#include "kgvconfigdialog.h"
+#include <QStyledItemDelegate>
 
-class QListWidget;
-#include <QtGui/QWidget>
-
-///@internal
-class KgvThemeSelector : public QWidget
+//This delegate can be used in list views which allow to select graphical components (such as themes).
+class KgvGraphicsDelegate : public QStyledItemDelegate
 {
-	Q_OBJECT
 	public:
-		KgvThemeSelector(KgvThemeProvider* provider, KgvConfigDialog::ThemeSelectorOptions options);
-	public Q_SLOTS:
-		void themesInserted(int firstIndex, int lastIndex);
-		void themesChanged(int firstIndex, int lastIndex);
-		void themesRemoved(int firstIndex, int lastIndex);
-		void openNewStuffDialog();
-	private:
-		KgvThemeProvider* m_provider;
-		QListWidget* m_themeList;
+		enum SpecialRole
+		{
+			CommentRole = Qt::UserRole + 1, ///< For additional descriptions beyond the name in Qt::DisplayRole.
+			ThumbnailRole,
+			AuthorRole,
+			AuthorEmailRole
+		};
+
+		KgvGraphicsDelegate(QObject* parent = 0);
+		virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+		virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
+		QRect thumbnailRect(const QRect& baseRect) const;
 };
 
-#endif // LIBKGAMEVISUALS_THEMESELECTOR_P_H
+#endif // LIBKGAMEVISUALS_GRAPHICSDELEGATE_P_H

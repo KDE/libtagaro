@@ -17,53 +17,71 @@
  ***************************************************************************/
 
 #include "kgvthemeselector_p.h"
+#include "kgvgraphicsdelegate_p.h"
 #include "kgvtheme.h"
 #include "kgvthemeprovider.h"
-#include "ui_kgvthemeselector.h"
 
-#include <QtGui/QPainter>
+#include <QtGui/QListWidget>
+#include <QtGui/QPushButton>
+#include <QtGui/QVBoxLayout>
+#include <KLocale>
 
 KgvThemeSelector::KgvThemeSelector(KgvThemeProvider* provider, KgvConfigDialog::ThemeSelectorOptions options)
 	: m_provider(provider)
-	, m_ui(new Ui_KgvThemeSelectorBase)
+	, m_themeList(new QListWidget(this))
 {
 	connect(m_provider, SIGNAL(themesChanged(int, int)), SLOT(themesChanged(int, int)));
 	connect(m_provider, SIGNAL(themesInserted(int, int)), SLOT(themesInserted(int, int)));
 	connect(m_provider, SIGNAL(themesAboutToBeRemoved(int, int)), SLOT(themesRemoved(int, int)));
 	//setup interface
-	m_ui->setupUi(this);
-	m_ui->getNewButton->setIcon(KIcon("get-hot-new-stuff"));
-	m_ui->getNewButton->setVisible(options & KgvConfigDialog::WithNewStuffDownload);
-	connect(m_ui->getNewButton, SIGNAL(clicked()), SLOT(openNewStuffDialog()));
+	QVBoxLayout* layout = new QVBoxLayout;
+	setLayout(layout);
+	layout->addWidget(m_themeList);
+	if (options & KgvConfigDialog::WithNewStuffDownload)
+	{
+		QPushButton* knsButton = new QPushButton(KIcon("get-hot-new-stuff"), i18n("Get New Themes..."), this);
+		layout->addWidget(knsButton);
+		connect(knsButton, SIGNAL(clicked()), SLOT(openNewStuffDialog()));
+	}
 	//setup theme list
+	new KgvGraphicsDelegate(m_themeList);
 	themesInserted(0, m_provider->themeCount() - 1);
-	connect(m_ui->themeList, SIGNAL(itemSelectionChanged()), SLOT(themeSelectionChanged()));
-	m_ui->themeList->setSelectionMode(QAbstractItemView::SingleSelection);
-	QListWidgetItem* selectedItem = m_ui->themeList->item(m_provider->selectedIndex());
-	m_ui->themeList->setCurrentItem(selectedItem, QItemSelectionModel::SelectCurrent);
-}
-
-KgvThemeSelector::~KgvThemeSelector()
-{
-	delete m_ui;
+	m_themeList->setSelectionMode(QAbstractItemView::SingleSelection);
+	QListWidgetItem* selectedItem = m_themeList->item(m_provider->selectedIndex());
+	m_themeList->setCurrentItem(selectedItem, QItemSelectionModel::SelectCurrent);
 }
 
 void KgvThemeSelector::themesInserted(int firstIndex, int lastIndex)
 {
+	//create empty items
 	QStringList themeNames;
 	for (int index = firstIndex; index <= lastIndex; ++index)
 	{
-		themeNames << m_provider->theme(index)->data(KgvTheme::NameRole, QString()).toString();
+		themeNames << QString();
 	}
-	m_ui->themeList->insertItems(firstIndex, themeNames);
+	m_themeList->insertItems(firstIndex, themeNames);
+	//fill empty items with data
+	themesChanged(firstIndex, lastIndex);
 }
 
 void KgvThemeSelector::themesChanged(int firstIndex, int lastIndex)
 {
 	for (int index = firstIndex; index <= lastIndex; ++index)
 	{
-		QListWidgetItem* item = m_ui->themeList->item(index);
-		item->setText(m_provider->theme(index)->data(KgvTheme::NameRole, QString()).toString());
+		//get data from associated theme
+		const KgvTheme* theme = m_provider->theme(index);
+		const QString name = theme->data(KgvTheme::NameRole, QString()).toString();
+		const QString description = theme->data(KgvTheme::DescriptionRole, QString()).toString();
+		const QString author = theme->data(KgvTheme::AuthorRole, QString()).toString();
+		const QString authorEmail = theme->data(KgvTheme::AuthorEmailRole, QString()).toString();
+		const QPixmap preview = theme->data(KgvTheme::PreviewRole).value<QPixmap>();
+		//update item with data
+		QListWidgetItem* item = m_themeList->item(index);
+		item->setData(Qt::DisplayRole, name);
+		item->setData(KgvGraphicsDelegate::CommentRole, description);
+		item->setData(KgvGraphicsDelegate::AuthorRole, author);
+		item->setData(KgvGraphicsDelegate::AuthorEmailRole, authorEmail);
+		item->setData(KgvGraphicsDelegate::ThumbnailRole, preview);
 	}
 }
 
@@ -71,41 +89,8 @@ void KgvThemeSelector::themesRemoved(int firstIndex, int lastIndex)
 {
 	for (int index = lastIndex; index >= firstIndex; --index)
 	{
-		delete m_ui->themeList->takeItem(index);
+		delete m_themeList->takeItem(index);
 	}
-}
-
-void KgvThemeSelector::themeSelectionChanged()
-{
-	const QListWidgetItem* selectedItem = m_ui->themeList->selectedItems().value(0);
-	if (!selectedItem)
-	{
-		return;
-	}
-	const KgvTheme* theme = m_provider->theme(m_ui->themeList->row(selectedItem));
-	//show detailed information about theme
-	m_ui->themeDescription->setText(theme->data(KgvTheme::DescriptionRole).toString());
-	m_ui->themeAuthor->setText(theme->data(KgvTheme::AuthorRole).toString());
-	QString authorEmail = theme->data(KgvTheme::AuthorEmailRole).toString();
-	if (!authorEmail.isEmpty())
-	{
-		authorEmail = QString::fromLatin1("<a href=\"mailto:%1\">%1</a>").arg(authorEmail);
-	}
-	m_ui->themeContact->setText(authorEmail);
-	//show preview if available
-	QPixmap preview = theme->data(KgvTheme::PreviewRole).value<QPixmap>();
-	QPixmap thumbnail(m_ui->themePreview->minimumSize());
-	thumbnail.fill(Qt::transparent);
-	if (!preview.isNull())
-	{
-		//center preview in the thumbnail pixmap (this ensures that the pixmap passed to the label is always of the same size)
-		preview = preview.scaled(m_ui->themePreview->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		const QSize sizeDelta = thumbnail.size() - preview.size();
-		QPainter painter(&thumbnail);
-		painter.drawPixmap(sizeDelta.width() / 2, sizeDelta.height() / 2, preview);
-		painter.end();
-	}
-	m_ui->themePreview->setPixmap(thumbnail);
 }
 
 void KgvThemeSelector::openNewStuffDialog()

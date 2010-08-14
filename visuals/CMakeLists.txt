@@ -7,6 +7,7 @@ kde4_no_enable_final(libkgamevisuals)
 
 set(kgamevisuals_LIB_SRCS
 	config/kgvconfigdialog.cpp
+	config/kgvgraphicsdelegate.cpp
 	config/kgvthemeselector.cpp
 	rendering/kgvrendererclient.cpp
 	rendering/kgvrenderer.cpp
@@ -14,9 +15,6 @@ set(kgamevisuals_LIB_SRCS
 	rendering/kgvspriteobjectitem.cpp
 	theming/kgvtheme.cpp
 	theming/kgvthemeprovider.cpp
-)
-kde4_add_ui_files(kgamevisuals_LIB_SRCS
-	config/kgvthemeselector.ui
 )
 
 kde4_add_library(kgamevisuals SHARED ${kgamevisuals_LIB_SRCS})
