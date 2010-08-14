@@ -26,7 +26,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 #include <QtGui/QPainter>
-#include <KDebug>
+#include <KDE/KDebug>
 
 //TODO: automatically schedule pre-rendering of animation frames
 
@@ -188,7 +188,7 @@ bool KgvRendererPrivate::setThemeInternal(const KgvTheme* theme)
 		const uint svgTimestamp = theme->modificationTimestamp();
 		QByteArray buffer;
 		if (!m_imageCache->find(QString::fromLatin1("kgvr_timestamp"), &buffer))
-			buffer = "0";
+			buffer = "0"; //krazy:exclude=doublequote_chars
 		const uint cacheTimestamp = buffer.toInt();
 		//try to instantiate renderer immediately if the cache does not exist or is outdated
 		//FIXME: This logic breaks if the cache evicts the "kgvr_timestamp" key. We need additional API in KSharedDataCache to make sure that this key does not get evicted.

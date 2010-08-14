@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_SPRITEITEM_H
-#define LIBKGAMEVISUALS_SPRITEITEM_H
+#ifndef KGVSPRITEITEM_H
+#define KGVSPRITEITEM_H
 
 #include <QtCore/QObject>
 #include <QtGui/QGraphicsItem>
@@ -50,4 +50,4 @@ class KGAMEVISUALS_EXPORT KgvSpriteItem : public QGraphicsPixmapItem, public Kgv
 		KgvSpriteItemPrivate* const d;
 };
 
-#endif // LIBKGAMEVISUALS_SPRITEITEM_H
+#endif // KGVSPRITEITEM_H

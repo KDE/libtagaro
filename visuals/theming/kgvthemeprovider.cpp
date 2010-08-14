@@ -22,10 +22,10 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QStack>
 #include <QtGui/QPixmap>
-#include <KConfig>
-#include <KConfigGroup>
-#include <KGlobal>
-#include <KStandardDirs>
+#include <KDE/KConfig>
+#include <KDE/KConfigGroup>
+#include <KDE/KGlobal>
+#include <KDE/KStandardDirs>
 
 enum OperationId { ThemeInsert, ThemeRemove };
 

@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_RENDERER_H
-#define LIBKGAMEVISUALS_RENDERER_H
+#ifndef KGVRENDERER_H
+#define KGVRENDERER_H
 
 #include <QtCore/QHash>
 #include <QtCore/QObject>
@@ -150,7 +150,7 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 		///default, both the UseDiskCache and the UseRenderingThreads strategies
 		///are enabled. This is a sane default for 99% of all games. You might 
 		///only want to disable optimizations if the graphics are so simple that
-		///the optimisations create an overhead in your special case.
+		///the optimizations create an overhead in your special case.
 		void setStrategyEnabled(Strategy strategy, bool enabled = true);
 
 		///@return the theme provider for this renderer
@@ -200,4 +200,4 @@ class KGAMEVISUALS_EXPORT KgvRenderer : public QObject
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KgvRenderer::Strategies)
 
-#endif // LIBKGAMEVISUALS_RENDERER_H
+#endif // KGVRENDERER_H

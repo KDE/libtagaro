@@ -16,11 +16,11 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_VIEW_H
-#define LIBKGAMEVISUALS_VIEW_H
+#ifndef KGVVIEW_H
+#define KGVVIEW_H
 
 #include <QtGui/QGraphicsView>
-#include <KgvRendererClient>
+#include <kgvrendererclient.h>
 
 #include <libkgame_export.h>
 
@@ -77,4 +77,4 @@ class KGAMEVISUALS_EXPORT KgvView : public QGraphicsView, public KgvRendererClie
 		Q_PRIVATE_SLOT(d, void _k_sceneRectChanged());
 };
 
-#endif // LIBKGAMEVISUALS_VIEW_H
+#endif // KGVVIEW_H

@@ -16,10 +16,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_CONFIGDIALOG_H
-#define LIBKGAMEVISUALS_CONFIGDIALOG_H
+#ifndef KGVCONFIGDIALOG_H
+#define KGVCONFIGDIALOG_H
 
-#include <KConfigDialog>
+#include <KDE/KConfigDialog>
 class KgvThemeProvider;
 
 #include <libkgame_export.h>
@@ -86,4 +86,4 @@ class KGAMEVISUALS_EXPORT KgvConfigDialog : public KConfigDialog
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KgvConfigDialog::ThemeSelectorOptions)
 
-#endif // LIBKGAMEVISUALS_CONFIGDIALOG_H
+#endif // KGVCONFIGDIALOG_H

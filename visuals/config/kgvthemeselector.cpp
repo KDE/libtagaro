@@ -24,7 +24,7 @@
 #include <QtGui/QListWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QVBoxLayout>
-#include <KLocale>
+#include <KDE/KLocale>
 
 KgvThemeSelector::KgvThemeSelector(KgvThemeProvider* provider, KgvConfigDialog::ThemeSelectorOptions options)
 	: m_provider(provider)

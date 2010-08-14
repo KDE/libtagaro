@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_RENDERER_P_H
-#define LIBKGAMEVISUALS_RENDERER_P_H
+#ifndef KGVRENDERER_P_H
+#define KGVRENDERER_P_H
 
 #include <QtCore/QHash>
 #include <QtCore/QMetaType>
@@ -25,8 +25,8 @@
 #include <QtCore/QRunnable>
 #include <QtCore/QThreadPool>
 #include <QtSvg/QSvgRenderer>
-#include <KGameTheme>
-#include <KImageCache>
+#include <KDE/KGameTheme>
+#include <KDE/KImageCache>
 
 namespace KGVRInternal
 {
@@ -172,4 +172,4 @@ class KgvRendererClientPrivate : public QObject
 		KGVRInternal::ClientSpec m_spec;
 };
 
-#endif // LIBKGAMEVISUALS_RENDERER_P_H
+#endif // KGVRENDERER_P_H

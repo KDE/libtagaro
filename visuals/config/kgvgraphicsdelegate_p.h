@@ -16,10 +16,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LIBKGAMEVISUALS_GRAPHICSDELEGATE_P_H
-#define LIBKGAMEVISUALS_GRAPHICSDELEGATE_P_H
+#ifndef KGVGRAPHICSDELEGATE_P_H
+#define KGVGRAPHICSDELEGATE_P_H
 
-#include <QStyledItemDelegate>
+#include <QtGui/QStyledItemDelegate>
 
 //This delegate can be used in list views which allow to select graphical components (such as themes).
 class KgvGraphicsDelegate : public QStyledItemDelegate
@@ -40,4 +40,4 @@ class KgvGraphicsDelegate : public QStyledItemDelegate
 		QRect thumbnailRect(const QRect& baseRect) const;
 };
 
-#endif // LIBKGAMEVISUALS_GRAPHICSDELEGATE_P_H
+#endif // KGVGRAPHICSDELEGATE_P_H

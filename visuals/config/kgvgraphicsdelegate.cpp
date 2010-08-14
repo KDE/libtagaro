@@ -18,12 +18,12 @@
 
 #include "kgvgraphicsdelegate_p.h"
 
-#include <QAbstractItemView>
-#include <QApplication>
-#include <QFont>
-#include <QFontMetrics>
-#include <QPainter>
-#include <KLocalizedString>
+#include <QtGui/QAbstractItemView>
+#include <QtGui/QApplication>
+#include <QtGui/QFont>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QPainter>
+#include <KDE/KLocalizedString>
 
 namespace Metrics
 {
