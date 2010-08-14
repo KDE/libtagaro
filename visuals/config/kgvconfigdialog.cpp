@@ -21,14 +21,22 @@
 #include "kgvthemeselector_p.h"
 
 #include <QtGui/QLayout>
+#include <KDE/KConfigSkeleton>
+#include <KDE/KGlobal>
 
 struct KgvConfigDialog::Private
 {
 	QList<KgvThemeSelector*> m_selectors;
 };
 
+K_GLOBAL_STATIC(KConfigSkeleton, g_dummyConfig)
+
+//We explicitly allow to construct KgvConfigDialog without a KConfigSkeleton
+//(i.e. config == 0). Because KConfigDialog itself does not allow it, we give it
+//a dummy object in this case. Note that g_dummyConfig is not created if it is
+//not needed.
 KgvConfigDialog::KgvConfigDialog(QWidget* parent, const QString& name, KConfigSkeleton* config)
-	: KConfigDialog(parent, name, config)
+	: KConfigDialog(parent, name, config ? config : (KConfigSkeleton*) g_dummyConfig)
 	, d(new Private)
 {
 }

@@ -62,7 +62,7 @@ class KGAMEVISUALS_EXPORT KgvConfigDialog : public KConfigDialog
 
 		///Creates a new KgvConfigDialog. The arguments are passed to the
 		///KConfigDialog constructor.
-		KgvConfigDialog(QWidget* parent, const QString& name, KConfigSkeleton* config);
+		KgvConfigDialog(QWidget* parent, const QString& name, KConfigSkeleton* config = 0);
 		///Destroys this KgvConfigDialog instance.
 		virtual ~KgvConfigDialog();
 
