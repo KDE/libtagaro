@@ -18,5 +18,6 @@ include_directories(
 add_subdirectory(visuals)
 add_subdirectory(includes)
 add_subdirectory(cmake)
+add_subdirectory(doc)
 
 install(FILES libkgame_export.h DESTINATION ${INCLUDE_INSTALL_DIR})
