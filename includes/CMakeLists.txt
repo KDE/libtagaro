@@ -1,4 +1,5 @@
 install(FILES
+	KgvDesktopThemeProvider
 	KgvRenderer
 	KgvRendererClient
 	KgvSpriteItem
