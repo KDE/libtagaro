@@ -13,6 +13,7 @@ set(kgamevisuals_LIB_SRCS
 	rendering/kgvrenderer.cpp
 	rendering/kgvspriteitem.cpp
 	rendering/kgvspriteobjectitem.cpp
+	rendering/kgvview.cpp
 	theming/kgvtheme.cpp
 	theming/kgvthemeprovider.cpp
 )
@@ -36,6 +37,7 @@ install(FILES
 	rendering/kgvrenderer.h
 	rendering/kgvspriteitem.h
 	rendering/kgvspriteobjectitem.h
+	rendering/kgvview.h
 	theming/kgvtheme.h
 	theming/kgvthemeprovider.h
 DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)

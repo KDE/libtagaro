@@ -22,6 +22,8 @@
 
 #include <QtCore/QTimer>
 
+//WARNING: d->m_renderer == 0 is allowed, and used actively by KgvView.
+
 KgvRendererClientPrivate::KgvRendererClientPrivate(KgvRenderer* renderer, const QString& spriteKey, KgvRendererClient* parent)
 	: m_parent(parent)
 	, m_renderer(renderer)
@@ -32,14 +34,20 @@ KgvRendererClientPrivate::KgvRendererClientPrivate(KgvRenderer* renderer, const 
 KgvRendererClient::KgvRendererClient(KgvRenderer* renderer, const QString& spriteKey)
 	: d(new KgvRendererClientPrivate(renderer, spriteKey, this))
 {
-	renderer->d->m_clients.insert(this, QString());
+	if (renderer)
+	{
+		renderer->d->m_clients.insert(this, QString());
+	}
 	//The following may not be triggered directly because it may call receivePixmap() which is a pure virtual method at this point.
 	QTimer::singleShot(0, d, SLOT(fetchPixmap()));
 }
 
 KgvRendererClient::~KgvRendererClient()
 {
-	d->m_renderer->d->m_clients.remove(this);
+	if (d->m_renderer)
+	{
+		d->m_renderer->d->m_clients.remove(this);
+	}
 	delete d;
 }
 
@@ -64,7 +72,7 @@ void KgvRendererClient::setSpriteKey(const QString& spriteKey)
 
 int KgvRendererClient::frameCount() const
 {
-	return d->m_renderer->frameCount(d->m_spec.spriteKey);
+	return d->m_renderer ? d->m_renderer->frameCount(d->m_spec.spriteKey) : -1;
 }
 
 int KgvRendererClient::frame() const
@@ -84,6 +92,8 @@ void KgvRendererClient::setFrame(int frame)
 		}
 		else
 		{
+			//NOTE: check for d->m_renderer == 0 not required because frameCount
+			//is -1 in this case, i.e. this branch is not chosen
 			const int frameBaseIndex = d->m_renderer->frameBaseIndex();
 			frame = (frame - frameBaseIndex) % frameCount + frameBaseIndex;
 		}
@@ -116,5 +126,12 @@ void KgvRendererClient::setRenderSize(const QSize& renderSize)
 
 void KgvRendererClientPrivate::fetchPixmap()
 {
-	m_renderer->d->requestPixmap(m_spec, m_parent);
+	if (m_renderer)
+	{
+		m_renderer->d->requestPixmap(m_spec, m_parent);
+	}
+	else
+	{
+		m_parent->receivePixmap(QPixmap());
+	}
 }

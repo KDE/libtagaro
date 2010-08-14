@@ -7,4 +7,5 @@ install(FILES
 	KgvSpriteObjectItem
 	KgvTheme
 	KgvThemeProvider
+	KgvView
 DESTINATION ${INCLUDE_INSTALL_DIR}/KDE COMPONENT Devel)
