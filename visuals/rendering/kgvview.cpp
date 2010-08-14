@@ -70,7 +70,7 @@ void KgvView::setScene(QGraphicsScene* scene)
 	QGraphicsView::setScene(scene);
 	if (scene)
 	{
-		connect(scene, SIGNAL(sceneRectChanged(QRectF)), SLOT(_k_sceneRectChanged(QRectF)));
+		connect(scene, SIGNAL(sceneRectChanged(QRectF)), SLOT(_k_sceneRectChanged()));
 		d->adjust();
 		//do not apply background brush unless we have a renderer!
 		if (renderer())
