@@ -47,7 +47,24 @@ KgvThemeSelector::KgvThemeSelector(KgvThemeProvider* provider, KgvConfigDialog::
 	new KgvGraphicsDelegate(m_themeList);
 	themesInserted(0, m_provider->themeCount() - 1);
 	m_themeList->setSelectionMode(QAbstractItemView::SingleSelection);
-	QListWidgetItem* selectedItem = m_themeList->item(m_provider->selectedIndex());
+	setSelectedIndex(m_provider->selectedIndex());
+	connect(m_themeList, SIGNAL(itemSelectionChanged()), SIGNAL(selectedIndexChanged()));
+}
+
+KgvThemeProvider* KgvThemeSelector::provider() const
+{
+	return m_provider;
+}
+
+int KgvThemeSelector::selectedIndex() const
+{
+	const QListWidgetItem* selectedItem = m_themeList->selectedItems().value(0);
+	return selectedItem ? m_themeList->row(selectedItem) : 0;
+}
+
+void KgvThemeSelector::setSelectedIndex(int index)
+{
+	QListWidgetItem* selectedItem = m_themeList->item(index);
 	m_themeList->setCurrentItem(selectedItem, QItemSelectionModel::SelectCurrent);
 }
 

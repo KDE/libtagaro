@@ -30,6 +30,12 @@ class KgvThemeSelector : public QWidget
 	Q_OBJECT
 	public:
 		KgvThemeSelector(KgvThemeProvider* provider, KgvConfigDialog::ThemeSelectorOptions options);
+
+		KgvThemeProvider* provider() const;
+		int selectedIndex() const;
+		void setSelectedIndex(int selectedIndex);
+	Q_SIGNALS:
+		void selectedIndexChanged();
 	public Q_SLOTS:
 		void themesInserted(int firstIndex, int lastIndex);
 		void themesChanged(int firstIndex, int lastIndex);

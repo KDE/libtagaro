@@ -267,6 +267,7 @@ KgvDesktopThemeProvider::KgvDesktopThemeProvider(const QByteArray& key)
 			setSelectedIndex(i);
 		}
 	}
+	connect(this, SIGNAL(selectedIndexChanged(int)), SLOT(saveSelectedIndex(int)));
 }
 
 KgvDesktopThemeProvider::~KgvDesktopThemeProvider()

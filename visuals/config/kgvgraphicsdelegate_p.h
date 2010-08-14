@@ -30,7 +30,8 @@ class KgvGraphicsDelegate : public QStyledItemDelegate
 			CommentRole = Qt::UserRole + 1, ///< For additional descriptions beyond the name in Qt::DisplayRole.
 			ThumbnailRole,
 			AuthorRole,
-			AuthorEmailRole
+			AuthorEmailRole,
+			UserRole ///< Users of KgvGraphicsDelegate can define their own roles above this index.
 		};
 
 		KgvGraphicsDelegate(QObject* parent = 0);

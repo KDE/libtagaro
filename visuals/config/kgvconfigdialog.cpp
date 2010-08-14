@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "kgvconfigdialog.h"
+#include "kgvthemeprovider.h"
 #include "kgvthemeselector_p.h"
 
 #include <QtGui/QLayout>
@@ -42,29 +43,54 @@ void KgvConfigDialog::addThemeSelector(KgvThemeProvider* provider, KgvConfigDial
 	KgvThemeSelector* selector = new KgvThemeSelector(provider, options);
 	selector->layout()->setMargin(0); //for embedding in the dialog's layout
 	addPage(selector, itemName, iconName, header);
+	d->m_selectors << selector;
+	connect(selector, SIGNAL(selectedIndexChanged()), SLOT(settingsChangedSlot()));
 }
 
 bool KgvConfigDialog::hasChanged()
 {
-	//TODO
+	foreach (KgvThemeSelector* selector, d->m_selectors)
+	{
+		if (selector->selectedIndex() != selector->provider()->selectedIndex())
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 bool KgvConfigDialog::isDefault()
 {
-	//TODO
+	foreach (KgvThemeSelector* selector, d->m_selectors)
+	{
+		if (selector->selectedIndex() != 0)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void KgvConfigDialog::updateSettings()
 {
-	//TODO
+	foreach (KgvThemeSelector* selector, d->m_selectors)
+	{
+		selector->provider()->setSelectedIndex(selector->selectedIndex());
+	}
 }
 
 void KgvConfigDialog::updateWidgets()
 {
-	//TODO
+	foreach (KgvThemeSelector* selector, d->m_selectors)
+	{
+		selector->setSelectedIndex(selector->provider()->selectedIndex());
+	}
 }
 
 void KgvConfigDialog::updateWidgetsDefault()
 {
-	//TODO
+	foreach (KgvThemeSelector* selector, d->m_selectors)
+	{
+		selector->setSelectedIndex(0);
+	}
 }
