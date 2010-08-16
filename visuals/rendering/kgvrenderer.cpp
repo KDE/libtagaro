@@ -19,6 +19,7 @@
 #include "kgvrenderer.h"
 #include "kgvrenderer_p.h"
 #include "kgvrendererclient.h"
+#include "kgvsettings.h"
 #include "kgvtheme.h"
 #include "kgvthemeprovider.h"
 
@@ -47,7 +48,7 @@ KgvRendererPrivate::KgvRendererPrivate(KgvThemeProvider* provider, unsigned cach
 	, m_boundsPrefix(QString::fromLatin1("br-"))
 	//default cache size: 3 MiB = 3 << 20 bytes
 	, m_cacheSize((cacheSize == 0 ? 3 : cacheSize) << 20)
-	, m_strategies(KgvRenderer::UseDiskCache | KgvRenderer::UseRenderingThreads)
+	, m_strategies(0)
 	, m_frameBaseIndex(0)
 	, m_themeProvider(provider)
 	//theme will be loaded on first request (not immediately, because the calling context might want to disable some rendering strategies first)
@@ -55,6 +56,14 @@ KgvRendererPrivate::KgvRendererPrivate(KgvThemeProvider* provider, unsigned cach
 	, m_rendererPool(&m_workerPool)
 	, m_imageCache(0)
 {
+	if (KgvSettings::useDiskCache())
+	{
+		m_strategies |= KgvRenderer::UseDiskCache;
+	}
+	if (KgvSettings::useRenderingThreads())
+	{
+		m_strategies |= KgvRenderer::UseRenderingThreads;
+	}
 	qRegisterMetaType<KGVRInternal::Job*>();
 	connect(m_themeProvider, SIGNAL(selectedIndexChanged(int)), SLOT(loadSelectedTheme()));
 }

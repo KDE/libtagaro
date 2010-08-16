@@ -18,6 +18,7 @@ set(kgamevisuals_LIB_SRCS
 	theming/kgvtheme.cpp
 	theming/kgvthemeprovider.cpp
 )
+kde4_add_kcfg_files(kgamevisuals_LIB_SRCS kgvsettings.kcfgc)
 
 kde4_add_library(kgamevisuals SHARED ${kgamevisuals_LIB_SRCS})
 target_link_libraries(kgamevisuals ${KDE4_KDEUI_LIBS} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY})
