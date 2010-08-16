@@ -21,10 +21,25 @@
 
 #include <QtCore/qmath.h>
 
-class KgvSpriteObjectItemPrivate : public QGraphicsPixmapItem
+static QPixmap dummyPixmap()
+{
+	static QPixmap pix(1, 1);
+	static bool first = true;
+	if (first)
+	{
+		pix.fill(Qt::transparent);
+		first = false;
+	}
+	return pix;
+}
+
+class KgvSpriteObjectItem::Private : public QGraphicsPixmapItem
 {
 	public:
-		KgvSpriteObjectItemPrivate(QGraphicsItem* parent);
+		QSizeF m_size, m_pixmapSize;
+
+		Private(QGraphicsItem* parent);
+		inline void updateTransform();
 
 		//QGraphicsItem reimplementations (see comment below for why we need all of this)
 		virtual bool contains(const QPointF& point) const;
@@ -33,15 +48,17 @@ class KgvSpriteObjectItemPrivate : public QGraphicsPixmapItem
 		virtual QPainterPath shape() const;
 };
 
-KgvSpriteObjectItemPrivate::KgvSpriteObjectItemPrivate(QGraphicsItem* parent)
-	: QGraphicsPixmapItem(parent)
+KgvSpriteObjectItem::Private::Private(QGraphicsItem* parent)
+	: QGraphicsPixmapItem(dummyPixmap(), parent)
+	, m_size(1, 1)
+	, m_pixmapSize(1, 1)
 {
 }
 
 KgvSpriteObjectItem::KgvSpriteObjectItem(KgvRenderer* renderer, const QString& spriteKey, QGraphicsItem* parent)
 	: QGraphicsObject(parent)
 	, KgvRendererClient(renderer, spriteKey)
-	, d(new KgvSpriteObjectItemPrivate(this))
+	, d(new Private(this))
 {
 }
 
@@ -65,16 +82,42 @@ void KgvSpriteObjectItem::setOffset(const QPointF& offset)
 	}
 }
 
-void KgvSpriteObjectItem::setOffset(qreal x, qreal y)
+QSizeF KgvSpriteObjectItem::size() const
 {
-	setOffset(QPointF(x, y));
+	return d->m_size;
+}
+
+void KgvSpriteObjectItem::setSize(const QSizeF& size)
+{
+	if (d->m_size != size && size.isValid())
+	{
+		prepareGeometryChange();
+		d->m_size = size;
+		d->updateTransform();
+		update();
+	}
 }
 
 void KgvSpriteObjectItem::receivePixmap(const QPixmap& pixmap)
 {
-	prepareGeometryChange();
-	d->setPixmap(pixmap);
+	QPixmap pixmapUse = pixmap.size().isEmpty() ? dummyPixmap() : pixmap;
+	const QSizeF pixmapSize = pixmapUse.size();
+	if (d->m_pixmapSize != pixmapSize)
+	{
+		prepareGeometryChange();
+		d->m_pixmapSize = pixmapUse.size();
+		d->updateTransform();
+	}
+	d->setPixmap(pixmapUse);
 	update();
+}
+
+void KgvSpriteObjectItem::Private::updateTransform()
+{
+	setTransform(QTransform::fromScale(
+		m_size.width() / m_pixmapSize.width(),
+		m_size.height() / m_pixmapSize.height()
+	));
 }
 
 //We want to make sure that all interactional events are sent ot this item, and
@@ -83,9 +126,9 @@ void KgvSpriteObjectItem::receivePixmap(const QPixmap& pixmap)
 //At the same time, we do not want the contained QGraphicsPixmapItem to slow
 //down operations like QGraphicsScene::collidingItems().
 //So the strategy is to use the QGraphicsPixmapItem implementation from
-//KgvSpriteObjectItemPrivate for KgvSpriteObjectItem.
-//Then the relevant methods in KgvSpriteObjectItemPrivate are reimplemented empty
-//to effectively clear the item and hide it from any collision detection. This
+//KgvSpriteObjectItem::Private for KgvSpriteObjectItem.
+//Then the relevant methods in KgvSpriteObjectItem::Private are reimplemented
+//empty to clear the item and hide it from any collision detection. This
 //strategy allows us to use the nifty QGraphicsPixmapItem logic without exposing
 //a QGraphicsPixmapItem subclass (which would conflict with QGraphicsObject).
 
@@ -122,30 +165,30 @@ QPainterPath KgvSpriteObjectItem::shape() const
 }
 
 //END QGraphicsItem reimplementation of KgvSpriteObjectItem
-//BEGIN QGraphicsItem reimplementation of KgvSpriteObjectItemPrivate
+//BEGIN QGraphicsItem reimplementation of KgvSpriteObjectItem::Private
 
-bool KgvSpriteObjectItemPrivate::contains(const QPointF& point) const
+bool KgvSpriteObjectItem::Private::contains(const QPointF& point) const
 {
 	Q_UNUSED(point)
 	return false;
 }
 
-bool KgvSpriteObjectItemPrivate::isObscuredBy(const QGraphicsItem* item) const
+bool KgvSpriteObjectItem::Private::isObscuredBy(const QGraphicsItem* item) const
 {
 	Q_UNUSED(item)
 	return false;
 }
 
-QPainterPath KgvSpriteObjectItemPrivate::opaqueArea() const
+QPainterPath KgvSpriteObjectItem::Private::opaqueArea() const
 {
 	return QPainterPath();
 }
 
-QPainterPath KgvSpriteObjectItemPrivate::shape() const
+QPainterPath KgvSpriteObjectItem::Private::shape() const
 {
 	return QPainterPath();
 }
 
-//END QGraphicsItem reimplementation of KgvSpriteObjectItemPrivate
+//END QGraphicsItem reimplementation of KgvSpriteObjectItem::Private
 
 #include "kgvspriteobjectitem.moc"

@@ -25,8 +25,6 @@
 #include <kgvrendererclient.h>
 #include <libkgame_export.h>
 
-class KgvSpriteObjectItemPrivate;
-
 /**
  * @class KgvSpriteObjectItem kgvspriteobjectitem.h <KgvSpriteObjectItem>
  * @since 4.6
@@ -38,11 +36,22 @@ class KgvSpriteObjectItemPrivate;
  * The item has built-in handling for animated sprites (i.e. those with multiple
  * frames). It is a QGraphicsObject and exposes a "frame" property, so you can
  * easily run the animation by plugging in a QPropertyAnimation.
+ *
+ * The most important difference to KgvSpriteItem, which is a classic
+ * QGraphicsPixmapItem, is that the bounding rectangle of this item is fixed
+ * to QRectF(offset(), size()). The rendered pixmap is scaled to fit into this
+ * bounding rectangle, regardless of its render size.
+ *
+ * To automatically adjust the render size to the physical coordinate system of
+ * a QGraphicsView, insert the KgvSpriteObjectItem into a KgvBoard.
  */
 class KGAMEVISUALS_EXPORT KgvSpriteObjectItem : public QGraphicsObject, public KgvRendererClient
 {
 	Q_OBJECT
 	Q_PROPERTY(int frame READ frame WRITE setFrame)
+	Q_PROPERTY(QPointF offset READ offset WRITE setOffset)
+	Q_PROPERTY(QSize renderSize READ renderSize WRITE setRenderSize)
+	Q_PROPERTY(QSizeF size READ size WRITE setSize)
 	public:
 		///Creates a new KgvSpriteObjectItem which renders the sprite with
 		///the given @a spriteKey as provided by the given @a renderer.
@@ -56,7 +65,14 @@ class KGAMEVISUALS_EXPORT KgvSpriteObjectItem : public QGraphicsObject, public K
 		///corner of the bounding rect, in local coordinates.
 		void setOffset(const QPointF& offset);
 		///@overload
-		void setOffset(qreal x, qreal y);
+		inline void setOffset(qreal x, qreal y);
+		///@return the size of the item's bounding rect
+		QSizeF size() const;
+		///Sets the size of the item's bounding rect. The rendered pixmap is
+		///scaled to fit in this size, regardless of the render size.
+		void setSize(const QSizeF& size);
+		///@overload
+		inline void setSize(qreal width, qreal height);
 
 		//QGraphicsItem reimplementations (see comment in source file for why we need all of this)
 		virtual QRectF boundingRect() const;
@@ -68,8 +84,18 @@ class KGAMEVISUALS_EXPORT KgvSpriteObjectItem : public QGraphicsObject, public K
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);
 	private:
-		friend class KgvSpriteObjectItemPrivate;
-		KgvSpriteObjectItemPrivate* const d;
+		class Private;
+		Private* const d;
 };
+
+void KgvSpriteObjectItem::setOffset(qreal x, qreal y)
+{
+	setOffset(QPointF(x, y));
+}
+
+void KgvSpriteObjectItem::setSize(qreal w, qreal h)
+{
+	setSize(QSizeF(w, h));
+}
 
 #endif // KGVSPRITEOBJECTITEM_H
