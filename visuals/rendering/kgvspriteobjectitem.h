@@ -51,7 +51,7 @@ class KGAMEVISUALS_EXPORT KgvSpriteObjectItem : public QGraphicsObject, public K
 	Q_PROPERTY(int frame READ frame WRITE setFrame)
 	Q_PROPERTY(QPointF offset READ offset WRITE setOffset)
 	Q_PROPERTY(QSize renderSize READ renderSize WRITE setRenderSize)
-	Q_PROPERTY(QSizeF size READ size WRITE setSize)
+	Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
 	public:
 		///Creates a new KgvSpriteObjectItem which renders the sprite with
 		///the given @a spriteKey as provided by the given @a renderer.
@@ -81,6 +81,10 @@ class KGAMEVISUALS_EXPORT KgvSpriteObjectItem : public QGraphicsObject, public K
 		virtual QPainterPath opaqueArea() const;
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 		virtual QPainterPath shape() const;
+	Q_SIGNALS:
+		///This signal is emitted when the size of the item's bounding rect
+		///changes.
+		void sizeChanged(const QSizeF& size);
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);
 	private:

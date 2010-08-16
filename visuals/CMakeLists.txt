@@ -9,6 +9,7 @@ set(kgamevisuals_LIB_SRCS
 	config/kgvconfigdialog.cpp
 	config/kgvgraphicsdelegate.cpp
 	config/kgvthemeselector.cpp
+	rendering/kgvboard.cpp
 	rendering/kgvrendererclient.cpp
 	rendering/kgvrenderer.cpp
 	rendering/kgvspriteitem.cpp
@@ -33,6 +34,7 @@ install(TARGETS kgamevisuals ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
 	config/kgvconfigdialog.h
+	rendering/kgvboard.h
 	rendering/kgvrendererclient.h
 	rendering/kgvrenderer.h
 	rendering/kgvspriteitem.h

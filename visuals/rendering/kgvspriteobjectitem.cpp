@@ -94,6 +94,7 @@ void KgvSpriteObjectItem::setSize(const QSizeF& size)
 		prepareGeometryChange();
 		d->m_size = size;
 		d->updateTransform();
+		emit sizeChanged(size);
 		update();
 	}
 }
