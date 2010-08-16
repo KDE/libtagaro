@@ -48,6 +48,10 @@ KgvBoard::KgvBoard(QGraphicsItem* parent)
 	, d(new Private(this))
 {
 	setFlag(QGraphicsItem::ItemHasNoContents); //so do not call paint()
+	if (parent)
+	{
+		d->_k_update();
+	}
 }
 
 KgvBoard::~KgvBoard()
