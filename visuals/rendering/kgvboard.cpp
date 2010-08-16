@@ -120,7 +120,7 @@ void KgvBoard::Private::_k_update()
 			const qreal dx = (baseRect.width() - m_physicalSize.width()) / 2;
 			physicalRect.translate(dx, 0);
 		}
-		else if (m_alignment & Qt::AlignLeft || ((m_alignment & Qt::AlignRight) && hReverse))
+		else if (m_alignment & Qt::AlignRight || ((m_alignment & Qt::AlignLeft) && hReverse))
 		{
 			physicalRect.moveRight(baseRect.right());
 		}
