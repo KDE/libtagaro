@@ -300,4 +300,43 @@ void KgvDesktopThemeProvider::Private::saveSelectedIndex(int index)
 
 //END KgvDesktopThemeProvider
 
+//BEGIN KgvFileThemeProvider
+
+static QByteArray KgvFileThemeProvider_identifier(const QString& file)
+{
+	return file.section(QChar('/'), -1).toUtf8();
+}
+
+struct KgvFileThemeProvider::Private
+{
+	KgvTheme m_theme;
+
+	Private(const QByteArray& key) : m_theme(key) {}
+};
+
+KgvFileThemeProvider::KgvFileThemeProvider(const QString& file, QObject* parent)
+	: KgvThemeProvider(parent)
+	, d(new Private(KgvFileThemeProvider_identifier(file)))
+{
+	d->m_theme.setData(KgvTheme::GraphicsFileRole, file);
+}
+
+KgvFileThemeProvider::~KgvFileThemeProvider()
+{
+	delete d;
+}
+
+int KgvFileThemeProvider::themeCount() const
+{
+	return 1;
+}
+
+const KgvTheme* KgvFileThemeProvider::theme(int index) const
+{
+	Q_UNUSED(index)
+	return &d->m_theme;
+}
+
+//END KgvFileThemeProvider
+
 #include "kgvthemeprovider.moc"

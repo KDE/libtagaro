@@ -163,4 +163,28 @@ class KGAMEVISUALS_EXPORT KgvDesktopThemeProvider : public KgvThemeProvider
 		Q_PRIVATE_SLOT(d, void saveSelectedIndex(int));
 };
 
+/**
+ * @class KgvFileThemeProvider kgvthemeprovider.h <KgvThemeProvider>
+ *
+ * This theme provider provides exactly one theme, which consists only of a
+ * single SVG file. You may use this provider if you do not have multiple themes
+ * to offer and want to avoid the need to create .desktop theme files.
+ */
+class KGAMEVISUALS_EXPORT KgvFileThemeProvider : public KgvThemeProvider
+{
+	Q_OBJECT
+	public:
+		///Creates a new KgvFileThemeProvider instance, which provides the
+		///given SVG @a file.
+		KgvFileThemeProvider(const QString& file, QObject* parent = 0);
+		///Destroys this KgvFileThemeProvider instance.
+		virtual ~KgvFileThemeProvider();
+
+		virtual int themeCount() const;
+		virtual const KgvTheme* theme(int index) const;
+	private:
+		class Private;
+		Private* const d;
+};
+
 #endif // KGVTHEMEPROVIDER_H

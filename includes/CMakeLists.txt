@@ -2,6 +2,7 @@ install(FILES
 	KgvBoard
 	KgvConfigDialog
 	KgvDesktopThemeProvider
+	KgvFileThemeProvider
 	KgvRenderer
 	KgvRendererClient
 	KgvSpriteItem
