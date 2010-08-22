@@ -51,6 +51,7 @@ class KGAMEVISUALS_EXPORT KgvSpriteObjectItem : public QGraphicsObject, public K
 	Q_PROPERTY(QPointF offset READ offset WRITE setOffset)
 	Q_PROPERTY(QSize renderSize READ renderSize WRITE setRenderSize)
 	Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
+	Q_PROPERTY(QString spriteKey READ spriteKey WRITE setSpriteKey)
 	public:
 		///Creates a new KgvSpriteObjectItem which renders the sprite with
 		///the given @a spriteKey as provided by the given @a renderer.
