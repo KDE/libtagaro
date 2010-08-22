@@ -29,7 +29,6 @@ class KgvSpriteItemPrivate;
 
 /**
  * @class KgvSpriteItem kgvspriteitem.h <KgvSpriteItem>
- * @since 4.6
  * @short A QGraphicsPixmapItem which reacts to theme changes automatically.
  *
  * This class is a QGraphicsPixmapItem which retrieves its pixmap from a

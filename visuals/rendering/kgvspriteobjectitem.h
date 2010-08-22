@@ -27,7 +27,6 @@
 
 /**
  * @class KgvSpriteObjectItem kgvspriteobjectitem.h <KgvSpriteObjectItem>
- * @since 4.6
  * @short A QGraphicsObject which displays pixmaps from a KgvRenderer.
  *
  * This item displays a pixmap which is retrieved from a KgvRenderer, and is

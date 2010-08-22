@@ -29,7 +29,6 @@ class KgvRendererPrivate;
 
 /**
  * @class KgvRendererClient kgvrendererclient.h <KgvRendererClient>
- * @since 4.6
  * @short An object that receives pixmaps from a KgvRenderer.
  *
  * This class abstracts a sprite rendered by KgvRenderer. Given a sprite key,
