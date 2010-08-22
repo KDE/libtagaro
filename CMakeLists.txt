@@ -17,6 +17,7 @@ include_directories(
 
 add_subdirectory(visuals)
 add_subdirectory(includes)
+add_subdirectory(tools)
 add_subdirectory(cmake)
 add_subdirectory(doc)
 

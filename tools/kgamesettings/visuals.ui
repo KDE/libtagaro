@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Visuals</class>
+ <widget class="QWidget" name="Visuals">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Rendering strategies</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="kcfg_UseDiskCache">
+        <property name="toolTip">
+         <string>This option should be enabled when you have a fast disk drive available (e.g. on a desktop computer or notebook). When the game is started for the next time and all sprites are in the disk cache, the game will start up faster because it does not need to load the theme.</string>
+        </property>
+        <property name="text">
+         <string>Store rendered sprites in a disk cache</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="kcfg_UseRenderingThreads">
+        <property name="toolTip">
+         <string>This option is beneficial for desktop computers and notebooks with multiple processors. If enabled, games will render their sprites using all available processors. If your processor is weak, try to disable this option to improve the rendering speed.</string>
+        </property>
+        <property name="text">
+         <string>Render sprites in multiple worker threads</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&lt;b&gt;Warning:&lt;/b&gt; Changes will not affect currently running games.</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
