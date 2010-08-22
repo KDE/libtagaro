@@ -3,4 +3,4 @@ ClassName=KgvSettings
 IncludeFiles=libkgame_export.h
 Visibility=KGAMEVISUALS_EXPORT
 Singleton=true
-Mutators=false
+Mutators=true

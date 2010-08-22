@@ -5,6 +5,7 @@ install(FILES
 	KgvFileThemeProvider
 	KgvRenderer
 	KgvRendererClient
+	KgvSettings
 	KgvSpriteItem
 	KgvSpriteObjectItem
 	KgvTheme

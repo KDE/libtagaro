@@ -43,4 +43,5 @@ install(FILES
 	rendering/kgvview.h
 	theming/kgvtheme.h
 	theming/kgvthemeprovider.h
+	${CMAKE_CURRENT_BINARY_DIR}/kgvsettings.h
 DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
