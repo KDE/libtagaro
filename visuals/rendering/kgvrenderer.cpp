@@ -80,9 +80,11 @@ KgvRenderer::KgvRenderer(const QByteArray& providerKey, unsigned cacheSize)
 
 KgvRenderer::~KgvRenderer()
 {
-	//cleanup clients (I explicitly take a copy instead of iterating over m_clients directly, because m_clients changes during the cleanup, when the clients deregister themselves from this renderer)
-	const QList<KgvRendererClient*> clients = d->m_clients.keys();
-	qDeleteAll(clients);
+	//cleanup clients
+	while (!d->m_clients.isEmpty())
+	{
+		delete d->m_clients.constBegin().key();
+	}
 	//cleanup own stuff
 	d->m_workerPool.waitForDone();
 	delete d->m_imageCache;
