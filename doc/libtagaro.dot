@@ -1,0 +1,46 @@
+digraph G {
+	edge [];
+
+	subgraph cluster0 {
+		node [style=filled,color=white];
+		style=filled;
+		color=lightgrey;
+		label="Configuration";
+
+		ConfigDialog;
+		Settings;
+	}
+
+	subgraph cluster1 {
+		node [style=filled,color=white];
+		style=filled;
+		color=lightgrey;
+		label="Graphics";
+
+		subgraph cluster1a {
+			node [style=solid,color=black];
+			color=white;
+			label="Theming";
+			
+			RendererClient -> Renderer [label="gets pixmap"];
+			Renderer -> ThemeProvider [label="uses"];
+			Renderer -> Theme [label="renders"];
+			ThemeProvider -> Theme [label="instantiates",constraint=false];
+		}
+
+		subgraph cluster1b {
+			node [style=solid,color=black];
+			color=white;
+			label="QGraphicsView";
+
+			SpriteItem [label="Sprite(Object)Item"];
+			Board -> SpriteItem [label="arranges"];
+			View;
+		}
+		SpriteItem -> RendererClient [label="gets content"];
+		View -> RendererClient [label="gets background"];
+	}
+
+	ConfigDialog -> ThemeProvider [label="configures"];
+	Settings -> Renderer [label="configures"];
+}
