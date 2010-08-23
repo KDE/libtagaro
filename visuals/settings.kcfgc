@@ -1,0 +1,7 @@
+File=settings.kcfg
+Namespace=Tagaro
+ClassName=Settings
+IncludeFiles=libtagaro_export.h
+Visibility=TAGAROVISUALS_EXPORT
+Singleton=true
+Mutators=true

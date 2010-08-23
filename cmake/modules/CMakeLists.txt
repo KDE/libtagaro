@@ -1,3 +1,3 @@
 install(FILES
-	FindLibKGameVisuals.cmake
+	FindTagaro.cmake
 DESTINATION ${DATA_INSTALL_DIR}/cmake/modules)

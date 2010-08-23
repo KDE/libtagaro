@@ -1,47 +1,48 @@
 enable_testing()
-project(libkgamevisuals)
+project(libtagarovisuals)
 
-kde4_no_enable_final(libkgamevisuals)
+kde4_no_enable_final(libtagarovisuals)
 
 #################### compile ####################
 
-set(kgamevisuals_LIB_SRCS
-	config/kgvconfigdialog.cpp
-	config/kgvgraphicsdelegate.cpp
-	config/kgvthemeselector.cpp
-	rendering/kgvboard.cpp
-	rendering/kgvrendererclient.cpp
-	rendering/kgvrenderer.cpp
-	rendering/kgvspriteitem.cpp
-	rendering/kgvspriteobjectitem.cpp
-	rendering/kgvview.cpp
-	theming/kgvtheme.cpp
-	theming/kgvthemeprovider.cpp
+set(tagarovisuals_LIB_SRCS
+	board.cpp
+	configdialog.cpp
+	graphicsdelegate.cpp
+	rendererclient.cpp
+	renderer.cpp
+	spriteitem.cpp
+	spriteobjectitem.cpp
+	theme.cpp
+	themeprovider.cpp
+	themeselector.cpp
+	view.cpp
 )
-kde4_add_kcfg_files(kgamevisuals_LIB_SRCS kgvsettings.kcfgc)
+kde4_add_kcfg_files(tagarovisuals_LIB_SRCS settings.kcfgc)
 
-kde4_add_library(kgamevisuals SHARED ${kgamevisuals_LIB_SRCS})
-target_link_libraries(kgamevisuals ${KDE4_KDEUI_LIBS} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY})
-target_link_libraries(kgamevisuals LINK_INTERFACE_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+kde4_add_library(tagarovisuals SHARED ${tagarovisuals_LIB_SRCS})
+target_link_libraries(tagarovisuals ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY})
+target_link_libraries(tagarovisuals LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
 
-set_target_properties(kgamevisuals PROPERTIES
+set_target_properties(tagarovisuals PROPERTIES
 	VERSION 0.1.0
 	SOVERSION 0
+	DEFINE_SYMBOL MAKE_TAGAROVISUALS_LIB
 )
 
 #################### install ####################
 
-install(TARGETS kgamevisuals ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS tagarovisuals ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
-	config/kgvconfigdialog.h
-	rendering/kgvboard.h
-	rendering/kgvrendererclient.h
-	rendering/kgvrenderer.h
-	rendering/kgvspriteitem.h
-	rendering/kgvspriteobjectitem.h
-	rendering/kgvview.h
-	theming/kgvtheme.h
-	theming/kgvthemeprovider.h
-	${CMAKE_CURRENT_BINARY_DIR}/kgvsettings.h
-DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
+	board.h
+	configdialog.h
+	rendererclient.h
+	renderer.h
+	spriteitem.h
+	spriteobjectitem.h
+	theme.h
+	themeprovider.h
+	view.h
+	${CMAKE_CURRENT_BINARY_DIR}/settings.h
+DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)

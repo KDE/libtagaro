@@ -10,9 +10,6 @@ include_directories(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/includes
-	${CMAKE_CURRENT_SOURCE_DIR}/visuals
-	${CMAKE_CURRENT_SOURCE_DIR}/visuals/rendering
-	${CMAKE_CURRENT_SOURCE_DIR}/visuals/theming
 )
 
 add_subdirectory(visuals)
@@ -21,4 +18,4 @@ add_subdirectory(tools)
 add_subdirectory(cmake)
 add_subdirectory(doc)
 
-install(FILES libkgame_export.h DESTINATION ${INCLUDE_INSTALL_DIR})
+install(FILES libtagaro_export.h DESTINATION ${INCLUDE_INSTALL_DIR})
