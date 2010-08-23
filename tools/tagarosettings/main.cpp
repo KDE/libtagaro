@@ -22,7 +22,7 @@
 #include <KDE/KConfigDialog>
 #include <KDE/KLocale>
 
-#include "../../visuals/settings.h"
+#include <Tagaro/Settings>
 #include "ui_visuals.h"
 
 int main(int argc, char** argv)

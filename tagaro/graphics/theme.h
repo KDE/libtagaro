@@ -32,7 +32,7 @@ TAGARO_BEGIN_NAMESPACE
  * metadata. Tagaro::Theme instances are usually created and managed by a
  * Tagaro::ThemeProvider.
  */
-class TAGAROVISUALS_EXPORT Theme
+class TAGARO_EXPORT Theme
 {
 	Q_DISABLE_COPY(Theme)
 	public:

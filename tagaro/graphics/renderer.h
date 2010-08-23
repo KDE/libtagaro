@@ -88,7 +88,7 @@ class ThemeProvider;
  * change these properties in new applications.
  *
  */
-class TAGAROVISUALS_EXPORT Renderer : public QObject
+class TAGARO_EXPORT Renderer : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(const Tagaro::Theme* theme READ theme NOTIFY themeChanged)

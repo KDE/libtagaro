@@ -46,7 +46,7 @@ TAGARO_BEGIN_NAMESPACE
  * To automatically adjust the render size to the physical coordinate system of
  * a QGraphicsView, insert the Tagaro::SpriteObjectItem into a Tagaro::Board.
  */
-class TAGAROVISUALS_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::RendererClient
+class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::RendererClient
 {
 	Q_OBJECT
 	Q_PROPERTY(int frame READ frame WRITE setFrame)

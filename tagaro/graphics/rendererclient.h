@@ -40,7 +40,7 @@ class RendererPrivate;
  *
  * Subclasses have to reimplement the receivePixmap() method.
  */
-class TAGAROVISUALS_EXPORT RendererClient
+class TAGARO_EXPORT RendererClient
 {
 	public:
 		///Creates a new client which receives pixmaps for the sprite with the

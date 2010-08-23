@@ -48,7 +48,7 @@ TAGARO_BEGIN_NAMESPACE
  * view->Tagaro::View::setScene(scene);
  * @endcode
  */
-class TAGAROVISUALS_EXPORT View : public QGraphicsView, public Tagaro::RendererClient
+class TAGARO_EXPORT View : public QGraphicsView, public Tagaro::RendererClient
 {
 	Q_OBJECT
 	public:

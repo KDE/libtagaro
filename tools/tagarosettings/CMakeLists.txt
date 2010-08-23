@@ -6,6 +6,6 @@ set(tagarosettings_SRCS
 kde4_add_ui_files(tagarosettings_SRCS visuals.ui)
 
 kde4_add_executable(tagarosettings ${tagarosettings_SRCS})
-target_link_libraries(tagarosettings tagarovisuals)
+target_link_libraries(tagarosettings tagaro)
 
 install(TARGETS tagarosettings ${INSTALL_TARGETS_DEFAULT_ARGS})

@@ -1,1 +1,1 @@
-#include <tagaro/themeprovider.h>
+#include <tagaro/graphics/themeprovider.h>

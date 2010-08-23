@@ -53,7 +53,7 @@ class ThemeProvider;
  * selection change for some other reason, use the
  * Tagaro::ThemeProvider::selectedIndexChanged() signal.
  */
-class TAGAROVISUALS_EXPORT ConfigDialog : public KConfigDialog
+class TAGARO_EXPORT ConfigDialog : public KConfigDialog
 {
 	public:
 		///This enumeration describes optional behavior of a theme selector.

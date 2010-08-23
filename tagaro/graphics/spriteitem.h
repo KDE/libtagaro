@@ -37,7 +37,7 @@ class SpriteItemPrivate;
  * Tagaro::Renderer, and updates it automatically when the Tagaro::Renderer
  * changes the theme.
  */
-class TAGAROVISUALS_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::RendererClient
+class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::RendererClient
 {
 	public:
 		///Creates a new Tagaro::SpriteItem which renders the sprite with the

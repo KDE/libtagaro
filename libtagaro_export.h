@@ -23,16 +23,18 @@
 
 #include <kdemacros.h>
 
-#ifndef TAGAROVISUALS_EXPORT
-#	if defined(MAKE_TAGAROVISUALS_LIB)
-#		define TAGAROVISUALS_EXPORT KDE_EXPORT //building the library
+//export macro for libtagaro
+
+#ifndef TAGARO_EXPORT
+#	if defined(MAKE_TAGARO_LIB)
+#		define TAGARO_EXPORT KDE_EXPORT //building the library
 #	else
-#		define TAGAROVISUALS_EXPORT KDE_IMPORT //using the library
+#		define TAGARO_EXPORT KDE_IMPORT //using the library
 #	endif
 #endif
 
-#ifndef TAGAROVISUALS_EXPORT_DEPRECATED
-#	define TAGAROVISUALS_EXPORT_DEPRECATED KDE_DEPRECATED TAGAROVISUALS_EXPORT
+#ifndef TAGARO_EXPORT_DEPRECATED
+#	define TAGARO_EXPORT_DEPRECATED KDE_DEPRECATED TAGARO_EXPORT
 #endif
 
 //Tagaro namespace

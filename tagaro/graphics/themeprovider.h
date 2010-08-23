@@ -43,7 +43,7 @@ class Theme;
  *
  * @see Tagaro::DesktopThemeProvider
  */
-class TAGAROVISUALS_EXPORT ThemeProvider : public QObject
+class TAGARO_EXPORT ThemeProvider : public QObject
 {
 	Q_OBJECT
 	public:
@@ -140,7 +140,7 @@ class DtpInstantiator;
  * install a system-wide configuration file which includes your custom
  * configuration.
  */
-class TAGAROVISUALS_EXPORT DesktopThemeProvider : public Tagaro::ThemeProvider
+class TAGARO_EXPORT DesktopThemeProvider : public Tagaro::ThemeProvider
 {
 	Q_OBJECT
 	public:
@@ -174,7 +174,7 @@ class TAGAROVISUALS_EXPORT DesktopThemeProvider : public Tagaro::ThemeProvider
  * single SVG file. You may use this provider if you do not have multiple themes
  * to offer and want to avoid the need to create .desktop theme files.
  */
-class TAGAROVISUALS_EXPORT FileThemeProvider : public Tagaro::ThemeProvider
+class TAGARO_EXPORT FileThemeProvider : public Tagaro::ThemeProvider
 {
 	Q_OBJECT
 	public:

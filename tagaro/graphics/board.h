@@ -36,7 +36,7 @@ TAGARO_BEGIN_NAMESPACE
  * @li When it is resized, it will automatically adjust the renderSize of any
  *     contained Tagaro::SpriteObjectItems.
  */
-class TAGAROVISUALS_EXPORT Board : public QGraphicsObject
+class TAGARO_EXPORT Board : public QGraphicsObject
 {
 	Q_OBJECT
 	public:

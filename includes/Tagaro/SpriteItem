@@ -1,1 +1,1 @@
-#include <tagaro/spriteitem.h>
+#include <tagaro/graphics/spriteitem.h>
