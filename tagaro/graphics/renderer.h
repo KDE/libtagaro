@@ -112,8 +112,8 @@ class TAGARO_EXPORT Renderer : public QObject
 
 		///Constructs a new Tagaro::Renderer.
 		///@param provider the theme provider to be used by this renderer
-		///@param cacheSize the cache size in megabytes (if not given, a sane
-		///default is used)
+		///@param cacheSize the cache size per theme in megabytes (if not given,
+		///a sane default is used)
 		///@warning This constructor may only be called from the main thread.
 		explicit Renderer(Tagaro::ThemeProvider* provider, unsigned cacheSize = 0);
 		///@overload
