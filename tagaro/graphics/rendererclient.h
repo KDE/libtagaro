@@ -45,23 +45,26 @@ class TAGARO_EXPORT RendererClient
 	public:
 		///Creates a new client which receives pixmaps for the sprite with the
 		///given @a spriteKey as provided by the given @a renderer.
+		///You may give a null pointer to @a renderer, or an empty string to
+		///@a spriteKey. In this case, no pixmap is fetched.
 		RendererClient(Tagaro::Renderer* renderer, const QString& spriteKey);
 		virtual ~RendererClient();
 
 		///@return the renderer used by this client
 		Tagaro::Renderer* renderer() const;
+		///Sets the renderer used by this client. Set to a null pointer to
+		///disable pixmap fetching.
+		void setRenderer(Tagaro::Renderer* renderer);
+		///@return the key of the sprite currently rendered by this client
+		QString spriteKey() const;
+		///Defines the key of the sprite which is rendered by this client. Set
+		///to an empty string to disable pixmap fetching.
+		void setSpriteKey(const QString& spriteKey);
+
 		///@return the frame count, or 0 for non-animated sprites, or -1 if the
 		///sprite does not exist at all
 		///@see Tagaro::Renderer::frameCount()
 		int frameCount() const;
-		///@return the rendered pixmap (or an invalid pixmap if no pixmap has
-		///been rendered yet)
-		QPixmap pixmap() const;
-
-		///@return the key of the sprite currently rendered by this client
-		QString spriteKey() const;
-		///Defines the key of the sprite which is rendered by this client.
-		void setSpriteKey(const QString& spriteKey);
 		///@return the current frame number, or -1 for non-animated sprites
 		int frame() const;
 		///For animated sprites, render another frame. The given frame number is
@@ -74,6 +77,7 @@ class TAGARO_EXPORT RendererClient
 		///    client.setFrame(KRandom::random());  //choose a random frame
 		///@endcode
 		void setFrame(int frame);
+
 		///@return the size of the pixmap requested from Tagaro::Renderer
 		QSize renderSize() const;
 		///Defines the size of the pixmap that will be requested from
@@ -84,6 +88,9 @@ class TAGARO_EXPORT RendererClient
 		///The default render size is very small (width = height = 3 pixels), so
 		///that you notice when you forget to set this. ;-)
 		void setRenderSize(const QSize& renderSize);
+		///@return the rendered pixmap (or an invalid pixmap if no pixmap has
+		///been rendered yet)
+		QPixmap pixmap() const;
 	protected:
 		///This method is called when the Tagaro::Renderer has provided a new
 		///pixmap for this client (esp. after theme changes and after calls to

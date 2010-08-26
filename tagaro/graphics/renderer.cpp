@@ -409,7 +409,7 @@ void Tagaro::RendererPrivate::requestPixmap__propagateResult(const QPixmap& pixm
 {
 	if (client)
 	{
-		client->receivePixmap(pixmap);
+		client->d->receivePixmapInternal(pixmap);
 	}
 	if (synchronousResult)
 	{
@@ -419,7 +419,7 @@ void Tagaro::RendererPrivate::requestPixmap__propagateResult(const QPixmap& pixm
 
 void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& spec, Tagaro::RendererClient* client, QPixmap* synchronousResult)
 {
-	//NOTE: If client == 0, the request is synchronous and must be finished when this method returns. This behavior is used by Tagaro::Renderer::spritePixmap(). Instead of Tagaro::RendererClient::receivePixmap, the QPixmap* argument is then used to return the result.
+	//NOTE: If client == 0, the request is synchronous and must be finished when this method returns. This behavior is used by Tagaro::Renderer::spritePixmap(). Instead of Tagaro::RendererClient::receivePixmapInternal, the QPixmap* argument is then used to return the result.
 	//parse request
 	if (spec.size.isEmpty())
 	{
@@ -482,14 +482,7 @@ void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& 
 		worker->run();
 		//if everything worked fine, result is in high-speed cache now
 		const QPixmap result = m_pixmapCache.value(cacheKey);
-		if (synchronousResult)
-		{
-			*synchronousResult = result;
-		}
-		if (client)
-		{
-			client->receivePixmap(result);
-		}
+		requestPixmap__propagateResult(result, client, synchronousResult);
 	}
 	else
 	{
@@ -522,7 +515,7 @@ void Tagaro::RendererPrivate::jobFinished(Tagaro::Internal::Job* job, bool isSyn
 	m_pixmapCache.insert(cacheKey, pixmap);
 	foreach (Tagaro::RendererClient* requester, requesters)
 	{
-		requester->receivePixmap(pixmap);
+		requester->d->receivePixmapInternal(pixmap);
 	}
 }
 

@@ -161,6 +161,8 @@ class RendererClientPrivate : public QObject
 	Q_OBJECT
 	public:
 		RendererClientPrivate(Tagaro::Renderer* renderer, const QString& spriteKey, Tagaro::RendererClient* parent);
+
+		void receivePixmapInternal(const QPixmap& pixmap);
 	public Q_SLOTS:
 		void fetchPixmap();
 	public:
@@ -169,6 +171,7 @@ class RendererClientPrivate : public QObject
 
 		QPixmap m_pixmap;
 		Internal::ClientSpec m_spec;
+		bool m_fetching;
 };
 
 TAGARO_END_NAMESPACE

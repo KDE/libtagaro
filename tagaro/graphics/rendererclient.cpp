@@ -28,6 +28,7 @@ Tagaro::RendererClientPrivate::RendererClientPrivate(Tagaro::Renderer* renderer,
 	: m_parent(parent)
 	, m_renderer(renderer)
 	, m_spec(spriteKey, -1, QSize(3, 3))
+	, m_fetching(renderer && !spriteKey.isEmpty())
 {
 }
 
@@ -56,6 +57,16 @@ Tagaro::Renderer* Tagaro::RendererClient::renderer() const
 	return d->m_renderer;
 }
 
+void Tagaro::RendererClient::setRenderer(Tagaro::Renderer* renderer)
+{
+	if (d->m_renderer != renderer)
+	{
+		d->m_renderer = renderer;
+		d->m_fetching = d->m_renderer && !d->m_spec.spriteKey.isEmpty();
+		d->fetchPixmap();
+	}
+}
+
 QString Tagaro::RendererClient::spriteKey() const
 {
 	return d->m_spec.spriteKey;
@@ -66,6 +77,7 @@ void Tagaro::RendererClient::setSpriteKey(const QString& spriteKey)
 	if (d->m_spec.spriteKey != spriteKey)
 	{
 		d->m_spec.spriteKey = spriteKey;
+		d->m_fetching = d->m_renderer && !d->m_spec.spriteKey.isEmpty();
 		d->fetchPixmap();
 	}
 }
@@ -105,11 +117,6 @@ void Tagaro::RendererClient::setFrame(int frame)
 	}
 }
 
-QPixmap Tagaro::RendererClient::pixmap() const
-{
-	return d->m_pixmap;
-}
-
 QSize Tagaro::RendererClient::renderSize() const
 {
 	return d->m_spec.size;
@@ -124,14 +131,25 @@ void Tagaro::RendererClient::setRenderSize(const QSize& renderSize)
 	}
 }
 
+QPixmap Tagaro::RendererClient::pixmap() const
+{
+	return d->m_pixmap;
+}
+
 void Tagaro::RendererClientPrivate::fetchPixmap()
 {
-	if (m_renderer)
+	if (m_fetching)
 	{
 		m_renderer->d->requestPixmap(m_spec, m_parent);
 	}
 	else
 	{
-		m_parent->receivePixmap(QPixmap());
+		receivePixmapInternal(QPixmap());
 	}
+}
+
+void Tagaro::RendererClientPrivate::receivePixmapInternal(const QPixmap& pixmap)
+{
+	m_pixmap = pixmap;
+	m_parent->receivePixmap(pixmap);
 }
