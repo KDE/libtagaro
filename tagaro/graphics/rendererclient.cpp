@@ -98,7 +98,7 @@ void Tagaro::RendererClient::setFrame(int frame)
 	{
 		//do some normalization ourselves
 		const int frameCount = this->frameCount();
-		if (frameCount <= 0)
+		if (frameCount <= 0 || frame <= 0)
 		{
 			frame = -1;
 		}
