@@ -339,6 +339,4 @@ const Tagaro::Theme* Tagaro::FileThemeProvider::theme(int index) const
 
 //END Tagaro::FileThemeProvider
 
-TAGARO_BEGIN_NAMESPACE
 #include "themeprovider.moc"
-TAGARO_END_NAMESPACE

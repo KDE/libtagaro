@@ -23,7 +23,7 @@
 
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 class RendererClientPrivate;
 class Renderer;
@@ -103,6 +103,6 @@ class TAGARO_EXPORT RendererClient
 		Tagaro::RendererClientPrivate* const d;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_RENDERERCLIENT_H

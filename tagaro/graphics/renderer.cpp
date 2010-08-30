@@ -628,7 +628,5 @@ void Tagaro::Internal::RendererPool::freeRenderer(QSvgRenderer* renderer)
 
 //END Tagaro::Internal::RendererPool
 
-TAGARO_BEGIN_NAMESPACE
 #include "renderer.moc"
 #include "renderer_p.moc"
-TAGARO_END_NAMESPACE

@@ -23,7 +23,7 @@
 
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 class ThemeProvider;
 
@@ -88,7 +88,7 @@ class TAGARO_EXPORT ConfigDialog : public KConfigDialog
 		Private* const d;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Tagaro::ConfigDialog::ThemeSelectorOptions)
 

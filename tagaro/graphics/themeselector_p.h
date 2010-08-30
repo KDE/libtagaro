@@ -24,7 +24,7 @@
 class QListWidget;
 #include <QtGui/QWidget>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 ///@internal
 class ThemeSelector : public QWidget
@@ -48,6 +48,6 @@ class ThemeSelector : public QWidget
 		QListWidget* m_themeList;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_THEMESELECTOR_P_H

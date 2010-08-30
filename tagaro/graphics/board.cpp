@@ -258,6 +258,4 @@ void Tagaro::Board::timerEvent(QTimerEvent* event)
 	}
 }
 
-TAGARO_BEGIN_NAMESPACE
 #include "board.moc"
-TAGARO_END_NAMESPACE

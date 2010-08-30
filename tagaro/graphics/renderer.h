@@ -25,7 +25,7 @@
 
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 class RendererPrivate;
 class RendererClient;
@@ -201,7 +201,7 @@ class TAGARO_EXPORT Renderer : public QObject
 		Tagaro::RendererPrivate* const d;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Tagaro::Renderer::Strategies)
 

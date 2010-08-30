@@ -37,9 +37,4 @@
 #	define TAGARO_EXPORT_DEPRECATED KDE_DEPRECATED TAGARO_EXPORT
 #endif
 
-//Tagaro namespace
-
-#define TAGARO_BEGIN_NAMESPACE namespace Tagaro {
-#define TAGARO_END_NAMESPACE   }
-
 #endif // LIBTAGARO_EXPORT_H

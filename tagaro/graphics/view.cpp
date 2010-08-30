@@ -115,6 +115,4 @@ void Tagaro::View::Private::adjust()
 	m_adjustingSceneRect = false;
 }
 
-TAGARO_BEGIN_NAMESPACE
 #include "view.moc"
-TAGARO_END_NAMESPACE

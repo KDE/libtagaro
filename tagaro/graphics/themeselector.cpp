@@ -120,6 +120,4 @@ void Tagaro::ThemeSelector::openNewStuffDialog()
 	//TODO
 }
 
-TAGARO_BEGIN_NAMESPACE
 #include "themeselector_p.moc"
-TAGARO_END_NAMESPACE

@@ -27,7 +27,7 @@
 #include <QtSvg/QSvgRenderer>
 #include <KDE/KImageCache>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 namespace Internal
 {
@@ -174,7 +174,7 @@ class RendererClientPrivate : public QObject
 		bool m_fetching;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 Q_DECLARE_METATYPE(Tagaro::Internal::Job*)
 

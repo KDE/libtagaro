@@ -23,7 +23,7 @@
 
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 /**
  * @class Tagaro::Theme theme.h <Tagaro/Theme>
@@ -92,6 +92,6 @@ class TAGARO_EXPORT Theme
 		Private* const d;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_THEME_H

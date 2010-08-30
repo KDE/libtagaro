@@ -25,7 +25,7 @@
 #include "rendererclient.h"
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 /**
  * @class Tagaro::SpriteObjectItem spriteobjectitem.h <Tagaro/SpriteObjectItem>
@@ -94,7 +94,7 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Re
 		Private* const d;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 void Tagaro::SpriteObjectItem::setOffset(qreal x, qreal y)
 {

@@ -23,7 +23,7 @@
 
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 //This delegate can be used in list views which allow to select graphical components (such as themes).
 class GraphicsDelegate : public QStyledItemDelegate
@@ -45,6 +45,6 @@ class GraphicsDelegate : public QStyledItemDelegate
 		QRect thumbnailRect(const QRect& baseRect) const;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_GRAPHICSDELEGATE_P_H

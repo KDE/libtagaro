@@ -23,7 +23,7 @@
 
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 /**
  * @class Tagaro::Board board.h <Tagaro/Board>
@@ -89,6 +89,6 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		Q_PRIVATE_SLOT(d, void _k_updateItem());
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_BOARD_H

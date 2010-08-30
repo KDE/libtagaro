@@ -24,7 +24,7 @@
 #include "rendererclient.h"
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 /**
  * @class Tagaro::View view.h <Tagaro/View>
@@ -79,6 +79,6 @@ class TAGARO_EXPORT View : public QGraphicsView, public Tagaro::RendererClient
 		Q_PRIVATE_SLOT(d, void _k_sceneRectChanged());
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_VIEW_H

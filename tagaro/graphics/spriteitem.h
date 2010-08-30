@@ -25,7 +25,7 @@
 #include "rendererclient.h"
 #include <libtagaro_export.h>
 
-TAGARO_BEGIN_NAMESPACE
+namespace Tagaro {
 
 class SpriteItemPrivate;
 
@@ -51,6 +51,6 @@ class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::Rend
 		Tagaro::SpriteItemPrivate* const d;
 };
 
-TAGARO_END_NAMESPACE
+} //namespace Tagaro
 
 #endif // TAGARO_SPRITEITEM_H
