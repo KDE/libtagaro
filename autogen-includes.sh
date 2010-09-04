@@ -3,20 +3,34 @@
 # library source trees, looks for exported classes inside there, and generates
 # forward includes for all these classes.
 
-[ -f autogen-includes.sh ] || ( echo "Call this script only from the root of the Tagaro source tree." >&2; exit 1 )
+# configuration
+EXPORT_MACRO=TAGARO_EXPORT  # the macro which denotes exported classes
+HEADER_DIR=tagaro           # the directory which contains the headers of your lib
+INCLUDE_DIR=includes/Tagaro # the directory which shall be filled with the pretty headers
+INCLUDE_INSTALL_DIR='${INCLUDE_INSTALL_DIR}/Tagaro'
+                            # the directory into which CMake shall install the pretty headers
+MANUAL_HEADERS='Settings'   # specify manually created headers in this list (separated by spaces)
+
+if [ ! -f $(basename $0) ]; then
+	echo "Call this script only from the directory which contains it." >&2
+	exit 1
+fi
 
 (
-	echo '#NOTE: Use the autogen-includes.sh script to update this file.'
+	echo "#NOTE: Use the $0 script to update this file."
 	echo 'install(FILES'
 	(
-		find tagaro/ -name \*.h -a \! -name \*_p.h | while read HEADERFILE; do
-			grep 'class TAGARO_EXPORT' $HEADERFILE | sed 's/^.*EXPORT \([^ ]*\).*$/\1/' | while read CLASSNAME; do
-				echo '#include <'$HEADERFILE'>' > includes/Tagaro/$CLASSNAME
+		find $HEADER_DIR/ -name \*.h -a \! -name \*_p.h | while read HEADERFILE; do
+			grep "class $EXPORT_MACRO" $HEADERFILE | sed "s/^.*$EXPORT_MACRO \\([^ ]*\\).*$/\\1/" | while read CLASSNAME; do
+				echo '#include <'$HEADERFILE'>' > $INCLUDE_DIR/$CLASSNAME
 				echo -en "\t"; echo "$CLASSNAME"
 			done
 		done
-		# add here hand-created headers
-		echo -en "\t"; echo Settings
+		for MANUAL_HEADER in $MANUAL_HEADERS; do
+			if [ -n $MANUAL_HEADER ]; then
+				echo -en "\t"; echo $MANUAL_HEADER
+			fi
+		done
 	) | sort
-	echo 'DESTINATION ${INCLUDE_INSTALL_DIR}/Tagaro COMPONENT Devel)'
-) > includes/Tagaro/CMakeLists.txt
+	echo "DESTINATION $INCLUDE_INSTALL_DIR COMPONENT Devel)"
+) > $INCLUDE_DIR/CMakeLists.txt
