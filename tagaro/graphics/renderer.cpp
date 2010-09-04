@@ -53,7 +53,7 @@ Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, unsign
 	, m_themeProvider(provider)
 	//theme will be loaded on first request (not immediately, because the calling context might want to disable some rendering strategies first)
 	, m_theme(0)
-	, m_rendererPool(&m_workerPool)
+	, m_rendererModule(0)
 	, m_imageCache(0)
 {
 	if (Tagaro::Settings::useDiskCache())
@@ -87,6 +87,7 @@ Tagaro::Renderer::~Renderer()
 	}
 	//cleanup own stuff
 	d->m_workerPool.waitForDone();
+	delete d->m_rendererModule;
 	delete d->m_imageCache;
 	delete d;
 }
@@ -187,35 +188,38 @@ void Tagaro::RendererPrivate::loadSelectedTheme()
 
 bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 {
-	const QString svgPath = theme->data(Tagaro::Theme::GraphicsFileRole).toString();
-	//open cache (and SVG file, if necessary)
+	const QString graphicsPath = theme->data(Tagaro::Theme::GraphicsFileRole).toString();
+	Tagaro::RendererModule* rendererModule = Tagaro::RendererModule::fromFile(graphicsPath);
+	//open cache (and graphics file, if necessary)
 	if (m_strategies & Tagaro::Renderer::UseDiskCache)
 	{
 		KImageCache* oldCache = m_imageCache;
 		const QString imageCacheName = cacheName(theme->identifier());
 		m_imageCache = new KImageCache(imageCacheName, m_cacheSize);
 		m_imageCache->setPixmapCaching(false); //see big comment in Tagaro::RendererPrivate class declaration
-		//check timestamp of cache vs. last write access to theme/SVG
-		const uint svgTimestamp = theme->modificationTimestamp();
+		//check timestamp of cache vs. last write access to theme/graphics file
+		const uint fileTimestamp = theme->modificationTimestamp();
 		QByteArray buffer;
 		if (!m_imageCache->find(QString::fromLatin1("tagaro_timestamp"), &buffer))
 			buffer = "0"; //krazy:exclude=doublequote_chars
 		const uint cacheTimestamp = buffer.toInt();
 		//try to instantiate renderer immediately if the cache does not exist or is outdated
 		//FIXME: This logic breaks if the cache evicts the "tagaro_timestamp" key. We need additional API in KSharedDataCache to make sure that this key does not get evicted.
-		if (cacheTimestamp < svgTimestamp)
+		if (cacheTimestamp < fileTimestamp)
 		{
-			kDebug() << "Theme newer than cache, checking SVG";
-			QSvgRenderer* renderer = new QSvgRenderer(svgPath);
-			if (renderer->isValid())
+			kDebug() << "Theme newer than cache, checking graphics file";
+			if (rendererModule->isValid())
 			{
-				m_rendererPool.setPath(svgPath, renderer);
-				m_imageCache->insert(QString::fromLatin1("tagaro_timestamp"), QByteArray::number(svgTimestamp));
+				m_workerPool.waitForDone();
+				delete m_rendererModule;
+				m_rendererModule = rendererModule;
+				m_imageCache->insert(QString::fromLatin1("tagaro_timestamp"), QByteArray::number(fileTimestamp));
 			}
 			else
 			{
 				//The SVG file is broken, so we deny to change the theme without
 				//breaking the previous theme.
+				delete rendererModule;
 				delete m_imageCache;
 				KSharedDataCache::deleteCache(imageCacheName);
 				m_imageCache = oldCache;
@@ -226,20 +230,24 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 		//theme is cached - just delete the old renderer after making sure that no worker threads are using it anymore
 		else if (m_theme != theme)
 		{
-			m_rendererPool.setPath(svgPath);
+			m_workerPool.waitForDone();
+			delete m_rendererModule;
+			m_rendererModule = rendererModule;
 		}
 	}
 	else // !(m_strategies & Tagaro::Renderer::UseDiskCache) -> no cache is used
 	{
 		//load SVG file
-		QSvgRenderer* renderer = new QSvgRenderer(svgPath);
-		if (renderer->isValid())
+		if (rendererModule->isValid())
 		{
-			m_rendererPool.setPath(svgPath, renderer);
+			m_workerPool.waitForDone();
+			delete m_rendererModule;
+			m_rendererModule = rendererModule;
 		}
 		else
 		{
-			kDebug() << "Theme change failed: SVG file broken";
+			kDebug() << "Theme change failed: Graphics file broken";
+			delete rendererModule;
 			return false;
 		}
 		//disconnect from disk cache (only needed if changing strategy)
@@ -300,7 +308,7 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 	int count = -1;
 	bool countFound = false;
 	const QString cacheKey = d->m_frameCountPrefix + key;
-	if (d->m_rendererPool.hasAvailableRenderers() && (d->m_strategies & Tagaro::Renderer::UseDiskCache))
+	if (!d->m_rendererModule->isLoaded() && (d->m_strategies & Tagaro::Renderer::UseDiskCache))
 	{
 		QByteArray buffer;
 		if (d->m_imageCache->find(cacheKey, &buffer))
@@ -312,10 +320,9 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 	//determine from SVG
 	if (!countFound)
 	{
-		QSvgRenderer* renderer = d->m_rendererPool.allocRenderer();
 		//look for animated sprite first
 		count = d->m_frameBaseIndex;
-		while (renderer->elementExists(d->spriteFrameKey(key, count, false)))
+		while (d->m_rendererModule->elementExists(d->spriteFrameKey(key, count, false)))
 		{
 			++count;
 		}
@@ -323,12 +330,11 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 		//look for non-animated sprite instead
 		if (count == 0)
 		{
-			if (!renderer->elementExists(key))
+			if (!d->m_rendererModule->elementExists(key))
 			{
 				count = -1;
 			}
 		}
-		d->m_rendererPool.freeRenderer(renderer);
 		//save in shared cache for following requests
 		if (d->m_strategies & Tagaro::Renderer::UseDiskCache)
 		{
@@ -361,7 +367,7 @@ QRectF Tagaro::Renderer::boundsOnSprite(const QString& key, int frame) const
 	QRectF bounds;
 	bool boundsFound = false;
 	const QString cacheKey = d->m_boundsPrefix + elementKey;
-	if (!d->m_rendererPool.hasAvailableRenderers() && (d->m_strategies & Tagaro::Renderer::UseDiskCache))
+	if (!d->m_rendererModule->isLoaded() && (d->m_strategies & Tagaro::Renderer::UseDiskCache))
 	{
 		QByteArray buffer;
 		if (d->m_imageCache->find(cacheKey, &buffer))
@@ -374,9 +380,7 @@ QRectF Tagaro::Renderer::boundsOnSprite(const QString& key, int frame) const
 	//determine from SVG
 	if (!boundsFound)
 	{
-		QSvgRenderer* renderer = d->m_rendererPool.allocRenderer();
-		bounds = renderer->boundsOnElement(elementKey);
-		d->m_rendererPool.freeRenderer(renderer);
+		bounds = d->m_rendererModule->boundsOnElement(elementKey);
 		//save in shared cache for following requests
 		if (d->m_strategies & Tagaro::Renderer::UseDiskCache)
 		{
@@ -471,7 +475,7 @@ void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& 
 	}
 	//create job
 	Tagaro::Internal::Job* job = new Tagaro::Internal::Job;
-	job->rendererPool = &m_rendererPool;
+	job->rendererModule = m_rendererModule;
 	job->cacheKey = cacheKey;
 	job->elementKey = elementKey;
 	job->spec = spec;
@@ -536,9 +540,7 @@ void Tagaro::Internal::Worker::run()
 	image.fill(transparentRgba);
 	//do renderering
 	QPainter painter(&image);
-	QSvgRenderer* renderer = m_job->rendererPool->allocRenderer();
-	renderer->render(&painter, m_job->elementKey);
-	m_job->rendererPool->freeRenderer(renderer);
+	m_job->rendererModule->render(&painter, m_job->elementKey);
 	painter.end();
 	//talk back to the main thread
 	m_job->result = image;
@@ -550,83 +552,6 @@ void Tagaro::Internal::Worker::run()
 }
 
 //END Tagaro::Internal::Job/Worker
-
-//BEGIN Tagaro::Internal::RendererPool
-
-Tagaro::Internal::RendererPool::RendererPool(QThreadPool* threadPool)
-	: m_valid(Checked_Invalid) //don't try to allocate renderers until given a valid SVG file
-	, m_threadPool(threadPool)
-{
-}
-
-Tagaro::Internal::RendererPool::~RendererPool()
-{
-	//This deletes all renderers.
-	setPath(QString());
-}
-
-void Tagaro::Internal::RendererPool::setPath(const QString& svgPath, QSvgRenderer* renderer)
-{
-	QMutexLocker locker(&m_mutex);
-	//delete all renderers
-	m_threadPool->waitForDone();
-	QHash<QSvgRenderer*, QThread*>::const_iterator it1 = m_hash.constBegin(), it2 = m_hash.constEnd();
-	for (; it1 != it2; ++it1)
-	{
-		Q_ASSERT(it1.value() == 0); //nobody may be using our renderers anymore now
-		delete it1.key();
-	}
-	m_hash.clear();
-	//set path
-	m_path = svgPath;
-	//existence of a renderer instance is evidence for the validity of the SVG file
-	if (renderer)
-	{
-		m_valid = Checked_Valid;
-		m_hash.insert(renderer, 0);
-	}
-	else
-	{
-		m_valid = Unchecked;
-	}
-}
-
-bool Tagaro::Internal::RendererPool::hasAvailableRenderers() const
-{
-	//look for a renderer which is not associated with a thread
-	QMutexLocker locker(&m_mutex);
-	return m_hash.key(0) != 0;
-}
-
-QSvgRenderer* Tagaro::Internal::RendererPool::allocRenderer()
-{
-	QThread* thread = QThread::currentThread();
-	//look for an available renderer
-	QMutexLocker locker(&m_mutex);
-	QSvgRenderer* renderer = m_hash.key(0);
-	if (!renderer)
-	{
-		//instantiate a new renderer (only if the SVG file has not been found to be invalid yet)
-		if (m_valid == Checked_Invalid)
-		{
-			return 0;
-		}
-		renderer = new QSvgRenderer(m_path);
-		m_valid = renderer->isValid() ? Checked_Valid : Checked_Invalid;
-	}
-	//mark renderer as used
-	m_hash.insert(renderer, thread);
-	return renderer;
-}
-
-void Tagaro::Internal::RendererPool::freeRenderer(QSvgRenderer* renderer)
-{
-	//mark renderer as available
-	QMutexLocker locker(&m_mutex);
-	m_hash.insert(renderer, 0);
-}
-
-//END Tagaro::Internal::RendererPool
 
 #include "renderer.moc"
 #include "renderer_p.moc"

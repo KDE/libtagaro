@@ -19,12 +19,13 @@
 #ifndef TAGARO_RENDERER_P_H
 #define TAGARO_RENDERER_P_H
 
+#include "renderermodule.h"
+
 #include <QtCore/QHash>
 #include <QtCore/QMetaType>
 #include <QtCore/QMutex>
 #include <QtCore/QRunnable>
 #include <QtCore/QThreadPool>
-#include <QtSvg/QSvgRenderer>
 #include <KDE/KImageCache>
 
 namespace Tagaro {
@@ -46,41 +47,10 @@ namespace Internal
 	{
 	}
 
-	//Instantiates QSvgRenderer instances from one SVG file for multiple threads.
-	class RendererPool
-	{
-		public:
-			//The renderer pool needs the thread pool instance of
-			//Tagaro::RendererPrivate to terminate workers when a new SVG is loaded.
-			//WARNING Call this only from the main thread.
-			inline RendererPool(QThreadPool* threadPool);
-			inline ~RendererPool();
-
-			//The second argument can be used to pass an instance which has been
-			//used earlier to check the validity of the SVG file.
-			inline void setPath(const QString& svgPath, QSvgRenderer* renderer = 0);
-			//This can be used to determine whether a call to allocRenderer()
-			//would need to create a new renderer instance.
-			inline bool hasAvailableRenderers() const;
-
-			//Returns a SVG renderer instance that can be used in the calling thread.
-			inline QSvgRenderer* allocRenderer();
-			//Marks this renderer as available for allocation by other threads.
-			inline void freeRenderer(QSvgRenderer* renderer);
-		private:
-			QString m_path;   //path to SVG file
-			enum Validity { Checked_Invalid, Checked_Valid, Unchecked };
-			Validity m_valid; //holds whether m_path points to a valid file
-
-			mutable QMutex m_mutex;
-			QThreadPool* m_threadPool;
-			QHash<QSvgRenderer*, QThread*> m_hash;
-	};
-
 	//Describes a rendering job which is delegated to a worker thread.
 	struct Job
 	{
-		Internal::RendererPool* rendererPool;
+		Tagaro::RendererModule* rendererModule;
 		ClientSpec spec;
 		QString cacheKey, elementKey;
 		QImage result;
@@ -125,7 +95,7 @@ class RendererPrivate : public QObject
 		const Tagaro::Theme* m_theme;
 
 		QThreadPool m_workerPool;
-		Internal::RendererPool m_rendererPool;
+		Tagaro::RendererModule* m_rendererModule;
 
 		QHash<Tagaro::RendererClient*, QString> m_clients; //maps client -> cache key of current pixmap
 		QStringList m_pendingRequests; //cache keys of pixmaps which are currently being rendered

@@ -15,6 +15,7 @@ set(tagaro_LIB_SRCS
 	graphics/board.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/rendererclient.cpp
+	graphics/renderermodule.cpp
 	graphics/renderer.cpp
 	graphics/spriteitem.cpp
 	graphics/spriteobjectitem.cpp
@@ -47,6 +48,7 @@ DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
 install(FILES
 	graphics/board.h
 	graphics/rendererclient.h
+	graphics/renderermodule.h
 	graphics/renderer.h
 	graphics/spriteitem.h
 	graphics/spriteobjectitem.h
