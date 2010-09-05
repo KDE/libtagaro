@@ -8,10 +8,10 @@ install(FILES
 	Renderer
 	RendererClient
 	RendererModule
+	Scene
 	Settings
 	SpriteItem
 	SpriteObjectItem
 	Theme
 	ThemeProvider
-	View
 DESTINATION ${INCLUDE_INSTALL_DIR}/Tagaro COMPONENT Devel)

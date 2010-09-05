@@ -22,7 +22,7 @@ set(tagaro_LIB_SRCS
 	graphics/theme.cpp
 	graphics/themeprovider.cpp
 	graphics/themeselector.cpp
-	graphics/view.cpp
+	interface/scene.cpp
 )
 kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
 
@@ -54,5 +54,8 @@ install(FILES
 	graphics/spriteobjectitem.h
 	graphics/theme.h
 	graphics/themeprovider.h
-	graphics/view.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/graphics COMPONENT Devel)
+
+install(FILES
+	interface/scene.h
+DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)
