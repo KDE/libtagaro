@@ -17,29 +17,14 @@
  ***************************************************************************/
 
 #include "scene.h"
-#include "../graphics/rendererclient.h"
+#include "scene_p.h"
+#include "messageoverlay.h"
 
 #include <QtCore/QEvent>
+#include <QtGui/QGraphicsTextItem>
 #include <QtGui/QGraphicsView>
-
-struct Tagaro::Scene::Private : public Tagaro::RendererClient
-{
-	public:
-		Private(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, Tagaro::Scene* parent);
-		void init();
-
-		//Returns whether sceneRect() was reset to mainView->rect().
-		bool _k_resetSceneRect();
-		void _k_updateSceneRect(const QRectF& rect);
-		inline void updateRenderSize(const QSize& sceneSize);
-
-		Tagaro::Scene* m_parent;
-		QGraphicsView* m_mainView;
-		QSize m_renderSize;
-		bool m_adjustingSceneRect;
-	protected:
-		virtual void receivePixmap(const QPixmap& pixmap);
-};
+#include <QtGui/QStyleOptionGraphicsItem>
+#include <QtGui/QTextDocument>
 
 Tagaro::Scene::Private::Private(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, Tagaro::Scene* parent)
 	: Tagaro::RendererClient(backgroundRenderer, backgroundSpriteKey)
@@ -47,27 +32,21 @@ Tagaro::Scene::Private::Private(Tagaro::Renderer* backgroundRenderer, const QStr
 	, m_mainView(0)
 	, m_renderSize() //constructed with invalid size (as documented)
 	, m_adjustingSceneRect(false)
+	, m_currentOverlay(0)
 {
 	connect(parent, SIGNAL(sceneRectChanged(QRectF)), parent, SLOT(_k_updateSceneRect(QRectF)));
-}
-
-void Tagaro::Scene::Private::init()
-{
-	//TODO
 }
 
 Tagaro::Scene::Scene(QObject* parent)
 	: QGraphicsScene(parent)
 	, d(new Private(0, QString(), this))
 {
-	d->init();
 }
 
 Tagaro::Scene::Scene(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, QObject* parent)
 	: QGraphicsScene(parent)
 	, d(new Private(backgroundRenderer, backgroundSpriteKey, this))
 {
-	d->init();
 }
 
 Tagaro::Scene::~Scene()
@@ -170,5 +149,87 @@ void Tagaro::Scene::Private::receivePixmap(const QPixmap& pixmap)
 }
 
 //END background brush stuff
+//BEGIN message overlays
+
+void Tagaro::Scene::Private::addMessageOverlay(Tagaro::MessageOverlay* overlay)
+{
+	//This is called during MessageOverlay instantiation. It is guaranteed that
+	//this overlay is not visible at this point.
+	m_overlays << overlay;
+	connect(overlay, SIGNAL(destroyed(QObject*)), m_parent, SLOT(_k_moDestroyed(QObject*)));
+	connect(overlay, SIGNAL(textChanged(QString)), m_parent, SLOT(_k_moTextChanged(QString)));
+	connect(overlay, SIGNAL(visibleChanged(bool)), m_parent, SLOT(_k_moVisibleChanged(bool)));
+}
+
+void Tagaro::Scene::Private::_k_moDestroyed(QObject* object)
+{
+	Tagaro::MessageOverlay* overlay = reinterpret_cast<Tagaro::MessageOverlay*>(object);
+	m_overlays.removeAll(overlay);
+	if (m_currentOverlay == overlay)
+	{
+		//choose new current overlay
+		_k_moVisibleChanged(false);
+	}
+}
+
+void Tagaro::Scene::Private::_k_moTextChanged(const QString& text)
+{
+	Q_UNUSED(text)
+	if (m_currentOverlay == m_parent->sender())
+	{
+		m_parent->invalidate(m_parent->sceneRect(), QGraphicsScene::ForegroundLayer);
+	}
+}
+
+void Tagaro::Scene::Private::_k_moVisibleChanged(bool isVisible)
+{
+	Q_UNUSED(isVisible)
+	//choose new current overlay
+	m_currentOverlay = 0;
+	foreach (Tagaro::MessageOverlay* overlay, m_overlays)
+	{
+		if (overlay->isVisible())
+		{
+			m_currentOverlay = overlay;
+		}
+	}
+	m_parent->invalidate(m_parent->sceneRect(), QGraphicsScene::ForegroundLayer);
+}
+
+void Tagaro::Scene::drawForeground(QPainter* painter, const QRectF& rect)
+{
+	QGraphicsScene::drawForeground(painter, rect);
+	if (!d->m_currentOverlay)
+	{
+		return;
+	}
+	//draw shadow
+	QColor shadowColor(Qt::black);
+	shadowColor.setAlpha(192);
+	painter->fillRect(rect, shadowColor);
+	//draw text via QGraphicsTextItem (to get HTML support)
+	QGraphicsTextItem item;
+	QTextOption tOpt = item.document()->defaultTextOption();
+	tOpt.setAlignment(Qt::AlignCenter);
+	item.document()->setDefaultTextOption(tOpt);
+	item.document()->setHtml(d->m_currentOverlay->text());
+	item.setDefaultTextColor(Qt::white);
+	QFont font = item.font();
+	font.setPointSize(3 * font.pointSize());
+	item.setFont(font);
+	item.setTextWidth(sceneRect().width() * 0.9); //10% difference = some margin at the left and right
+	QRectF itemRect(QPointF(), item.boundingRect().size());
+	itemRect.moveCenter(sceneRect().center());
+	painter->save();
+	painter->translate(itemRect.topLeft());
+	QStyleOptionGraphicsItem opt;
+	opt.initFrom(dynamic_cast<QWidget*>(painter->device()));
+	opt.exposedRect = rect.translated(-itemRect.topLeft());
+	opt.state = QStyle::State_Active;
+	item.paint(painter, &opt, 0);
+	painter->restore();
+}
+
+//END message overlays
 
 #include "scene.moc"

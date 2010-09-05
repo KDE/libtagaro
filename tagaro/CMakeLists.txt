@@ -22,6 +22,7 @@ set(tagaro_LIB_SRCS
 	graphics/theme.cpp
 	graphics/themeprovider.cpp
 	graphics/themeselector.cpp
+	interface/messageoverlay.cpp
 	interface/scene.cpp
 )
 kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
@@ -57,5 +58,6 @@ install(FILES
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/graphics COMPONENT Devel)
 
 install(FILES
+	interface/messageoverlay.h
 	interface/scene.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)

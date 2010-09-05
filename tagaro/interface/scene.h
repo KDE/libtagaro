@@ -25,6 +25,7 @@
 
 namespace Tagaro {
 
+class MessageOverlay;
 class Renderer;
 class RendererClient;
 
@@ -32,11 +33,12 @@ class RendererClient;
  * @class Tagaro::Scene scene.h <Tagaro/Scene>
  * @brief QGraphicsScene with automatic viewport transform adjustments
  *
- * This QGraphicsScene subclass provides integration with Tagaro, by acting as
- * a Tagaro::RendererClient to fetch a scene background pixmap.
- *
- * Additionally, it can be used to keep the QGraphicsScene's sceneRect() in sync
- * with the rect() of a QGraphicsView instance (the "main view").
+ * This QGraphicsScene subclass provides integration with Tagaro and 
+ * miscellaneous convenience features:
+ * @li It acts as a Tagaro::RendererClient to fetch a scene background pixmap.
+ * @li It can be used to keep the QGraphicsScene's sceneRect() in sync
+ *     with the rect() of a QGraphicsView instance (the "main view").
+ * @li It can display Tagaro::MessageOverlay instances.
  */
 class TAGARO_EXPORT Scene : public QGraphicsScene
 {
@@ -82,10 +84,15 @@ class TAGARO_EXPORT Scene : public QGraphicsScene
 		void setBackgroundBrushRenderSize(const QSize& size);
 	protected:
 		virtual bool eventFilter(QObject* watched, QEvent* event);
+		virtual void drawForeground(QPainter* painter, const QRectF& rect);
 	private:
+		friend class MessageOverlay;
 		class Private;
 		Private* const d;
 		Q_PRIVATE_SLOT(d, void _k_updateSceneRect(const QRectF&));
+		Q_PRIVATE_SLOT(d, void _k_moDestroyed(QObject*));
+		Q_PRIVATE_SLOT(d, void _k_moTextChanged(const QString&));
+		Q_PRIVATE_SLOT(d, void _k_moVisibleChanged(bool));
 };
 
 } //namespace Tagaro

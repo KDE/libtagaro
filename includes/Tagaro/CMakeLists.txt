@@ -4,6 +4,7 @@ install(FILES
 	ConfigDialog
 	DesktopThemeProvider
 	FileThemeProvider
+	MessageOverlay
 	QSvgRendererModule
 	Renderer
 	RendererClient
