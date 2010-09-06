@@ -106,6 +106,29 @@ class TAGARO_EXPORT ObjectPool
  *
  * For more advise on how to use smart pointers, see e.g. the documentation for
  * the QScopedPointer class from QtCore.
+ *
+ * @section tid Using T_ID in the instantiation of ObjectPointer arguments
+ *
+ * ObjectPointers are commonly used as method arguments, when it does not matter
+ * whether the instance comes from the calling context or from a pool. For
+ * example, suppose you have a Tagaro::Renderer available under the key "foo",
+ * and want to call a method:
+ * @code
+ * //declaration
+ * void doSomething(Tagaro::ObjectPointer<Tagaro::Renderer> renderer);
+ * //usage
+ * doSomething("foo");
+ * @endcode
+ * This does not work, because a C string (i.e., const char*) can not be
+ * converted to ObjectPointer directly. If there were such an overload, it would
+ * conflict, for null pointers, with the constructor that takes a pointer. The
+ * T_ID "macro" is provided to solve this problem. Plus, it gives the argument
+ * additional semantics:
+ * @code
+ * doSomething(T_ID("foo"));
+ * @endcode
+ * If you wonder why the word macro is in quotes above, it's because T_ID is
+ * actually only a typedef for QByteArray.
  */
 template<typename T> class TAGARO_EXPORT ObjectPointer
 {
@@ -145,6 +168,9 @@ DEFINE_TYPEDEF(ThemeProvider)
 //END typedefs for commonly used ObjectPointers
 
 } //namespace Tagaro
+
+//See APIDOX for Tagaro::ObjectPointer.
+typedef QByteArray T_ID;
 
 //BEGIN implementation of Tagaro::ObjectPointer
 
