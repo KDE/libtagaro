@@ -42,7 +42,7 @@ class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::Rend
 	public:
 		///Creates a new Tagaro::SpriteItem which renders the sprite with the
 		///given @a spriteKey as provided by the given @a renderer.
-		SpriteItem(Tagaro::Renderer* renderer, const QString& spriteKey, QGraphicsItem* parent = 0);
+		SpriteItem(Tagaro::RendererPtr renderer, const QString& spriteKey, QGraphicsItem* parent = 0);
 		virtual ~SpriteItem();
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);

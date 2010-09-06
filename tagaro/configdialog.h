@@ -35,21 +35,17 @@ class ThemeProvider;
  *
  * @section themeselector Theme selectors
  *
- * For example, if you use Tagaro::Renderer with a Tagaro::DesktopThemeProvider,
- * @code
- * Tagaro::Renderer* r = new Tagaro::Renderer("foobar");
- * @endcode
- * add a theme selector page like this:
+ * The following example code illustrates how to add a theme selector page:
  * @code
  * Tagaro::ConfigDialog dialog;
  * dialog.addThemeSelector(
- *     Tagaro::DesktopThemeProvider::instance("foobar"),
+ *     themeProvider
  *     Tagaro::ConfigDialog::NormalThemeSelector,
  *     i18n("Theme"), "games-config-theme", i18n("Choose a theme")
  * );
  * @endcode
- * The Tagaro::Renderer instance will pickup selection changes in
- * Tagaro::ThemeProvider automatically. If you need to be informed about the
+ * Any Tagaro::Renderer instances connected to the @a themeProvider will pickup
+ * selection changes automatically. If you need to be informed about the
  * selection change for some other reason, use the
  * Tagaro::ThemeProvider::selectedIndexChanged() signal.
  */

@@ -23,7 +23,7 @@ class Tagaro::SpriteItemPrivate
 	//NOTE: reserved for later use
 };
 
-Tagaro::SpriteItem::SpriteItem(Tagaro::Renderer* renderer, const QString& spriteKey, QGraphicsItem* parent)
+Tagaro::SpriteItem::SpriteItem(Tagaro::RendererPtr renderer, const QString& spriteKey, QGraphicsItem* parent)
 	: QGraphicsPixmapItem(parent)
 	, Tagaro::RendererClient(renderer, spriteKey)
 	, d(0)

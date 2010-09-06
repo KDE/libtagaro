@@ -22,7 +22,7 @@
 
 #include <QtCore/QTimer>
 
-//WARNING: d->m_renderer == 0 is allowed, and used actively by Tagaro::View.
+//WARNING: d->m_renderer == 0 is allowed, and used actively by Tagaro::Scene.
 
 Tagaro::RendererClientPrivate::RendererClientPrivate(Tagaro::Renderer* renderer, const QString& spriteKey, Tagaro::RendererClient* parent)
 	: m_parent(parent)
@@ -32,7 +32,7 @@ Tagaro::RendererClientPrivate::RendererClientPrivate(Tagaro::Renderer* renderer,
 {
 }
 
-Tagaro::RendererClient::RendererClient(Tagaro::Renderer* renderer, const QString& spriteKey)
+Tagaro::RendererClient::RendererClient(Tagaro::RendererPtr renderer, const QString& spriteKey)
 	: d(new Tagaro::RendererClientPrivate(renderer, spriteKey, this))
 {
 	if (renderer)
@@ -57,7 +57,7 @@ Tagaro::Renderer* Tagaro::RendererClient::renderer() const
 	return d->m_renderer;
 }
 
-void Tagaro::RendererClient::setRenderer(Tagaro::Renderer* renderer)
+void Tagaro::RendererClient::setRenderer(Tagaro::RendererPtr renderer)
 {
 	if (d->m_renderer != renderer)
 	{

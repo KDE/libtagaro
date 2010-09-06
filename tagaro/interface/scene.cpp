@@ -26,7 +26,7 @@
 #include <QtGui/QStyleOptionGraphicsItem>
 #include <QtGui/QTextDocument>
 
-Tagaro::Scene::Private::Private(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, Tagaro::Scene* parent)
+Tagaro::Scene::Private::Private(Tagaro::RendererPtr backgroundRenderer, const QString& backgroundSpriteKey, Tagaro::Scene* parent)
 	: Tagaro::RendererClient(backgroundRenderer, backgroundSpriteKey)
 	, m_parent(parent)
 	, m_mainView(0)
@@ -43,7 +43,7 @@ Tagaro::Scene::Scene(QObject* parent)
 {
 }
 
-Tagaro::Scene::Scene(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, QObject* parent)
+Tagaro::Scene::Scene(Tagaro::RendererPtr backgroundRenderer, const QString& backgroundSpriteKey, QObject* parent)
 	: QGraphicsScene(parent)
 	, d(new Private(backgroundRenderer, backgroundSpriteKey, this))
 {

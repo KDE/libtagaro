@@ -131,6 +131,18 @@ template<typename T> class TAGARO_EXPORT ObjectPointer
 		T* m_pointer;
 };
 
+//BEGIN typedefs for commonly used ObjectPointers
+
+#define DEFINE_TYPEDEF(CLASS) \
+	class CLASS; \
+	typedef Tagaro::ObjectPointer<Tagaro::CLASS> CLASS##Ptr;
+
+DEFINE_TYPEDEF(Renderer)
+
+#undef DEFINE_TYPEDEF
+
+//END typedefs for commonly used ObjectPointers
+
 } //namespace Tagaro
 
 //BEGIN implementation of Tagaro::ObjectPointer
