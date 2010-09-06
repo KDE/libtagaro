@@ -484,6 +484,7 @@ void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& 
 	if (synchronous || !(m_strategies & Tagaro::Renderer::UseRenderingThreads))
 	{
 		worker->run();
+		delete worker;
 		//if everything worked fine, result is in high-speed cache now
 		const QPixmap result = m_pixmapCache.value(cacheKey);
 		requestPixmap__propagateResult(result, client, synchronousResult);
