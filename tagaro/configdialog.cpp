@@ -46,7 +46,7 @@ Tagaro::ConfigDialog::~ConfigDialog()
 	delete d;
 }
 
-void Tagaro::ConfigDialog::addThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header)
+void Tagaro::ConfigDialog::addThemeSelector(Tagaro::ThemeProviderPtr provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header)
 {
 	Tagaro::ThemeSelector* selector = new Tagaro::ThemeSelector(provider, options);
 	selector->layout()->setMargin(0); //for embedding in the dialog's layout

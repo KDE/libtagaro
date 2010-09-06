@@ -167,80 +167,49 @@ void Tagaro::ThemeProvider::endRemoveThemes()
 //END Tagaro::ThemeProvider
 //BEGIN Tagaro::DesktopThemeProvider
 
-struct Tagaro::DtpInstantiator : public QHash<QByteArray, Tagaro::DesktopThemeProvider*>
-{
-	//This class owns (and therefore deletes) all Tagaro::DesktopThemeProvider instances.
-	~DtpInstantiator()
-	{
-		//cannot do this with qDeleteAll() because this method may not call the destructor
-		iterator it1 = begin(), it2 = end();
-		for (; it1 != it2; ++it1)
-		{
-			delete it1.value();
-		}
-	}
-};
-
-K_GLOBAL_STATIC(Tagaro::DtpInstantiator, g_instantiator)
-
-Tagaro::DesktopThemeProvider* Tagaro::DesktopThemeProvider::instance(const QByteArray& key)
-{
-	Tagaro::DesktopThemeProvider*& provider = (*g_instantiator)[key];
-	if (!provider) //provider == 0 on first access -> instance needs to be created
-	{
-		//Because we obtained a reference from the hash, this assignment will also store the new instance there.
-		provider = new Tagaro::DesktopThemeProvider(key);
-	}
-	return provider;
-}
-
 struct Tagaro::DesktopThemeProvider::Private
 {
-	QByteArray m_key;
 	Tagaro::DesktopThemeProvider* m_parent;
 	QVector<Tagaro::Theme*> m_themes;
+	QByteArray m_configKey;
 
-	Private(const QByteArray& key, Tagaro::DesktopThemeProvider* parent) : m_key(key), m_parent(parent) {}
+	Private(const QByteArray& configKey, Tagaro::DesktopThemeProvider* parent) : m_parent(parent), m_configKey(configKey) {}
 	~Private() { qDeleteAll(m_themes); }
 
-	void saveSelectedIndex(int index);
+	void _k_saveSelectedIndex(int index);
 };
 
-Tagaro::DesktopThemeProvider::DesktopThemeProvider(const QByteArray& key)
-	: d(new Private(key, this))
+Tagaro::DesktopThemeProvider::DesktopThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, QObject* parent)
+	: Tagaro::ThemeProvider(parent)
+	, d(new Private(configKey, this))
 {
 	static const QString defaultTheme = QLatin1String("default.desktop");
+	const QString ksdDirectory = ksdDirectory_ + QChar('/');
 	//read my configuration
-	KConfigGroup mainConfig(KGlobal::config(), "Tagaro::DesktopThemeProvider");
-	KConfigGroup myConfig(&mainConfig, key.constData());
-	const QByteArray resourceType = myConfig.readEntry("ResourceType", QByteArray("appdata"));
-	const char* const resourceType_ = resourceType.constData();
-	QString directory = myConfig.readEntry("Directory", QString::fromLatin1("themes"));
-	if (!directory.endsWith(QChar('/')))
-		directory += QChar('/');
-	const QByteArray selectedTheme = myConfig.readEntry("Selected", (directory + defaultTheme).toUtf8());
+	KConfigGroup config(KGlobal::config(), "Tagaro::DesktopThemeProvider");
+	const QByteArray selectedTheme = config.readEntry(configKey.data(), (ksdDirectory + defaultTheme).toUtf8());
 	//find themes
 	const QStringList themePaths = KGlobal::dirs()->findAllResources(
-		resourceType_, directory + "*.desktop",
+		ksdResource, ksdDirectory + "*.desktop",
 		KStandardDirs::NoDuplicates
 	);
 	foreach (const QString& themePath, themePaths)
 	{
 		const QString themeFile = QFileInfo(themePath).fileName();
 		//create theme from configuration
-		Tagaro::Theme* theme = new Tagaro::Theme((directory + themeFile).toUtf8());
+		Tagaro::Theme* theme = new Tagaro::Theme((ksdDirectory + themeFile).toUtf8());
 		KConfig themeConfigFile(themePath, KConfig::SimpleConfig);
 		KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
 		//read standard properties
 		const QString graphicsFile = themeConfig.readEntry("FileName", QString());
-		theme->setData(Tagaro::Theme::GraphicsFileRole, KStandardDirs::locate(resourceType_, directory + graphicsFile));
+		theme->setData(Tagaro::Theme::GraphicsFileRole, KStandardDirs::locate(ksdResource, ksdDirectory + graphicsFile));
 		theme->setData(Tagaro::Theme::ThemeFileRole, themePath);
 		theme->setData(Tagaro::Theme::NameRole, themeConfig.readEntry("Name", QString()));
 		theme->setData(Tagaro::Theme::DescriptionRole, themeConfig.readEntry("Description", QString()));
 		theme->setData(Tagaro::Theme::AuthorRole, themeConfig.readEntry("Author", QString()));
 		theme->setData(Tagaro::Theme::AuthorEmailRole, themeConfig.readEntry("AuthorEmail", QString()));
 		const QString previewFile = themeConfig.readEntry("Preview", QString());
-		theme->setData(Tagaro::Theme::PreviewRole, QPixmap(KStandardDirs::locate(resourceType_, directory + previewFile)));
+		theme->setData(Tagaro::Theme::PreviewRole, QPixmap(KStandardDirs::locate(ksdResource, ksdDirectory + previewFile)));
 		//write everything except for the standard properties into the theme's custom data
 		//some applications use this for per-theme configuration values
 		QMap<QString, QString> entryMap = themeConfig.entryMap();
@@ -267,7 +236,7 @@ Tagaro::DesktopThemeProvider::DesktopThemeProvider(const QByteArray& key)
 			setSelectedIndex(i);
 		}
 	}
-	connect(this, SIGNAL(selectedIndexChanged(int)), SLOT(saveSelectedIndex(int)));
+	connect(this, SIGNAL(selectedIndexChanged(int)), SLOT(_k_saveSelectedIndex(int)));
 }
 
 Tagaro::DesktopThemeProvider::~DesktopThemeProvider()
@@ -285,16 +254,15 @@ const Tagaro::Theme* Tagaro::DesktopThemeProvider::theme(int index) const
 	return d->m_themes.value(index, 0);
 }
 
-void Tagaro::DesktopThemeProvider::Private::saveSelectedIndex(int index)
+void Tagaro::DesktopThemeProvider::Private::_k_saveSelectedIndex(int index)
 {
 	const Tagaro::Theme* theme = m_parent->Tagaro::DesktopThemeProvider::theme(index);
 	if (!theme)
 	{
 		return;
 	}
-	KConfigGroup mainConfig(KGlobal::config(), "Tagaro::DesktopThemeProvider");
-	KConfigGroup myConfig(&mainConfig, m_key.constData());
-	myConfig.writeEntry("Selected", theme->identifier());
+	KConfigGroup config(KGlobal::config(), "Tagaro::DesktopThemeProvider");
+	config.writeEntry(m_configKey.data(), theme->identifier());
 	KGlobal::config()->sync();
 }
 

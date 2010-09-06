@@ -110,76 +110,50 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		Private* const d;
 };
 
-class DtpInstantiator;
-
 /**
- * @class Tagaro::DesktopThemeProvider themeprovider.h <Tagaro/ThemeProvider>
+ * @class Tagaro::DesktopThemeProvider themeprovider.h <Tagaro/DesktopThemeProvider>
  *
  * This theme provider locates theme files (*.desktop) in the installation
  * directories via KStandardDirs. The SVG file is referenced by the "FileName"
  * key in the desktop file's main config group, and expected to be in the same
  * directory as the desktop file.
- *
- * @section config Configuration
- *
- * The configuration of a Tagaro::DesktopThemeProvider instance is stored in the
- * application's configuration file (i.e. KGlobal::config()). A typical
- * configuration looks like this (in fact, the values below are the defaults):
- * @code
- * [Tagaro::DesktopThemeProvider][foo]
- * ResourceType=appdata
- * Directory=themes
- * @endcode
- * In this example, "foo" is the key which needs to be passed to the instance()
- * method. The "ResourceType" and "Directory" will be used to find the theme
- * files with KStandardDirs like this:
- * @code
- * KGlobal::dirs()->findAllResources(resourceType, directory + "/.desktop");
- * @endcode
- * If you need to differ from the standard configuration, it is recommended to
- * install a system-wide configuration file which includes your custom
- * configuration.
  */
 class TAGARO_EXPORT DesktopThemeProvider : public Tagaro::ThemeProvider
 {
 	Q_OBJECT
 	public:
-		///@return a Tagaro::DesktopThemeProvider instance
-		///Application writers are not allowed to instantiate this class
-		///directly, but must use this method instead. If given the same @a key
-		///in multiple calls, this method will always return the same instance.
-		///Multiple instances can be created by using different @a keys.
-		static Tagaro::DesktopThemeProvider* instance(const QByteArray& key);
+		///Creates a new Tagaro::DesktopThemeProvider instance. The @a configKey
+		///is used to store the theme selection in the configuration. The
+		///following two arguments are passed to KStandardDirs, so this theme
+		///provider will list all themes which can be found with:
+		///@code
+		///KGlobal::dirs()->findAllResources(ksdResource, ksdDirectory + "/*.desktop");
+		///@endcode
+		DesktopThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, QObject* parent = 0);
+		///Destroys this Tagaro::DesktopThemeProvider instance.
+		virtual ~DesktopThemeProvider();
 
 		virtual int themeCount() const;
 		virtual const Tagaro::Theme* theme(int index) const;
 	private:
-		///Creates a new Tagaro::DesktopThemeProvider instance. For the meaning
-		///of the @a key argument, see the instance() method.
-		///@see instance()
-		DesktopThemeProvider(const QByteArray& key);
-		///Destroys this Tagaro::DesktopThemeProvider instance.
-		virtual ~DesktopThemeProvider();
-	private:
-		friend class DtpInstantiator;
 		class Private;
 		Private* const d;
-		Q_PRIVATE_SLOT(d, void saveSelectedIndex(int));
+		Q_PRIVATE_SLOT(d, void _k_saveSelectedIndex(int));
 };
 
 /**
- * @class Tagaro::FileThemeProvider themeprovider.h <Tagaro/ThemeProvider>
+ * @class Tagaro::FileThemeProvider themeprovider.h <Tagaro/FileThemeProvider>
  *
  * This theme provider provides exactly one theme, which consists only of a
- * single SVG file. You may use this provider if you do not have multiple themes
- * to offer and want to avoid the need to create .desktop theme files.
+ * single graphics file. You may use this provider if you do not have multiple
+ * themes to offer and want to avoid the need to create .desktop theme files.
  */
 class TAGARO_EXPORT FileThemeProvider : public Tagaro::ThemeProvider
 {
 	Q_OBJECT
 	public:
 		///Creates a new Tagaro::FileThemeProvider instance, which provides the
-		///given SVG @a file.
+		///given graphics @a file.
 		FileThemeProvider(const QString& file, QObject* parent = 0);
 		///Destroys this Tagaro::FileThemeProvider instance.
 		virtual ~FileThemeProvider();

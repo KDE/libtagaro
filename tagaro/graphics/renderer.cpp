@@ -68,13 +68,8 @@ Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, unsign
 	connect(m_themeProvider, SIGNAL(selectedIndexChanged(int)), SLOT(loadSelectedTheme()));
 }
 
-Tagaro::Renderer::Renderer(Tagaro::ThemeProvider* provider, unsigned cacheSize)
+Tagaro::Renderer::Renderer(Tagaro::ThemeProviderPtr provider, unsigned cacheSize)
 	: d(new Tagaro::RendererPrivate(provider, cacheSize, this))
-{
-}
-
-Tagaro::Renderer::Renderer(const QByteArray& providerKey, unsigned cacheSize)
-	: d(new Tagaro::RendererPrivate(Tagaro::DesktopThemeProvider::instance(providerKey), cacheSize, this))
 {
 }
 

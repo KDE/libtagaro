@@ -138,6 +138,7 @@ template<typename T> class TAGARO_EXPORT ObjectPointer
 	typedef Tagaro::ObjectPointer<Tagaro::CLASS> CLASS##Ptr;
 
 DEFINE_TYPEDEF(Renderer)
+DEFINE_TYPEDEF(ThemeProvider)
 
 #undef DEFINE_TYPEDEF
 

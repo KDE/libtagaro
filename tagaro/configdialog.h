@@ -21,6 +21,7 @@
 
 #include <KDE/KConfigDialog>
 
+#include "objectpool.h"
 #include <libtagaro_export.h>
 
 namespace Tagaro {
@@ -39,7 +40,7 @@ class ThemeProvider;
  * @code
  * Tagaro::ConfigDialog dialog;
  * dialog.addThemeSelector(
- *     themeProvider
+ *     themeProvider,
  *     Tagaro::ConfigDialog::NormalThemeSelector,
  *     i18n("Theme"), "games-config-theme", i18n("Choose a theme")
  * );
@@ -72,7 +73,7 @@ class TAGARO_EXPORT ConfigDialog : public KConfigDialog
 		///@param iconName The name of the icon that should be used if needed.
 		///@param header   The header text to be shown above the page (defaults
 		///                to the item name if nothing is given).
-		void addThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header = QString());
+		void addThemeSelector(Tagaro::ThemeProviderPtr provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header = QString());
 	protected:
 		virtual bool hasChanged();
 		virtual bool isDefault();

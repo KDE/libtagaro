@@ -23,6 +23,7 @@
 #include <QtCore/QObject>
 #include <QtGui/QPixmap>
 
+#include "../objectpool.h"
 #include <libtagaro_export.h>
 
 namespace Tagaro {
@@ -115,10 +116,7 @@ class TAGARO_EXPORT Renderer : public QObject
 		///@param cacheSize the cache size per theme in megabytes (if not given,
 		///a sane default is used)
 		///@warning This constructor may only be called from the main thread.
-		explicit Renderer(Tagaro::ThemeProvider* provider, unsigned cacheSize = 0);
-		///@overload
-		///The renderer will use the Tagaro::DesktopThemeProvider with the given key.
-		explicit Renderer(const QByteArray& providerKey, unsigned cacheSize = 0);
+		explicit Renderer(Tagaro::ThemeProviderPtr provider, unsigned cacheSize = 0);
 		///Deletes this Tagaro::Renderer instance, and all clients using it.
 		virtual ~Renderer();
 
