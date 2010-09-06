@@ -12,6 +12,7 @@ include_directories(
 
 set(tagaro_LIB_SRCS
 	configdialog.cpp
+	objectpool.cpp
 	graphics/board.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/rendererclient.cpp
@@ -43,6 +44,7 @@ install(TARGETS tagaro ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
 	configdialog.h
+	objectpool.h
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
 

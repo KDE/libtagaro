@@ -5,6 +5,8 @@ install(FILES
 	DesktopThemeProvider
 	FileThemeProvider
 	MessageOverlay
+	ObjectPointer
+	ObjectPool
 	QSvgRendererModule
 	Renderer
 	RendererClient
