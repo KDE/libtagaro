@@ -57,7 +57,7 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Re
 	public:
 		///Creates a new Tagaro::SpriteObjectItem which renders the sprite with
 		///the given @a spriteKey as provided by the given @a renderer.
-		SpriteObjectItem(Tagaro::RendererPtr renderer, const QString& spriteKey, QGraphicsItem* parent = 0);
+		SpriteObjectItem(Tagaro::Renderer* renderer, const QString& spriteKey, QGraphicsItem* parent = 0);
 		virtual ~SpriteObjectItem();
 
 		///@return the item's offset, which defines the point of the top-left

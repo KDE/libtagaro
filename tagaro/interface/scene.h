@@ -21,7 +21,7 @@
 
 #include <QtGui/QGraphicsScene>
 
-#include "../objectpool.h" //for Tagaro::RendererPtr
+#include "../objectpool.h" //for Tagaro::Renderer*
 #include <libtagaro_export.h>
 
 namespace Tagaro {
@@ -50,7 +50,7 @@ class TAGARO_EXPORT Scene : public QGraphicsScene
 		///@overload
 		///Initializes the renderer client for the scene background brush with
 		///the given renderer and sprite key.
-		Scene(Tagaro::RendererPtr backgroundRenderer, const QString& backgroundSpriteKey, QObject* parent = 0);
+		Scene(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, QObject* parent = 0);
 		///Destroys this Tagaro::Scene instance.
 		virtual ~Scene();
 

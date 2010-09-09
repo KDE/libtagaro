@@ -21,7 +21,7 @@
 
 #include <QtGui/QPixmap>
 
-#include "../objectpool.h" //for Tagaro::RendererPtr
+#include "../objectpool.h" //for Tagaro::Renderer*
 #include <libtagaro_export.h>
 
 namespace Tagaro {
@@ -48,14 +48,14 @@ class TAGARO_EXPORT RendererClient
 		///given @a spriteKey as provided by the given @a renderer.
 		///You may give a null pointer to @a renderer, or an empty string to
 		///@a spriteKey. In this case, no pixmap is fetched.
-		RendererClient(Tagaro::RendererPtr renderer, const QString& spriteKey);
+		RendererClient(Tagaro::Renderer* renderer, const QString& spriteKey);
 		virtual ~RendererClient();
 
 		///@return the renderer used by this client
 		Tagaro::Renderer* renderer() const;
 		///Sets the renderer used by this client. Set to a null pointer to
 		///disable pixmap fetching.
-		void setRenderer(Tagaro::RendererPtr renderer);
+		void setRenderer(Tagaro::Renderer* renderer);
 		///@return the key of the sprite currently rendered by this client
 		QString spriteKey() const;
 		///Defines the key of the sprite which is rendered by this client. Set

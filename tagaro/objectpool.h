@@ -47,10 +47,23 @@ namespace Tagaro {
  * Tagaro::Renderer* renderer = qobject_cast<Tagaro::Renderer*>(rendererObj);
  * renderer->...
  * @endcode
- * This becomes even simpler when using the Tagaro::ObjectPointer class:
+ * The casting is done automatically by the Tagaro::ObjectPointer class:
  * @code
- * Tagaro::ObjectPointer<Tagaro::Renderer> renderer("myrenderer");
+ * Tagaro::Renderer* renderer = Tagaro::ObjectPointer("myrenderer");
  * renderer->...
+ * @endcode
+ * This becomes even shorter when using the T_OBJ typedef:
+ * @code
+ * Tagaro::Renderer* renderer = T_OBJ("myrenderer");
+ * renderer->...
+ * @endcode
+ * Please note though that it is not possible to use Tagaro::Renderer methods
+ * directly on T_OBJ(), because that is basically a QObject pointer with
+ * implicit casting to QObject subclasses. You can, however, omit the exact type
+ * when passing the pointer to a method. In this case, the argument type will
+ * cast the ObjectPointer. For example:
+ * @code
+ * connect(T_OBJ("foo"), SIGNAL(valueChanged(int)), T_OBJ("bar"), SLOT(setValue(int)));
  * @endcode
  */
 class TAGARO_EXPORT ObjectPool
@@ -98,39 +111,8 @@ class TAGARO_EXPORT ObjectPool
  * to provide a type-safe access method to objects stored in object pools.
  *
  * @see Tagaro::ObjectPool for example code
- *
- * As usual for smart pointer classes, this class can always be used when a
- * pointer to T is expected. Because its constructors can be used implicitly,
- * when a method takes an ObjectPointer argument, you can give a QByteArray key
- * to tell the method to fetch the object from the object pool.
- *
- * For more advise on how to use smart pointers, see e.g. the documentation for
- * the QScopedPointer class from QtCore.
- *
- * @section tid Using T_ID in the instantiation of ObjectPointer arguments
- *
- * ObjectPointers are commonly used as method arguments, when it does not matter
- * whether the instance comes from the calling context or from a pool. For
- * example, suppose you have a Tagaro::Renderer available under the key "foo",
- * and want to call a method:
- * @code
- * //declaration
- * void doSomething(Tagaro::ObjectPointer<Tagaro::Renderer> renderer);
- * //usage
- * doSomething("foo");
- * @endcode
- * This does not work, because a C string (i.e., const char*) can not be
- * converted to ObjectPointer directly. If there were such an overload, it would
- * conflict, for null pointers, with the constructor that takes a pointer. The
- * T_ID "macro" is provided to solve this problem. Plus, it gives the argument
- * additional semantics:
- * @code
- * doSomething(T_ID("foo"));
- * @endcode
- * If you wonder why the word macro is in quotes above, it's because T_ID is
- * actually only a typedef for QByteArray.
  */
-template<typename T> class TAGARO_EXPORT ObjectPointer
+class TAGARO_EXPORT ObjectPointer
 {
 	public:
 		///Creates a Tagaro::ObjectPointer instance by fetching the pointer to
@@ -139,75 +121,36 @@ template<typename T> class TAGARO_EXPORT ObjectPointer
 		///but has the wrong type, this pointer will be null.
 		///@see Tagaro::ObjectPool::get
 		inline ObjectPointer(const QByteArray& key); //krazy:exclude=explicit
-		///Creates a Tagaro::ObjectPointer instance and sets its pointer to @a p.
-		inline ObjectPointer(T* p); //krazy:exclude=explicit
 
 		///@return true if the pointer is not null
 		inline operator bool() const;
 		///@return the pointer encapsulated by this object
-		inline operator T*() const;
-		///Provides access to the pointer's object.
-		inline T& operator*() const;
-		///Provides access to the pointer's object.
-		inline T* operator->() const;
+		template<typename T> inline operator T*() const;
 	private:
-		T* m_pointer;
+		QObject* m_pointer;
 };
-
-//BEGIN typedefs for commonly used ObjectPointers
-
-#define DEFINE_TYPEDEF(CLASS) \
-	class CLASS; \
-	typedef Tagaro::ObjectPointer<Tagaro::CLASS> CLASS##Ptr;
-
-DEFINE_TYPEDEF(Renderer)
-DEFINE_TYPEDEF(ThemeProvider)
-
-#undef DEFINE_TYPEDEF
-
-//END typedefs for commonly used ObjectPointers
 
 } //namespace Tagaro
 
 //See APIDOX for Tagaro::ObjectPointer.
-typedef QByteArray T_ID;
+typedef Tagaro::ObjectPointer T_OBJ;
 
 //BEGIN implementation of Tagaro::ObjectPointer
 
-template <typename T>
-Tagaro::ObjectPointer<T>::ObjectPointer(const QByteArray& key)
-	: m_pointer(qobject_cast<T*>(Tagaro::ObjectPool::get(key)))
+Tagaro::ObjectPointer::ObjectPointer(const QByteArray& key)
+	: m_pointer(Tagaro::ObjectPool::get(key))
 {
 }
 
-template <typename T>
-Tagaro::ObjectPointer<T>::ObjectPointer(T* p)
-	: m_pointer(p)
-{
-}
-
-template <typename T>
-Tagaro::ObjectPointer<T>::operator bool() const
+Tagaro::ObjectPointer::operator bool() const
 {
 	return (bool) m_pointer;
 }
 
 template <typename T>
-Tagaro::ObjectPointer<T>::operator T*() const
+Tagaro::ObjectPointer::operator T*() const
 {
-	return m_pointer;
-}
-
-template <typename T>
-T& Tagaro::ObjectPointer<T>::operator*() const
-{
-	return *m_pointer;
-}
-
-template <typename T>
-T* Tagaro::ObjectPointer<T>::operator->() const
-{
-	return m_pointer;
+	return qobject_cast<T*>(m_pointer);
 }
 
 //END implementation of Tagaro::ObjectPointer

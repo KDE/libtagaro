@@ -73,7 +73,7 @@ class TAGARO_EXPORT ConfigDialog : public KConfigDialog
 		///@param iconName The name of the icon that should be used if needed.
 		///@param header   The header text to be shown above the page (defaults
 		///                to the item name if nothing is given).
-		void addThemeSelector(Tagaro::ThemeProviderPtr provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header = QString());
+		void addThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header = QString());
 	protected:
 		virtual bool hasChanged();
 		virtual bool isDefault();
