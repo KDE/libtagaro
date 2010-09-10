@@ -13,6 +13,8 @@ include_directories(
 set(tagaro_LIB_SRCS
 	configdialog.cpp
 	objectpool.cpp
+	audio/audioscene.cpp
+	audio/sound.cpp
 	graphics/board.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/rendererclient.cpp
@@ -29,7 +31,7 @@ set(tagaro_LIB_SRCS
 kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
 
 kde4_add_library(tagaro SHARED ${tagaro_LIB_SRCS})
-target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY})
+target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${OPENAL_LIBRARY} ${SNDFILE_LIBRARIES})
 target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
 
 set_target_properties(tagaro PROPERTIES
@@ -47,6 +49,11 @@ install(FILES
 	objectpool.h
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
+
+install(FILES
+	audio/audioscene.h
+	audio/sound.h
+DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
 
 install(FILES
 	graphics/board.h

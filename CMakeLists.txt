@@ -3,9 +3,11 @@ project(libtagaro)
 find_package(KDE4 4.4.80 REQUIRED)
 include(KDE4Defaults)
 include(MacroLibrary)
+find_package(OpenAL REQUIRED)
+find_package(SndFile REQUIRED)
 
 add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
-include_directories(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
+include_directories(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES} ${OPENAL_INCLUDE_DIR} ${SNDFILE_INCLUDE_DIRS})
 
 add_subdirectory(tagaro)
 add_subdirectory(includes)
