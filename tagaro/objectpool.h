@@ -65,6 +65,10 @@ namespace Tagaro {
  * @code
  * connect(T_OBJ("foo"), SIGNAL(valueChanged(int)), T_OBJ("bar"), SLOT(setValue(int)));
  * @endcode
+ * If you want more type safety in such situations, you can use the as() method:
+ * @code
+ * connect(T_OBJ("foo").as<QSlider>(), SIGNAL(valueChanged(int)), T_OBJ("bar").as<QProgressBar>(), SLOT(setValue(int)));
+ * @endcode
  */
 class TAGARO_EXPORT ObjectPool
 {
@@ -124,8 +128,10 @@ class TAGARO_EXPORT ObjectPointer
 
 		///@return true if the pointer is not null
 		inline operator bool() const;
-		///@return the pointer encapsulated by this object
+		///@return the pointer encapsulated by this object, qobject_casted to T*
 		template<typename T> inline operator T*() const;
+		///A synonym for the implicit cast to T*.
+		template<typename T> T* as() const;
 	private:
 		QObject* m_pointer;
 };
@@ -149,6 +155,12 @@ Tagaro::ObjectPointer::operator bool() const
 
 template <typename T>
 Tagaro::ObjectPointer::operator T*() const
+{
+	return qobject_cast<T*>(m_pointer);
+}
+
+template <typename T>
+T* Tagaro::ObjectPointer::as() const
 {
 	return qobject_cast<T*>(m_pointer);
 }
