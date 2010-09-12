@@ -31,7 +31,7 @@ struct Tagaro::Sound::Private
 	bool m_valid;
 	ALuint m_buffer;
 
-	Private() : m_type(Tagaro::Sound::AmbientPlayback), m_volume(1.0), m_valid(false) {}
+	Private() : m_type(Tagaro::Sound::AmbientPlayback), m_volume(1.0), m_valid(false), m_buffer(AL_NONE) {}
 };
 
 //BEGIN Tagaro::Sound
@@ -184,23 +184,15 @@ Tagaro::PlaybackEvent::PlaybackEvent(Tagaro::Sound* sound, const QPointF& pos)
 	m_valid = true;
 	//connect to sound (buffer)
 	alSource3f(m_source, AL_POSITION, pos.x(), pos.y(), 0);
+	alSourcef(m_source, AL_PITCH, 1.5); //TODO: debug
 	alSourcef(m_source, AL_GAIN, sound->volume());
 	alSourcei(m_source, AL_BUFFER, sound->d->m_buffer);
-	switch (sound->playbackType())
-	{
-		case Tagaro::Sound::AmbientPlayback:
-			alSourcef(m_source, AL_ROLLOFF_FACTOR, 0.0);
-			break;
-		case Tagaro::Sound::AbsolutePlayback:
-			alSourcei(m_source, AL_SOURCE_RELATIVE, AL_FALSE);
-			break;
-		case Tagaro::Sound::RelativePlayback:
-			alSourcei(m_source, AL_SOURCE_RELATIVE, AL_TRUE);
-			break;
-	}
+	const Tagaro::Sound::PlaybackType type = sound->playbackType();
+	alSourcef(m_source, AL_ROLLOFF_FACTOR, type == Tagaro::Sound::AmbientPlayback ? 0.0 : 1.0);
+	alSourcei(m_source, AL_SOURCE_RELATIVE, type == Tagaro::Sound::RelativePlayback ? AL_TRUE : AL_FALSE);
 	if ((error = alGetError()) != AL_NO_ERROR)
 	{
-		kDebug() << "Failed to setup OpenAL m_source: Error code" << error;
+		kDebug() << "Failed to setup OpenAL source: Error code" << error;
 		return;
 	}
 	//start playback

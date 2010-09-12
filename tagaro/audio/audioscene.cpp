@@ -58,7 +58,8 @@ void Tagaro::AudioScene::setVolume(qreal volume)
 //BEGIN Tagaro::OpenALRuntime
 
 Tagaro::OpenALRuntime::OpenALRuntime()
-	: m_context(0)
+	: m_volume(1)
+	, m_context(0)
 	, m_device(alcOpenDevice(""))
 {
 	if (!m_device)
@@ -74,6 +75,7 @@ Tagaro::OpenALRuntime::OpenALRuntime()
 		return;
 	}
 	alcMakeContextCurrent(m_context);
+	configureListener();
 }
 
 Tagaro::OpenALRuntime::~OpenALRuntime()
@@ -95,14 +97,10 @@ void Tagaro::OpenALRuntime::configureListener()
 {
 	int error; alGetError(); //clear error cache
 	alListener3f(AL_POSITION, m_listenerPos.x(), m_listenerPos.y(), 0);
-	if ((error = alGetError()) != AL_NO_ERROR)
-	{
-		kDebug() << "Failed to set OpenAL listener position: Error code" << error;
-	}
 	alListenerf(AL_GAIN, m_volume);
 	if ((error = alGetError()) != AL_NO_ERROR)
 	{
-		kDebug() << "Failed to set OpenAL listener gain: Error code" << error;
+		kDebug() << "Failed to setup OpenAL listener: Error code" << error;
 	}
 }
 
