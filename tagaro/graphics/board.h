@@ -60,8 +60,26 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		///Sets the size of this board, i.e. the size of its bounding rect in
 		///the parent item's local coordinates.
 		///@warning Calls to this method will disable automatic alignment by
-		///setting the Tagaro::Board::alignment() to 0.
+		///setting the alignment() to 0.
 		void setSize(const QSizeF& size);
+		///@return the physical size factor @see setPhysicalSizeFactor
+		qreal physicalSizeFactor() const;
+		///Sets the physical size factor. This factor will be used in the
+		///calculation of renderSizes for contained Tagaro::SpriteObjectItems.
+		///Leave this at 1.0 (the default) if scene coordinates and viewport
+		///coordinates have an equal scale (e.g. Tagaro::Scene and its main
+		///view).
+		///
+		///Values between 0.0 and 1.0 mean that the render size of the item is
+		///smaller than its actual size, e.g. because the viewport is smaller
+		///is smaller than the scene which contains. If the viewport is bigger,
+		///you will have to increase the render sizes with factors above 1.0.
+		///
+		///So if the viewport renders the board with size @a s in an area of
+		///size @a vs, you need to do:
+		///@code setPhysicalSizeFactor(vs.width() / s.width()); @endcode
+		///Of course, Repeat this whenever that ratio changes.
+		void setPhysicalSizeFactor(qreal physicalSizeFactor);
 
 		///@return the alignment of this board in the parent item's bounding
 		///rect (or the scene rect, if there is no parent item)

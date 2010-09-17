@@ -30,6 +30,7 @@ struct Tagaro::Board::Private
 
 	Qt::Alignment m_alignment;
 	QSizeF m_logicalSize, m_size;
+	qreal m_physicalSizeFactor;
 	QPointF m_renderSizeFactor;
 
 	QList<Tagaro::SpriteObjectItem*> m_items;
@@ -40,7 +41,7 @@ struct Tagaro::Board::Private
 	inline void update(Tagaro::SpriteObjectItem* item);
 	void _k_updateItem();
 
-	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_renderSizeFactor(1, 1) {}
+	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_physicalSizeFactor(1), m_renderSizeFactor(1, 1) {}
 };
 
 Tagaro::Board::Board(QGraphicsItem* parent)
@@ -84,6 +85,20 @@ void Tagaro::Board::setSize(const QSizeF& size)
 	{
 		d->m_size = size;
 		d->m_alignment = (Qt::Alignment) 0;
+		d->_k_update();
+	}
+}
+
+qreal Tagaro::Board::physicalSizeFactor() const
+{
+	return d->m_physicalSizeFactor;
+}
+
+void Tagaro::Board::setPhysicalSizeFactor(qreal physicalSizeFactor)
+{
+	if (physicalSizeFactor > 0.0 && d->m_physicalSizeFactor != physicalSizeFactor)
+	{
+		d->m_physicalSizeFactor = physicalSizeFactor;
 		d->_k_update();
 	}
 }
@@ -140,10 +155,11 @@ void Tagaro::Board::Private::_k_update()
 		}
 		m_board->setPos(physicalRect.topLeft());
 	}
-	//update own transform
+	//update own transform and calculate renderSizeFactor
 	m_renderSizeFactor.setX(m_size.width() / m_logicalSize.width());
 	m_renderSizeFactor.setY(m_size.height() / m_logicalSize.height());
 	m_board->setTransform(QTransform::fromScale(m_renderSizeFactor.x(), m_renderSizeFactor.y()));
+	m_renderSizeFactor *= m_physicalSizeFactor;
 	//update items
 	QList<Tagaro::SpriteObjectItem*>::const_iterator it1 = m_items.constBegin(), it2 = m_items.constEnd();
 	for (; it1 != it2; ++it1)
