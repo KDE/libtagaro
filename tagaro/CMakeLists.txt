@@ -15,7 +15,6 @@ set(tagaro_LIB_SRCS
 	objectpool.cpp
 	audio/audioscene.cpp
 	audio/sound.cpp
-	graphics/board.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/rendererclient.cpp
 	graphics/renderermodule.cpp
@@ -25,6 +24,7 @@ set(tagaro_LIB_SRCS
 	graphics/theme.cpp
 	graphics/themeprovider.cpp
 	graphics/themeselector.cpp
+	interface/board.cpp
 	interface/messageoverlay.cpp
 	interface/scene.cpp
 )
@@ -56,7 +56,6 @@ install(FILES
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
 
 install(FILES
-	graphics/board.h
 	graphics/rendererclient.h
 	graphics/renderermodule.h
 	graphics/renderer.h
@@ -67,6 +66,7 @@ install(FILES
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/graphics COMPONENT Devel)
 
 install(FILES
+	interface/board.h
 	interface/messageoverlay.h
 	interface/scene.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)

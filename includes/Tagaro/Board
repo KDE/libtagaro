@@ -1,1 +1,1 @@
-#include <tagaro/graphics/board.h>
+#include <tagaro/interface/board.h>
