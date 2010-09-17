@@ -125,8 +125,18 @@ void Tagaro::Board::Private::_k_update()
 	//determine physical size
 	if (m_alignment)
 	{
-		QGraphicsScene* scene = m_board->scene();
-		const QRectF baseRect = scene ? scene->sceneRect() : QRectF(QPointF(), m_size);
+		//determine base rect (the rect into which we will be layouting)
+		QRectF baseRect;
+		QGraphicsItem* parentItem = m_board->parentItem();
+		if (parentItem)
+		{
+			baseRect = parentItem->boundingRect();
+		}
+		else
+		{
+			QGraphicsScene* scene = m_board->scene();
+			baseRect = scene ? scene->sceneRect() : QRectF(QPointF(), m_size);
+		}
 		//keep aspect ratio
 		const qreal scaleX = baseRect.width() / m_logicalSize.width();
 		const qreal scaleY = baseRect.height() / m_logicalSize.height();
