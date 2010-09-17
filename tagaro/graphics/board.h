@@ -54,14 +54,14 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		///Sets the logical size of this board, i.e. the size of its bounding
 		///rect in the item's local coordinates.
 		void setLogicalSize(const QSizeF& size);
-		///@return the physical size of this board, i.e. the size of its
-		///bounding rect in the parent item's local coordinates
-		QSizeF physicalSize() const;
-		///Sets the physical size of this board, i.e. the size of its
-		///bounding rect in the parent item's local coordinates.
+		///@return the size of this board, i.e. the size of its bounding rect in
+		///the parent item's local coordinates
+		QSizeF size() const;
+		///Sets the size of this board, i.e. the size of its bounding rect in
+		///the parent item's local coordinates.
 		///@warning Calls to this method will disable automatic alignment by
 		///setting the Tagaro::Board::alignment() to 0.
-		void setPhysicalSize(const QSizeF& size);
+		void setSize(const QSizeF& size);
 
 		///@return the alignment of this board in the parent item's bounding
 		///rect (or the scene rect, if there is no parent item)

@@ -29,7 +29,7 @@ struct Tagaro::Board::Private
 	Tagaro::Board* m_board;
 
 	Qt::Alignment m_alignment;
-	QSizeF m_logicalSize, m_physicalSize;
+	QSizeF m_logicalSize, m_size;
 	QPointF m_renderSizeFactor;
 
 	QList<Tagaro::SpriteObjectItem*> m_items;
@@ -40,7 +40,7 @@ struct Tagaro::Board::Private
 	inline void update(Tagaro::SpriteObjectItem* item);
 	void _k_updateItem();
 
-	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_physicalSize(1, 1), m_renderSizeFactor(1, 1) {}
+	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_renderSizeFactor(1, 1) {}
 };
 
 Tagaro::Board::Board(QGraphicsItem* parent)
@@ -73,16 +73,16 @@ void Tagaro::Board::setLogicalSize(const QSizeF& size)
 	}
 }
 
-QSizeF Tagaro::Board::physicalSize() const
+QSizeF Tagaro::Board::size() const
 {
-	return d->m_physicalSize;
+	return d->m_size;
 }
 
-void Tagaro::Board::setPhysicalSize(const QSizeF& size)
+void Tagaro::Board::setSize(const QSizeF& size)
 {
-	if (size.isValid() && d->m_physicalSize != size)
+	if (size.isValid() && d->m_size != size)
 	{
-		d->m_physicalSize = size;
+		d->m_size = size;
 		d->m_alignment = (Qt::Alignment) 0;
 		d->_k_update();
 	}
@@ -111,17 +111,17 @@ void Tagaro::Board::Private::_k_update()
 	if (m_alignment)
 	{
 		QGraphicsScene* scene = m_board->scene();
-		const QRectF baseRect = scene ? scene->sceneRect() : QRectF(QPointF(), m_physicalSize);
+		const QRectF baseRect = scene ? scene->sceneRect() : QRectF(QPointF(), m_size);
 		//keep aspect ratio
 		const qreal scaleX = baseRect.width() / m_logicalSize.width();
 		const qreal scaleY = baseRect.height() / m_logicalSize.height();
-		m_physicalSize = qMin(scaleX, scaleY) * m_logicalSize;
-		QRectF physicalRect(baseRect.topLeft(), m_physicalSize);
+		m_size = qMin(scaleX, scaleY) * m_logicalSize;
+		QRectF physicalRect(baseRect.topLeft(), m_size);
 		//horizontal alignment (constructor of physicalRect aligns on left)
 		const bool hReverse = !(m_alignment & Qt::AlignAbsolute) && QApplication::isRightToLeft();
 		if (m_alignment & Qt::AlignHCenter)
 		{
-			const qreal dx = (baseRect.width() - m_physicalSize.width()) / 2;
+			const qreal dx = (baseRect.width() - m_size.width()) / 2;
 			physicalRect.translate(dx, 0);
 		}
 		else if (m_alignment & Qt::AlignRight || ((m_alignment & Qt::AlignLeft) && hReverse))
@@ -131,7 +131,7 @@ void Tagaro::Board::Private::_k_update()
 		//vertical alignment (constructor of physicalRect aligns on top)
 		if (m_alignment & Qt::AlignVCenter)
 		{
-			const qreal dy = (baseRect.height() - m_physicalSize.height()) / 2;
+			const qreal dy = (baseRect.height() - m_size.height()) / 2;
 			physicalRect.translate(0, dy);
 		}
 		else if (m_alignment & Qt::AlignBottom)
@@ -141,8 +141,8 @@ void Tagaro::Board::Private::_k_update()
 		m_board->setPos(physicalRect.topLeft());
 	}
 	//update own transform
-	m_renderSizeFactor.setX(m_physicalSize.width() / m_logicalSize.width());
-	m_renderSizeFactor.setY(m_physicalSize.height() / m_logicalSize.height());
+	m_renderSizeFactor.setX(m_size.width() / m_logicalSize.width());
+	m_renderSizeFactor.setY(m_size.height() / m_logicalSize.height());
 	m_board->setTransform(QTransform::fromScale(m_renderSizeFactor.x(), m_renderSizeFactor.y()));
 	//update items
 	QList<Tagaro::SpriteObjectItem*>::const_iterator it1 = m_items.constBegin(), it2 = m_items.constEnd();
@@ -169,7 +169,7 @@ void Tagaro::Board::Private::update(Tagaro::SpriteObjectItem* item)
 
 QRectF Tagaro::Board::boundingRect() const
 {
-	return QRectF();
+	return QRectF(QPointF(), d->m_size);
 }
 
 void Tagaro::Board::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
