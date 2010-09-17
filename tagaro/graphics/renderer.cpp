@@ -162,17 +162,19 @@ void Tagaro::RendererPrivate::setTheme(const Tagaro::Theme* theme)
 			setThemeInternal(defaultTheme);
 		}
 	}
-	//announce change to Tagaro::RendererClients
-	QHash<Tagaro::RendererClient*, QString>::iterator it1 = m_clients.begin(), it2 = m_clients.end();
-	for (; it1 != it2; ++it1)
-	{
-		it1.value().clear(); //because the pixmap is outdated
-		it1.key()->d->fetchPixmap();
-	}
-	//announce change publicly
 	if (oldTheme != m_theme)
 	{
+		//announce change publicly
 		emit m_parent->themeChanged(m_theme);
+		//announce change to renderer clients (this is done *after* the
+		//public announcement because the application might want to do special
+		//preparations on the RendererModule before the rendering starts)
+		QHash<Tagaro::RendererClient*, QString>::iterator it1 = m_clients.begin(), it2 = m_clients.end();
+		for (; it1 != it2; ++it1)
+		{
+			it1.value().clear(); //because the pixmap is outdated
+			it1.key()->d->fetchPixmap();
+		}
 	}
 }
 
@@ -256,6 +258,16 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 	//done
 	m_theme = theme;
 	return true;
+}
+
+const Tagaro::RendererModule* Tagaro::Renderer::rendererModule() const
+{
+	return d->m_rendererModule;
+}
+
+Tagaro::RendererModule* Tagaro::Renderer::rendererModule()
+{
+	return d->m_rendererModule;
 }
 
 QString Tagaro::RendererPrivate::spriteFrameKey(const QString& key, int frame, bool normalizeFrameNo) const

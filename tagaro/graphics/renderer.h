@@ -28,9 +28,10 @@
 
 namespace Tagaro {
 
-class RendererPrivate;
 class RendererClient;
 class RendererClientPrivate;
+class RendererModule;
+class RendererPrivate;
 class Theme;
 class ThemeProvider;
 
@@ -160,6 +161,10 @@ class TAGARO_EXPORT Renderer : public QObject
 		///To change this theme, use the selection functionality in
 		///Tagaro::ThemeProvider.
 		const Tagaro::Theme* theme() const;
+		///@return the renderer module currently used by this renderer
+		const Tagaro::RendererModule* rendererModule() const;
+		///@return the renderer module currently used by this renderer
+		Tagaro::RendererModule* rendererModule();
 
 		///@return the bounding rectangle of the sprite with this @a key
 		///This is equal to QSvgRenderer::boundsOnElement() of the corresponding
@@ -188,9 +193,12 @@ class TAGARO_EXPORT Renderer : public QObject
 		///@note  For non-animated frames, set @a frame to -1 or omit it.
 		QPixmap spritePixmap(const QString& key, const QSize& size, int frame = -1) const;
 	Q_SIGNALS:
-		///This signal is emitted when a new theme has been loaded. You usually
-		///do not need to react on this signal if you use Tagaro::RendererClient
-		///subclasses, because these update their pixmaps automatically.
+		///This signal is emitted when a new theme has been loaded, but
+		///@b before the active renderer clients are told to update their
+		///pixmaps.
+		///
+		///If you use Tagaro::RendererClient instances to retrieve pixmaps from
+		///the renderer, you will usually not need to react to this signal.
 		void themeChanged(const Tagaro::Theme* theme);
 	private:
 		friend class Tagaro::RendererPrivate;
