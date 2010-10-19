@@ -165,28 +165,28 @@ void Tagaro::ThemeProvider::endRemoveThemes()
 }
 
 //END Tagaro::ThemeProvider
-//BEGIN Tagaro::DesktopThemeProvider
+//BEGIN Tagaro::StandardThemeProvider
 
-struct Tagaro::DesktopThemeProvider::Private
+struct Tagaro::StandardThemeProvider::Private
 {
-	Tagaro::DesktopThemeProvider* m_parent;
+	Tagaro::StandardThemeProvider* m_parent;
 	QVector<Tagaro::Theme*> m_themes;
 	QByteArray m_configKey;
 
-	Private(const QByteArray& configKey, Tagaro::DesktopThemeProvider* parent) : m_parent(parent), m_configKey(configKey) {}
+	Private(const QByteArray& configKey, Tagaro::StandardThemeProvider* parent) : m_parent(parent), m_configKey(configKey) {}
 	~Private() { qDeleteAll(m_themes); }
 
 	void _k_saveSelectedIndex(int index);
 };
 
-Tagaro::DesktopThemeProvider::DesktopThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, QObject* parent)
+Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, QObject* parent)
 	: Tagaro::ThemeProvider(parent)
 	, d(new Private(configKey, this))
 {
 	static const QString defaultTheme = QLatin1String("default.desktop");
 	const QString ksdDirectory = ksdDirectory_ + QChar('/');
 	//read my configuration
-	KConfigGroup config(KGlobal::config(), "Tagaro::DesktopThemeProvider");
+	KConfigGroup config(KGlobal::config(), "Tagaro::StandardThemeProvider");
 	const QByteArray selectedTheme = config.readEntry(configKey.data(), (ksdDirectory + defaultTheme).toUtf8());
 	//find themes
 	const QStringList themePaths = KGlobal::dirs()->findAllResources(
@@ -239,34 +239,34 @@ Tagaro::DesktopThemeProvider::DesktopThemeProvider(const QByteArray& configKey, 
 	connect(this, SIGNAL(selectedIndexChanged(int)), SLOT(_k_saveSelectedIndex(int)));
 }
 
-Tagaro::DesktopThemeProvider::~DesktopThemeProvider()
+Tagaro::StandardThemeProvider::~StandardThemeProvider()
 {
 	delete d;
 }
 
-int Tagaro::DesktopThemeProvider::themeCount() const
+int Tagaro::StandardThemeProvider::themeCount() const
 {
 	return d->m_themes.count();
 }
 
-const Tagaro::Theme* Tagaro::DesktopThemeProvider::theme(int index) const
+const Tagaro::Theme* Tagaro::StandardThemeProvider::theme(int index) const
 {
 	return d->m_themes.value(index, 0);
 }
 
-void Tagaro::DesktopThemeProvider::Private::_k_saveSelectedIndex(int index)
+void Tagaro::StandardThemeProvider::Private::_k_saveSelectedIndex(int index)
 {
-	const Tagaro::Theme* theme = m_parent->Tagaro::DesktopThemeProvider::theme(index);
+	const Tagaro::Theme* theme = m_parent->Tagaro::StandardThemeProvider::theme(index);
 	if (!theme)
 	{
 		return;
 	}
-	KConfigGroup config(KGlobal::config(), "Tagaro::DesktopThemeProvider");
+	KConfigGroup config(KGlobal::config(), "Tagaro::StandardThemeProvider");
 	config.writeEntry(m_configKey.data(), theme->identifier());
 	KGlobal::config()->sync();
 }
 
-//END Tagaro::DesktopThemeProvider
+//END Tagaro::StandardThemeProvider
 
 //BEGIN Tagaro::FileThemeProvider
 

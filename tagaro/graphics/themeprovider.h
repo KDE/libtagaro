@@ -41,7 +41,7 @@ class Theme;
  * instances using this theme provider. If a subclass wants to save the
  * selection, it should connect to the selectedIndexChanged() signal.
  *
- * @see Tagaro::DesktopThemeProvider
+ * @see Tagaro::StandardThemeProvider
  */
 class TAGARO_EXPORT ThemeProvider : public QObject
 {
@@ -111,27 +111,27 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 };
 
 /**
- * @class Tagaro::DesktopThemeProvider themeprovider.h <Tagaro/DesktopThemeProvider>
+ * @class Tagaro::StandardThemeProvider themeprovider.h <Tagaro/StandardThemeProvider>
  *
  * This theme provider locates theme files (*.desktop) in the installation
  * directories via KStandardDirs. The SVG file is referenced by the "FileName"
  * key in the desktop file's main config group, and expected to be in the same
  * directory as the desktop file.
  */
-class TAGARO_EXPORT DesktopThemeProvider : public Tagaro::ThemeProvider
+class TAGARO_EXPORT StandardThemeProvider : public Tagaro::ThemeProvider
 {
 	Q_OBJECT
 	public:
-		///Creates a new Tagaro::DesktopThemeProvider instance. The @a configKey
+		///Creates a new Tagaro::StandardThemeProvider instance. The @a configKey
 		///is used to store the theme selection in the configuration. The
 		///following two arguments are passed to KStandardDirs, so this theme
 		///provider will list all themes which can be found with:
 		///@code
 		///KGlobal::dirs()->findAllResources(ksdResource, ksdDirectory + "/*.desktop");
 		///@endcode
-		DesktopThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, QObject* parent = 0);
-		///Destroys this Tagaro::DesktopThemeProvider instance.
-		virtual ~DesktopThemeProvider();
+		StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, QObject* parent = 0);
+		///Destroys this Tagaro::StandardThemeProvider instance.
+		virtual ~StandardThemeProvider();
 
 		virtual int themeCount() const;
 		virtual const Tagaro::Theme* theme(int index) const;

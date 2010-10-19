@@ -3,7 +3,6 @@ install(FILES
 	AudioScene
 	Board
 	ConfigDialog
-	DesktopThemeProvider
 	FileThemeProvider
 	MessageOverlay
 	ObjectPointer
@@ -17,6 +16,7 @@ install(FILES
 	Sound
 	SpriteItem
 	SpriteObjectItem
+	StandardThemeProvider
 	Theme
 	ThemeProvider
 DESTINATION ${INCLUDE_INSTALL_DIR}/Tagaro COMPONENT Devel)
