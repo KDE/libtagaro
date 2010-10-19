@@ -1,4 +1,4 @@
-#NOTE: Use the ./autogen-includes.sh script to update this file.
+#NOTE: Use the autogen-includes.sh script to update this file.
 install(FILES
 	AudioScene
 	Board

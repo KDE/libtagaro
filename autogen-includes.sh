@@ -6,6 +6,7 @@
 # configuration
 EXPORT_MACRO=TAGARO_EXPORT  # the macro which denotes exported classes
 HEADER_DIR=tagaro           # the directory which contains the headers of your lib
+NAMESPACE=Tagaro            # the namespace in which the classes reside
 INCLUDE_DIR=includes/Tagaro # the directory which shall be filled with the pretty headers
 INCLUDE_INSTALL_DIR='${INCLUDE_INSTALL_DIR}/Tagaro'
                             # the directory into which CMake shall install the pretty headers
@@ -17,10 +18,10 @@ if [ ! -f $(basename $0) ]; then
 fi
 
 (
-	echo "#NOTE: Use the $0 script to update this file."
+	echo "#NOTE: Use the $(basename $0) script to update this file."
 	echo 'install(FILES'
 	(
-		find $HEADER_DIR/ -name \*.h -a \! -name \*_p.h | while read HEADERFILE; do
+		find $HEADER_DIR/ -name \*.h -a \! -name \*_p.h | xargs grep "namespace $NAMESPACE" -l | while read HEADERFILE; do
 			grep "class $EXPORT_MACRO" $HEADERFILE | sed "s/^.*$EXPORT_MACRO \\([^ ]*\\).*$/\\1/" | while read CLASSNAME; do
 				echo '#include <'$HEADERFILE'>' > $INCLUDE_DIR/$CLASSNAME
 				echo -en "\t"; echo "$CLASSNAME"
