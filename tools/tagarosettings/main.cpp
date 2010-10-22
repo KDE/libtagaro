@@ -28,7 +28,7 @@
 int main(int argc, char** argv)
 {
 	const KLocalizedString appName = ki18nc("application name", "TagaroSettings");
-	KAboutData about("tagarosettings", 0, appName, "0.1",
+	KAboutData about("tagarosettings", "libtagaro", appName, "0.1",
 		ki18n("Global configuration interface for libtagaro-based applications"),
 		KAboutData::License_GPL, ki18n("Copyright 2010 Stefan Majewsky"));
 	about.addAuthor(ki18n("Stefan Majewsky"), KLocalizedString(), "majewsky@gmx.net");
