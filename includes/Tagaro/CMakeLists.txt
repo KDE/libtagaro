@@ -16,6 +16,7 @@ install(FILES
 	Sound
 	SpriteItem
 	SpriteObjectItem
+	StandardTheme
 	StandardThemeProvider
 	Theme
 	ThemeProvider

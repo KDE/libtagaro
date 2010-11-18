@@ -21,7 +21,6 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QStack>
-#include <QtGui/QPixmap>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KGlobal>
@@ -193,31 +192,11 @@ Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey
 		ksdResource, ksdDirectory + "*.desktop",
 		KStandardDirs::NoDuplicates
 	);
+	//create themes
 	foreach (const QString& themePath, themePaths)
 	{
 		const QString themeFile = QFileInfo(themePath).fileName();
-		//create theme from configuration
-		Tagaro::Theme* theme = new Tagaro::Theme((ksdDirectory + themeFile).toUtf8());
-		KConfig themeConfigFile(themePath, KConfig::SimpleConfig);
-		KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
-		//read standard properties
-		const QString graphicsFile = themeConfig.readEntry("FileName", QString());
-		theme->setData(Tagaro::Theme::GraphicsFileRole, KStandardDirs::locate(ksdResource, ksdDirectory + graphicsFile));
-		theme->setData(Tagaro::Theme::ThemeFileRole, themePath);
-		theme->setData(Tagaro::Theme::NameRole, themeConfig.readEntry("Name", QString()));
-		theme->setData(Tagaro::Theme::DescriptionRole, themeConfig.readEntry("Description", QString()));
-		theme->setData(Tagaro::Theme::AuthorRole, themeConfig.readEntry("Author", QString()));
-		theme->setData(Tagaro::Theme::AuthorEmailRole, themeConfig.readEntry("AuthorEmail", QString()));
-		const QString previewFile = themeConfig.readEntry("Preview", QString());
-		theme->setData(Tagaro::Theme::PreviewRole, QPixmap(KStandardDirs::locate(ksdResource, ksdDirectory + previewFile)));
-		//write everything except for the standard properties into the theme's custom data
-		//some applications use this for per-theme configuration values
-		QMap<QString, QString> entryMap = themeConfig.entryMap();
-		QMap<QString, QString>::const_iterator it1 = entryMap.constBegin(), it2 = entryMap.constEnd();
-		for (; it1 != it2; ++it1)
-		{
-			theme->setData(it1.key().toUtf8(), it1.value());
-		}
+		Tagaro::Theme* theme = new Tagaro::StandardTheme(ksdResource, ksdDirectory, themeFile);
 		//insert theme into list, place theme with hard-coded default name at the beginning
 		if (themeFile == defaultTheme)
 		{

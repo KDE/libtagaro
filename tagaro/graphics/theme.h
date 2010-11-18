@@ -92,6 +92,35 @@ class TAGARO_EXPORT Theme
 		Private* const d;
 };
 
+/**
+ * @class Tagaro::StandardTheme theme.h <Tagaro/StandardTheme>
+ *
+ * This subclass implements loading of themes which are stored in a format
+ * loosely based on the freedesktop.org Desktop File Specification.
+ *
+ * Also, this class provides legacy support for KGameTheme.
+ */
+//TODO: provide legacy support for KMahjonggBackground, KMahjonggTileset
+class TAGARO_EXPORT StandardTheme : public Tagaro::Theme
+{
+	public:
+		///Creates a new Tagaro::StandardTheme instance by reading in the
+		///desktop file at the given @a filePath.
+		StandardTheme(const QString& filePath);
+		///Creates a new Tagaro::StandardTheme instance by reading in the
+		///desktop file at
+		///@code
+		///KStandardDirs::locate(ksdResource, ksdDirectory + fileName);
+		///@endcode
+		///The important difference to the single-argument constructor is that
+		///references to graphics files are also resolved via
+		///KStandardDirs::locate rather than just looking in the same directory.
+		StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName);
+	private:
+		class Private;
+		Private* const d;
+};
+
 } //namespace Tagaro
 
 #endif // TAGARO_THEME_H
