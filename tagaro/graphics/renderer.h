@@ -23,7 +23,6 @@
 #include <QtCore/QObject>
 #include <QtGui/QPixmap>
 
-#include "../objectpool.h"
 #include <libtagaro_export.h>
 
 namespace Tagaro {
