@@ -19,27 +19,25 @@
 #ifndef TAGARO_THEMESELECTOR_P_H
 #define TAGARO_THEMESELECTOR_P_H
 
-#include "configdialog.h"
-
+class QItemSelection;
 class QListView;
 #include <QtGui/QWidget>
 
 namespace Tagaro {
+
+class ThemeProvider;
 
 ///@internal
 class ThemeSelector : public QWidget
 {
 	Q_OBJECT
 	public:
-		ThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::ConfigDialog::ThemeSelectorOptions options);
+		ThemeSelector(Tagaro::ThemeProvider* provider);
 
 		Tagaro::ThemeProvider* provider() const;
-		int selectedIndex() const;
-		void setSelectedIndex(int selectedIndex);
-	Q_SIGNALS:
-		void selectedIndexChanged();
-	public Q_SLOTS:
-		void openNewStuffDialog();
+	private Q_SLOTS:
+		void updateSelectedIndex(int selectedIndex);
+		void storeSelection(const QItemSelection& selection);
 	private:
 		Tagaro::ThemeProvider* m_provider;
 		QListView* m_themeList;

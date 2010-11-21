@@ -16,77 +16,59 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_CONFIGDIALOG_H
-#define TAGARO_CONFIGDIALOG_H
+#ifndef TAGARO_GRAPHICSCONFIGDIALOG_H
+#define TAGARO_GRAPHICSCONFIGDIALOG_H
 
-#include <KDE/KConfigDialog>
-
-#include "objectpool.h"
 #include <libtagaro_export.h>
+
+#include <KDE/KPageDialog>
 
 namespace Tagaro {
 
 class ThemeProvider;
 
 /**
- * @class Tagaro::ConfigDialog configdialog.h <Tagaro/ConfigDialog>
+ * @class Tagaro::GraphicsConfigDialog graphicsconfigdialog.h <Tagaro/GraphicsConfigDialog>
  *
- * This KConfigDialog subclass provides convenience functions for configuring
- * libtagaro components.
- *
- * @section themeselector Theme selectors
+ * This dialog provides convenience functions for configuring graphical 
+ * components.
  *
  * The following example code illustrates how to add a theme selector page:
  * @code
- * Tagaro::ConfigDialog dialog;
- * dialog.addThemeSelector(
- *     themeProvider,
- *     Tagaro::ConfigDialog::NormalThemeSelector,
- *     i18n("Theme"), "games-config-theme", i18n("Choose a theme")
+ * Tagaro::GraphicsConfigDialog dialog;
+ * dialog.addThemeSelector(themeProvider,
+ *     i18n("Theme"), "games-config-theme",
+ *     i18n("Choose a theme")
  * );
  * @endcode
  * Any Tagaro::Renderer instances connected to the @a themeProvider will pickup
  * selection changes automatically. If you need to be informed about the
- * selection change for some other reason, use the
- * Tagaro::ThemeProvider::selectedIndexChanged() signal.
+ * selection change for some other reason, use the theme provider's
+ * selectedIndexChanged() signal.
  */
-class TAGARO_EXPORT ConfigDialog : public KConfigDialog
+class TAGARO_EXPORT GraphicsConfigDialog : public KPageDialog
 {
+	Q_OBJECT
 	public:
-		///This enumeration describes optional behavior of a theme selector.
-		enum ThemeSelectorOption
-		{
-			NormalThemeSelector = 0,      ///< Default behavior.
-			WithNewStuffDownload = 1 << 0 ///< Enable download of new themes via KNewStuff3.
-		};
-		Q_DECLARE_FLAGS(ThemeSelectorOptions, ThemeSelectorOption)
-
-		///Creates a new Tagaro::ConfigDialog. The arguments are passed to the
-		///KConfigDialog constructor.
-		ConfigDialog(QWidget* parent, const QString& name, KConfigSkeleton* config = 0);
+		///Creates a new Tagaro::GraphicsConfigDialog.
+		GraphicsConfigDialog(const QString& title = QString(), QWidget* parent = 0);
 		///Destroys this Tagaro::ConfigDialog instance.
-		virtual ~ConfigDialog();
+		virtual ~GraphicsConfigDialog();
 
-		///Adds a page to this dialog which allows to select a theme from the
-		///given theme @a provider.
+		///Adds a page to this dialog which allows to change a theme selection.
+		///@param provider The theme provider whose selection shall be configured.
 		///@param itemName The name of the page.
-		///@param iconName The name of the icon that should be used if needed.
+		///@param icon     The icon that should be used if needed.
 		///@param header   The header text to be shown above the page (defaults
 		///                to the item name if nothing is given).
-		void addThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::ConfigDialog::ThemeSelectorOptions options, const QString& itemName, const QString& iconName, const QString& header = QString());
-	protected:
-		virtual bool hasChanged();
-		virtual bool isDefault();
-		virtual void updateSettings();
-		virtual void updateWidgets();
-		virtual void updateWidgetsDefault();
+		void addThemeSelector(Tagaro::ThemeProvider* provider, const QString& itemName, const KIcon& icon, const QString& header = QString());
 	private:
 		class Private;
 		Private* const d;
+		Q_PRIVATE_SLOT(d, void _k_restoreDefault());
+		Q_PRIVATE_SLOT(d, void _k_selectionChanged());
 };
 
 } //namespace Tagaro
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(Tagaro::ConfigDialog::ThemeSelectorOptions)
-
-#endif // TAGARO_CONFIGDIALOG_H
+#endif // TAGARO_GRAPHICSCONFIGDIALOG_H

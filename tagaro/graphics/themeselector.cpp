@@ -27,7 +27,7 @@
 #include <QtGui/QVBoxLayout>
 #include <KDE/KLocale>
 
-Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::ConfigDialog::ThemeSelectorOptions options)
+Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider)
 	: m_provider(provider)
 	, m_themeList(new QListView(this))
 {
@@ -35,6 +35,7 @@ Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::Co
 	QVBoxLayout* layout = new QVBoxLayout;
 	setLayout(layout);
 	layout->addWidget(m_themeList);
+#if 0
 	if (options & Tagaro::ConfigDialog::WithNewStuffDownload)
 	{
 		QPushButton* knsButton = new QPushButton(KIcon("get-hot-new-stuff"), i18n("Get New Themes..."), this);
@@ -42,11 +43,13 @@ Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider, Tagaro::Co
 		layout->addWidget(knsButton);
 		connect(knsButton, SIGNAL(clicked()), SLOT(openNewStuffDialog()));
 	}
+#endif
 	//setup theme list
 	m_themeList->setModel(provider->model());
 	m_themeList->setSelectionMode(QAbstractItemView::SingleSelection);
-	setSelectedIndex(m_provider->selectedIndex());
-	connect(m_themeList->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SIGNAL(selectedIndexChanged()));
+	updateSelectedIndex(provider->selectedIndex());
+	connect(m_themeList->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(storeSelection(QItemSelection)));
+	connect(provider, SIGNAL(selectedIndexChanged(int)), SLOT(updateSelectedIndex(int)));
 	//setup appearance of theme list (minimum size = 4 items)
 	Tagaro::GraphicsDelegate* delegate = new Tagaro::GraphicsDelegate(m_themeList);
 	const QSize itemSizeHint = delegate->sizeHint(QStyleOptionViewItem(), QModelIndex());
@@ -59,20 +62,15 @@ Tagaro::ThemeProvider* Tagaro::ThemeSelector::provider() const
 	return m_provider;
 }
 
-int Tagaro::ThemeSelector::selectedIndex() const
+void Tagaro::ThemeSelector::updateSelectedIndex(int selectedIndex)
 {
-	const QModelIndex selectedIndex = m_themeList->selectionModel()->selectedIndexes().value(0);
-	return selectedIndex.isValid() ? selectedIndex.row() : 0;
+	const QModelIndex selectedModelIndex = m_themeList->model()->index(selectedIndex, 0);
+	m_themeList->selectionModel()->setCurrentIndex(selectedModelIndex, QItemSelectionModel::ClearAndSelect);
 }
 
-void Tagaro::ThemeSelector::setSelectedIndex(int index)
+void Tagaro::ThemeSelector::storeSelection(const QItemSelection& selection)
 {
-	m_themeList->selectionModel()->setCurrentIndex(m_themeList->model()->index(index, 0), QItemSelectionModel::ClearAndSelect);
-}
-
-void Tagaro::ThemeSelector::openNewStuffDialog()
-{
-	//TODO: implement KNS support
+	m_provider->setSelectedIndex(selection.indexes().value(0).row());
 }
 
 #include "themeselector_p.moc"

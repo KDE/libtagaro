@@ -2,8 +2,8 @@
 install(FILES
 	AudioScene
 	Board
-	ConfigDialog
 	FileThemeProvider
+	GraphicsConfigDialog
 	MessageOverlay
 	ObjectPointer
 	ObjectPool
