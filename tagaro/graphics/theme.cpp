@@ -31,7 +31,7 @@
 struct Tagaro::Theme::Private
 {
 	QByteArray m_identifier;
-	QHash<Tagaro::Theme::Role, QVariant> m_values;
+	QHash<int, QVariant> m_values;
 	QHash<QByteArray, QVariant> m_customValues;
 
 	Private(const QByteArray& identifier) : m_identifier(identifier) {}
@@ -47,7 +47,7 @@ Tagaro::Theme::~Theme()
 	delete d;
 }
 
-QVariant Tagaro::Theme::data(Tagaro::Theme::Role role, const QVariant& defaultValue) const
+QVariant Tagaro::Theme::data(int role, const QVariant& defaultValue) const
 {
 	return d->m_values.value(role, defaultValue);
 }
@@ -57,7 +57,7 @@ QVariant Tagaro::Theme::data(const QByteArray& key, const QVariant& defaultValue
 	return d->m_customValues.value(key, defaultValue);
 }
 
-void Tagaro::Theme::setData(Tagaro::Theme::Role role, const QVariant& value)
+void Tagaro::Theme::setData(int role, const QVariant& value)
 {
 	d->m_values.insert(role, value);
 }

@@ -19,6 +19,7 @@
 #ifndef TAGARO_THEMEPROVIDER_H
 #define TAGARO_THEMEPROVIDER_H
 
+class QAbstractItemModel;
 #include <QtCore/QObject>
 
 #include <libtagaro_export.h>
@@ -63,12 +64,21 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		///or 0 if no such theme can be found.
 		const Tagaro::Theme* theme(const QByteArray& identifier) const;
 
+		///@return a list-shaped model exposing the themes' data
+		QAbstractItemModel* model() const;
 		///@return the index of the selected theme, or 0 if nothing is selected
 		int selectedIndex() const;
+	public Q_SLOTS:
 		///Selects the theme identified by the given @a index (unless @a index
 		///is out of bounds). If a Tagaro::Renderer instance is using this theme
 		///provider, it will load this theme automatically.
 		void setSelectedIndex(int index);
+	Q_SIGNALS:
+		///This signal is emitted when the selected theme changes.
+		void selectedIndexChanged(int index);
+		///This signal is emitted when the selected theme changes, or when the
+		///currently selected theme is modified.
+		void selectedThemeChanged(const Tagaro::Theme* theme);
 	protected:
 		///Announces that the data of the themes between @a firstIndex and
 		///@a lastIndex inclusive has changed.
@@ -83,28 +93,6 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		void endInsertThemes();
 		///Ends a removal operation started by beginRemoveThemes().
 		void endRemoveThemes();
-	Q_SIGNALS:
-		///This signal is emitted just before themes are inserted into the
-		///provider's theme list. The new themes will be positioned between
-		///@a firstIndex and @a lastIndex inclusive.
-		void themesAboutToBeInserted(int firstIndex, int lastIndex);
-		///This signal is emitted just before themes are removed from the
-		///provider's theme list. The themes to be removed are those between
-		///@a firstIndex and @a lastIndex inclusive.
-		void themesAboutToBeRemoved(int firstIndex, int lastIndex);
-		///This signal is emitted when the data in themes changes. The affected
-		///themes are those between @a firstIndex and @a lastIndex inclusive.
-		void themesChanged(int firstIndex, int lastIndex);
-		///This signal is emitted after themes have been inserted into the
-		///provider's theme list. The new themes will be positioned between
-		///@a firstIndex and @a lastIndex inclusive.
-		void themesInserted(int firstIndex, int lastIndex);
-		///This signal is emitted after themes have been removed from the
-		///provider's theme list. The themes which have been removed are those
-		///between @a firstIndex and @a lastIndex inclusive.
-		void themesRemoved(int firstIndex, int lastIndex);
-		///This signal is emitted when the selected theme changes.
-		void selectedIndexChanged(int index);
 	private:
 		class Private;
 		Private* const d;

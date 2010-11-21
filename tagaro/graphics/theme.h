@@ -41,26 +41,30 @@ class TAGARO_EXPORT Theme
 		///display information about the themes, or to determine the files
 		///associated with this theme.
 		///@see setData(), data()
-		enum Role
+		///
+		///The roles are aligned with Qt::ItemDataRole because of
+		///Tagaro::ThemeProvider::model(). Themes behave similar to
+		///QStandardItems in this regard.
+		enum Roles
 		{
+			///The name of this theme.
+			NameRole = Qt::DisplayRole,
+			///(optional) A preview image showing the visual appearance of the
+			///theme.
+			PreviewRole = Qt::DecorationRole,
 			///This role *must* be filled with the path of the SVG file which is
 			///represented by this theme. If this role is empty or the data is
 			///invalid, loading the theme into a Tagaro::Renderer will fail.
-			GraphicsFileRole,
+			GraphicsFileRole = Qt::UserRole,
 			///If the data in this Tagaro::Theme instance was read from a file,
 			///this role may contain the path to that file.
 			ThemeFileRole,
-			///The name of this theme.
-			NameRole,
 			///An additional description which goes beyond the Name.
 			DescriptionRole,
 			///(optional) The name of this theme's author.
 			AuthorRole,
 			///(optional) The email address of this theme's author.
-			AuthorEmailRole,
-			///(optional) A preview image showing the visual appearance of the
-			///theme.
-			PreviewRole
+			AuthorEmailRole
 		};
 
 		///Creates a new Tagaro::Theme with the given @a identifier. The
@@ -74,11 +78,13 @@ class TAGARO_EXPORT Theme
 
 		///@return the data stored unter the given @a role, or the given
 		///@a defaultValue if no data is stored
-		QVariant data(Tagaro::Theme::Role role, const QVariant& defaultValue = QVariant()) const;
+		///@see Tagaro::Theme::Roles
+		QVariant data(int role, const QVariant& defaultValue = QVariant()) const;
 		///@overload for custom data
 		QVariant data(const QByteArray& key, const QVariant& defaultValue = QVariant()) const;
 		///Stores the given @a value unter the given @a role.
-		void setData(Tagaro::Theme::Role role, const QVariant& value);
+		///@see Tagaro::Theme::Roles
+		void setData(int role, const QVariant& value);
 		///@overload for custom data
 		void setData(const QByteArray& key, const QVariant& value);
 		///@return the internal identifier for this theme

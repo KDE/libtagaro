@@ -19,40 +19,62 @@
 #include "themeprovider.h"
 #include "theme.h"
 
+#include <QtCore/QAbstractListModel>
 #include <QtCore/QFileInfo>
-#include <QtCore/QStack>
+#include <QtCore/QVector>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KGlobal>
 #include <KDE/KStandardDirs>
 
-enum OperationId { ThemeInsert, ThemeRemove };
-
-struct Operation
-{
-	OperationId id; //'+' for insertions, '-' for removals
-	int first, last, oldCount;
-};
-
 //BEGIN Tagaro::ThemeProvider
 
-struct Tagaro::ThemeProvider::Private
+class Tagaro::ThemeProvider::Private : public QAbstractListModel
 {
-	int m_selectedIndex;
-	QStack<Operation> m_activeOps;
+	public:
+		Tagaro::ThemeProvider* q;
+		int m_selectedIndex;
 
-	Private() : m_selectedIndex(0) {}
+		Private(Tagaro::ThemeProvider* q_) : QAbstractListModel(q_), q(q_), m_selectedIndex(0) {}
+
+		virtual QVariant data(const QModelIndex& index, int role) const;
+		virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+		virtual int rowCount(const QModelIndex& index) const;
+	private:
+		friend class Tagaro::ThemeProvider;
 };
+
+QVariant Tagaro::ThemeProvider::Private::data(const QModelIndex& index, int role) const
+{
+	const Tagaro::Theme* theme = q->theme(index.row());
+	return theme ? theme->data(role) : QVariant();
+}
+
+Qt::ItemFlags Tagaro::ThemeProvider::Private::flags(const QModelIndex& index) const
+{
+	Q_UNUSED(index)
+	return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+}
+
+int Tagaro::ThemeProvider::Private::rowCount(const QModelIndex& index) const
+{
+	return index.isValid() ? 0 : q->themeCount();
+}
 
 Tagaro::ThemeProvider::ThemeProvider(QObject* parent)
 	: QObject(parent)
-	, d(new Private)
+	, d(new Private(this))
 {
 }
 
 Tagaro::ThemeProvider::~ThemeProvider()
 {
 	delete d;
+}
+
+QAbstractItemModel* Tagaro::ThemeProvider::model() const
+{
+	return d;
 }
 
 int Tagaro::ThemeProvider::selectedIndex() const
@@ -91,76 +113,30 @@ const Tagaro::Theme* Tagaro::ThemeProvider::theme(const QByteArray& identifier) 
 
 void Tagaro::ThemeProvider::announceChange(int firstIndex, int lastIndex)
 {
-	//validate
-	Q_ASSERT(firstIndex <= lastIndex);
-	//announce
-	emit themesChanged(firstIndex, lastIndex);
+	const int themeCount = this->themeCount();
+	firstIndex = qBound(0, firstIndex, themeCount);
+	lastIndex = qBound(firstIndex, lastIndex, themeCount);
+	emit d->dataChanged(d->index(firstIndex), d->index(lastIndex));
 }
 
 void Tagaro::ThemeProvider::beginInsertThemes(int firstIndex, int lastIndex)
 {
-	//validate
-	const int count = themeCount();
-	Q_ASSERT(0 <= firstIndex && firstIndex <= lastIndex && lastIndex < count + (lastIndex - firstIndex + 1));
-	Operation op = { ThemeInsert, firstIndex, lastIndex, count };
-	d->m_activeOps.push(op);
-	//announce
-	emit themesAboutToBeInserted(firstIndex, lastIndex);
+	d->beginInsertRows(QModelIndex(), firstIndex, lastIndex);
 }
 
 void Tagaro::ThemeProvider::beginRemoveThemes(int firstIndex, int lastIndex)
 {
-	//validate
-	const int count = themeCount();
-	Q_ASSERT(0 <= firstIndex && firstIndex <= lastIndex && lastIndex < count);
-	Operation op = { ThemeRemove, firstIndex, lastIndex, count };
-	d->m_activeOps.push(op);
-	//announce
-	emit themesAboutToBeRemoved(firstIndex, lastIndex);
+	d->beginRemoveRows(QModelIndex(), firstIndex, lastIndex);
 }
 
 void Tagaro::ThemeProvider::endInsertThemes()
 {
-	//validate
-	Q_ASSERT(!d->m_activeOps.isEmpty());
-	const Operation op = d->m_activeOps.pop();
-	Q_ASSERT(op.id == ThemeInsert);
-	const int countDiff = op.last - op.first + 1;
-	Q_ASSERT(frameCount() == op.oldCount + countDiff);
-	//update selection index
-	if (d->m_selectedIndex >= op.first)
-	{
-		d->m_selectedIndex += countDiff;
-		emit selectedIndexChanged(d->m_selectedIndex);
-	}
-	//announce
-	emit themesInserted(op.first, op.last);
+	d->endInsertRows();
 }
 
 void Tagaro::ThemeProvider::endRemoveThemes()
 {
-	//validate
-	Q_ASSERT(!d->m_activeOps.isEmpty());
-	const Operation op = d->m_activeOps.pop();
-	Q_ASSERT(op.id == ThemeRemove);
-	const int countDiff = op.last - op.first + 1;
-	Q_ASSERT(frameCount() == op.oldCount - countDiff);
-	//update selection index
-	if (d->m_selectedIndex >= op.first)
-	{
-		if (d->m_selectedIndex <= op.last)
-		{
-			//theme has been removed, so reset selection index to first theme
-			d->m_selectedIndex = 0;
-		}
-		else
-		{
-			d->m_selectedIndex -= countDiff;
-		}
-		emit selectedIndexChanged(d->m_selectedIndex);
-	}
-	//announce
-	emit themesRemoved(op.first, op.last);
+	d->endRemoveRows();
 }
 
 //END Tagaro::ThemeProvider

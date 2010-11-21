@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "graphicsdelegate_p.h"
+#include "theme.h" //for role names
 
 #include <QtGui/QAbstractItemView>
 #include <QtGui/QApplication>
@@ -56,7 +57,7 @@ void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 	QApplication::style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, 0);
 	//draw thumbnail
 	QRect thumbnailBaseRect = this->thumbnailRect(baseRect);
-	const QPixmap thumbnail = index.data(ThumbnailRole).value<QPixmap>().scaled(Metrics::ThumbnailBaseSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	const QPixmap thumbnail = index.data(Qt::DecorationRole).value<QPixmap>().scaled(Metrics::ThumbnailBaseSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	QRect thumbnailRect(thumbnailBaseRect.topLeft(), thumbnail.size());
 	thumbnailRect.translate( //center inside thumbnailBaseRect
 		(thumbnailBaseRect.width() - thumbnailRect.width()) / 2,
@@ -72,14 +73,14 @@ void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 		texts << name;
 		QFont theFont(painter->font()); theFont.setBold(true); fonts << theFont;
 	}{
-		QString comment = index.data(CommentRole).toString();
+		QString comment = index.data(Tagaro::Theme::DescriptionRole).toString();
 		if (!comment.isEmpty())
 		{
 			texts << comment;
 			fonts << painter->font();
 		}
 	}{
-		QString author = index.data(AuthorRole).toString();
+		QString author = index.data(Tagaro::Theme::AuthorRole).toString();
 		if (!author.isEmpty())
 		{
 			const QString authorString = ki18nc("Author attribution, e.g. \"by Jack\"", "by %1").subs(author).toString();
@@ -87,7 +88,7 @@ void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 			QFont theFont(painter->font()); theFont.setItalic(true); fonts << theFont;
 		}
 	}
-	//TODO: display AuthorEmailRole
+	//TODO: display Tagaro::Theme::AuthorEmailRole
 	QList<QRect> textRects; int totalTextHeight = 0;
 	for (int i = 0; i < texts.count(); ++i)
 	{

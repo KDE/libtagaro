@@ -21,7 +21,7 @@
 
 #include "configdialog.h"
 
-class QListWidget;
+class QListView;
 #include <QtGui/QWidget>
 
 namespace Tagaro {
@@ -39,13 +39,10 @@ class ThemeSelector : public QWidget
 	Q_SIGNALS:
 		void selectedIndexChanged();
 	public Q_SLOTS:
-		void themesInserted(int firstIndex, int lastIndex);
-		void themesChanged(int firstIndex, int lastIndex);
-		void themesRemoved(int firstIndex, int lastIndex);
 		void openNewStuffDialog();
 	private:
 		Tagaro::ThemeProvider* m_provider;
-		QListWidget* m_themeList;
+		QListView* m_themeList;
 };
 
 } //namespace Tagaro
