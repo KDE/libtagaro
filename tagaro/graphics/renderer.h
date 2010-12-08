@@ -31,6 +31,7 @@ class RendererClient;
 class RendererClientPrivate;
 class RendererModule;
 class RendererPrivate;
+class Sprite;
 class Theme;
 class ThemeProvider;
 
@@ -165,6 +166,8 @@ class TAGARO_EXPORT Renderer : public QObject
 		///@return the renderer module currently used by this renderer
 		Tagaro::RendererModule* rendererModule();
 
+		///@return a Tagaro::Sprite instance for the given @a spriteKey
+		Tagaro::Sprite* sprite(const QString& spriteKey) const;
 		///@return the bounding rectangle of the sprite with this @a key
 		///This is equal to QSvgRenderer::boundsOnElement() of the corresponding
 		///SVG element.

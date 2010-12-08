@@ -14,6 +14,7 @@ install(FILES
 	Scene
 	Settings
 	Sound
+	Sprite
 	SpriteItem
 	SpriteObjectItem
 	StandardTheme

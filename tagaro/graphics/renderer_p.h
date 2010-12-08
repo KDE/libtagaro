@@ -20,6 +20,7 @@
 #define TAGARO_RENDERER_P_H
 
 #include "renderermodule.h"
+#include "sprite.h"
 
 #include <QtCore/QHash>
 #include <QtCore/QMetaType>
@@ -97,6 +98,7 @@ class RendererPrivate : public QObject
 		QThreadPool m_workerPool;
 		Tagaro::RendererModule* m_rendererModule;
 
+		QHash<QString, Tagaro::Sprite*> m_sprites; //maps sprite keys -> sprite instances
 		QHash<Tagaro::RendererClient*, QString> m_clients; //maps client -> cache key of current pixmap
 		QStringList m_pendingRequests; //cache keys of pixmaps which are currently being rendered
 

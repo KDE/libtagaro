@@ -80,6 +80,11 @@ Tagaro::Renderer::~Renderer()
 	{
 		delete d->m_clients.constBegin().key();
 	}
+	//cleanup sprites (without qDeleteAll because that's not a friend of Sprite)
+	QHash<QString, Tagaro::Sprite*>::const_iterator it1 = d->m_sprites.constBegin(),
+	                                                it2 = d->m_sprites.constEnd();
+	for (; it1 != it2; ++it1)
+		delete it1.value();
 	//cleanup own stuff
 	d->m_workerPool.waitForDone();
 	delete d->m_rendererModule;
@@ -268,6 +273,17 @@ const Tagaro::RendererModule* Tagaro::Renderer::rendererModule() const
 Tagaro::RendererModule* Tagaro::Renderer::rendererModule()
 {
 	return d->m_rendererModule;
+}
+
+Tagaro::Sprite* Tagaro::Renderer::sprite(const QString& key) const
+{
+	Tagaro::Sprite*& sprite = d->m_sprites[key];
+	if (!sprite)
+	{
+		//instantiate on first use
+		sprite = new Tagaro::Sprite(const_cast<Tagaro::Renderer*>(this), key);
+	}
+	return sprite;
 }
 
 QString Tagaro::RendererPrivate::spriteFrameKey(const QString& key, int frame, bool normalizeFrameNo) const

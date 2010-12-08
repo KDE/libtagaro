@@ -19,6 +19,7 @@ set(tagaro_LIB_SRCS
 	graphics/rendererclient.cpp
 	graphics/renderermodule.cpp
 	graphics/renderer.cpp
+	graphics/sprite.cpp
 	graphics/spriteitem.cpp
 	graphics/spriteobjectitem.cpp
 	graphics/theme.cpp
@@ -59,6 +60,7 @@ install(FILES
 	graphics/rendererclient.h
 	graphics/renderermodule.h
 	graphics/renderer.h
+	graphics/sprite.h
 	graphics/spriteitem.h
 	graphics/spriteobjectitem.h
 	graphics/theme.h
