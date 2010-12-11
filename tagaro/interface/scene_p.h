@@ -25,7 +25,7 @@
 struct Tagaro::Scene::Private : public Tagaro::RendererClient
 {
 	public:
-		Private(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, Tagaro::Scene* parent);
+		Private(Tagaro::Sprite* backgroundSprite, Tagaro::Scene* parent);
 
 		//Returns whether sceneRect() was reset to mainView->rect().
 		bool _k_resetSceneRect();

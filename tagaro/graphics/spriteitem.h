@@ -19,8 +19,7 @@
 #ifndef TAGARO_SPRITEITEM_H
 #define TAGARO_SPRITEITEM_H
 
-#include <QtCore/QObject>
-#include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsPixmapItem>
 
 #include "rendererclient.h"
 #include <libtagaro_export.h>
@@ -34,15 +33,14 @@ class SpriteItemPrivate;
  * @short A QGraphicsPixmapItem which reacts to theme changes automatically.
  *
  * This class is a QGraphicsPixmapItem which retrieves its pixmap from a
- * Tagaro::Renderer, and updates it automatically when the Tagaro::Renderer
- * changes the theme.
+ * Tagaro::Sprite, and updates it automatically when the corresponding
+ * Tagaro::ThemeProvider changes the theme.
  */
 class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::RendererClient
 {
 	public:
-		///Creates a new Tagaro::SpriteItem which renders the sprite with the
-		///given @a spriteKey as provided by the given @a renderer.
-		SpriteItem(Tagaro::Renderer* renderer, const QString& spriteKey, QGraphicsItem* parent = 0);
+		///Creates a new Tagaro::SpriteItem which renders the given @a sprite.
+		SpriteItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
 		virtual ~SpriteItem();
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);

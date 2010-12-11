@@ -28,6 +28,7 @@ namespace Tagaro {
 class RendererClientPrivate;
 class Renderer;
 class RendererPrivate;
+class Sprite;
 
 /**
  * @class Tagaro::RendererClient rendererclient.h <Tagaro/RendererClient>
@@ -39,32 +40,25 @@ class RendererPrivate;
  * documentation for details.
  *
  * Subclasses have to reimplement the receivePixmap() method.
+ *
+ * TODO: Update documentation for Tagaro::Sprite
  */
 class TAGARO_EXPORT RendererClient
 {
 	public:
-		///Creates a new client which receives pixmaps for the sprite with the
-		///given @a spriteKey as provided by the given @a renderer.
-		///You may give a null pointer to @a renderer, or an empty string to
-		///@a spriteKey. In this case, no pixmap is fetched.
-		RendererClient(Tagaro::Renderer* renderer, const QString& spriteKey);
+		///Creates a new client which receives pixmaps for the given @a sprite.
+		///You may give a null pointer to @a sprite to disable pixmap fetching.
+		///The pixmap() will then be invalid.
+		RendererClient(Tagaro::Sprite* sprite);
+		///Destroys this Tagaro::RendererClient.
 		virtual ~RendererClient();
 
-		///@return the renderer used by this client
-		Tagaro::Renderer* renderer() const;
-		///Sets the renderer used by this client. Set to a null pointer to
+		///@return the sprite rendered by this client
+		Tagaro::Sprite* sprite() const;
+		///Sets the sprite rendered by this client. Set to a null pointer to
 		///disable pixmap fetching.
-		void setRenderer(Tagaro::Renderer* renderer);
-		///@return the key of the sprite currently rendered by this client
-		QString spriteKey() const;
-		///Defines the key of the sprite which is rendered by this client. Set
-		///to an empty string to disable pixmap fetching.
-		void setSpriteKey(const QString& spriteKey);
+		void setSprite(Tagaro::Sprite* sprite);
 
-		///@return the frame count, or 0 for non-animated sprites, or -1 if the
-		///sprite does not exist at all
-		///@see Tagaro::Renderer::frameCount()
-		int frameCount() const;
 		///@return the current frame number, or -1 for non-animated sprites
 		int frame() const;
 		///For animated sprites, render another frame. The given frame number is
@@ -85,16 +79,15 @@ class TAGARO_EXPORT RendererClient
 		///want to set this size such that the pixmap does not have to be scaled
 		///when it is rendered onto your primary view (for speed reasons).
 		///
-		///The default render size is very small (width = height = 3 pixels), so
-		///that you notice when you forget to set this. ;-)
+		///The default render size is empty, so that pixmap rendering is
+		///disabled (i.e. pixmap() is invalid).
 		void setRenderSize(const QSize& renderSize);
 		///@return the rendered pixmap (or an invalid pixmap if no pixmap has
 		///been rendered yet)
 		QPixmap pixmap() const;
 	protected:
-		///This method is called when the Tagaro::Renderer has provided a new
-		///pixmap for this client (esp. after theme changes and after calls to
-		///setFrame(), setRenderSize() and setSpriteKey()).
+		///This method is called when a new pixmap has been rendered for this
+		///client (esp. after theme changes and calls to the client's setters).
 		virtual void receivePixmap(const QPixmap& pixmap) = 0;
 	private:
 		friend class Tagaro::RendererClientPrivate;

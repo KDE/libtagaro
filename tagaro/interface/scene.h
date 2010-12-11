@@ -26,14 +26,14 @@
 namespace Tagaro {
 
 class MessageOverlay;
-class Renderer;
 class RendererClient;
+class Sprite;
 
 /**
  * @class Tagaro::Scene scene.h <Tagaro/Scene>
  * @brief QGraphicsScene with automatic viewport transform adjustments
  *
- * This QGraphicsScene subclass provides integration with Tagaro and 
+ * This QGraphicsScene subclass provides integration with Tagaro and
  * miscellaneous convenience features:
  * @li It acts as a Tagaro::RendererClient to fetch a scene background pixmap.
  * @li It can be used to keep the QGraphicsScene's sceneRect() in sync
@@ -48,8 +48,8 @@ class TAGARO_EXPORT Scene : public QGraphicsScene
 		Scene(QObject* parent = 0);
 		///@overload
 		///Initializes the renderer client for the scene background brush with
-		///the given renderer and sprite key.
-		Scene(Tagaro::Renderer* backgroundRenderer, const QString& backgroundSpriteKey, QObject* parent = 0);
+		///the given @a sprite.
+		Scene(Tagaro::Sprite* backgroundSprite, QObject* parent = 0);
 		///Destroys this Tagaro::Scene instance.
 		virtual ~Scene();
 

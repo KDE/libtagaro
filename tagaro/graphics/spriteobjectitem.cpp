@@ -56,9 +56,9 @@ Tagaro::SpriteObjectItem::Private::Private(QGraphicsItem* parent)
 {
 }
 
-Tagaro::SpriteObjectItem::SpriteObjectItem(Tagaro::Renderer* renderer, const QString& spriteKey, QGraphicsItem* parent)
+Tagaro::SpriteObjectItem::SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent)
 	: QGraphicsObject(parent)
-	, Tagaro::RendererClient(renderer, spriteKey)
+	, Tagaro::RendererClient(sprite)
 	, d(new Private(this))
 {
 }

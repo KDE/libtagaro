@@ -29,10 +29,11 @@ namespace Tagaro {
 
 /**
  * @class Tagaro::SpriteObjectItem spriteobjectitem.h <Tagaro/SpriteObjectItem>
- * @short A QGraphicsObject which displays pixmaps from a Tagaro::Renderer.
+ * @short A QGraphicsObject which displays pixmaps from a Tagaro::Sprite.
  *
- * This item displays a pixmap which is retrieved from a Tagaro::Renderer, and
- * is updated automatically when the Tagaro::Renderer changes the theme.
+ * This item displays a pixmap which is retrieved from a Tagaro::Sprite, and
+ * is updated automatically when the corresponding Tagaro::ThemeProvider
+ * changes the theme.
  *
  * The item has built-in handling for animated sprites (i.e. those with multiple
  * frames). It is a QGraphicsObject and exposes a "frame" property, so you can
@@ -53,11 +54,9 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Re
 	Q_PROPERTY(QPointF offset READ offset WRITE setOffset)
 	Q_PROPERTY(QSize renderSize READ renderSize WRITE setRenderSize)
 	Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
-	Q_PROPERTY(QString spriteKey READ spriteKey WRITE setSpriteKey)
 	public:
-		///Creates a new Tagaro::SpriteObjectItem which renders the sprite with
-		///the given @a spriteKey as provided by the given @a renderer.
-		SpriteObjectItem(Tagaro::Renderer* renderer, const QString& spriteKey, QGraphicsItem* parent = 0);
+		///Creates a new Tagaro::SpriteObjectItem which renders the given @sprite.
+		SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
 		virtual ~SpriteObjectItem();
 
 		///@return the item's offset, which defines the point of the top-left

@@ -20,7 +20,7 @@
 #include "renderer.h"
 
 //TODO: ACTION PLAN for Tagaro theming 2.0
-//TODO: 1. replace Renderer dependency of RendererClient by Sprite dependency
+//TODO: 1. (DONE) replace Renderer dependency of RendererClient by Sprite dependency
 //TODO: 2. move rendering logic from Renderer to Sprite
 //TODO: 3. move renderer module and cache instantiation from Renderer to Theme
 //TODO: 4. move worker pool management from Renderer to an internal global-static class
