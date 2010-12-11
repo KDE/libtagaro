@@ -19,14 +19,12 @@
 #ifndef TAGARO_RENDERER_P_H
 #define TAGARO_RENDERER_P_H
 
+#include "renderer.h"
 #include "renderermodule.h"
+#include "rendering_p.h"
 #include "sprite.h"
 
 #include <QtCore/QHash>
-#include <QtCore/QMetaType>
-#include <QtCore/QMutex>
-#include <QtCore/QRunnable>
-#include <QtCore/QThreadPool>
 #include <KDE/KImageCache>
 
 namespace Tagaro {
@@ -47,28 +45,6 @@ namespace Internal
 		, size(size_)
 	{
 	}
-
-	//Describes a rendering job which is delegated to a worker thread.
-	struct Job
-	{
-		Tagaro::RendererModule* rendererModule;
-		ClientSpec spec;
-		QString cacheKey, elementKey;
-		QImage result;
-	};
-
-	//Describes a worker thread.
-	class Worker : public QRunnable
-	{
-		public:
-			Worker(Job* job, bool isSynchronous, Tagaro::RendererPrivate* parent);
-
-			virtual void run();
-		private:
-			Job* m_job;
-			bool m_synchronous;
-			Tagaro::RendererPrivate* m_parent;
-	};
 };
 
 class RendererPrivate : public QObject
@@ -84,7 +60,7 @@ class RendererPrivate : public QObject
 		inline void requestPixmap__propagateResult(const QPixmap& pixmap, Tagaro::RendererClient* client, QPixmap* synchronousResult);
 	public Q_SLOTS:
 		void loadSelectedTheme();
-		void jobFinished(Tagaro::Internal::Job* job, bool isSynchronous); //NOTE: This is invoked from Internal::Worker::run.
+		void jobFinished(Tagaro::RenderJob* job, const QImage& result, bool isSynchronous); //NOTE: This is invoked from Tagaro::RenderWorker::run.
 	public:
 		Tagaro::Renderer* m_parent;
 
@@ -95,7 +71,6 @@ class RendererPrivate : public QObject
 		Tagaro::ThemeProvider* m_themeProvider;
 		const Tagaro::Theme* m_theme;
 
-		QThreadPool m_workerPool;
 		Tagaro::RendererModule* m_rendererModule;
 
 		QHash<QString, Tagaro::Sprite*> m_sprites; //maps sprite keys -> sprite instances
@@ -147,7 +122,5 @@ class RendererClientPrivate : public QObject
 };
 
 } //namespace Tagaro
-
-Q_DECLARE_METATYPE(Tagaro::Internal::Job*)
 
 #endif // TAGARO_RENDERER_P_H

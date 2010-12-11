@@ -23,7 +23,7 @@
 //TODO: 1. (DONE) replace Renderer dependency of RendererClient by Sprite dependency
 //TODO: 2. move rendering logic from Renderer to Sprite
 //TODO: 3. move renderer module and cache instantiation from Renderer to Theme
-//TODO: 4. move worker pool management from Renderer to an internal global-static class
+//TODO: 4. (SOMEHOW DONE) move worker pool management from Renderer to an internal global-static class
 //TODO: 5. merge Renderer into ThemeProvider; convert legacy properties (frameSuffix, frameBaseIndex) and strategies into a configuration structure that can only be passed in once at ThemeProvider creation
 
 struct Tagaro::Sprite::Private

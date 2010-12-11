@@ -26,6 +26,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+#include <QtCore/QThreadPool>
 #include <QtGui/QPainter>
 #include <KDE/KDebug>
 
@@ -64,7 +65,7 @@ Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, unsign
 	{
 		m_strategies |= Tagaro::Renderer::UseRenderingThreads;
 	}
-	qRegisterMetaType<Tagaro::Internal::Job*>();
+	qRegisterMetaType<Tagaro::RenderJob*>();
 	connect(m_themeProvider, SIGNAL(selectedIndexChanged(int)), SLOT(loadSelectedTheme()));
 }
 
@@ -86,7 +87,7 @@ Tagaro::Renderer::~Renderer()
 	for (; it1 != it2; ++it1)
 		delete it1.value();
 	//cleanup own stuff
-	d->m_workerPool.waitForDone();
+	QThreadPool::globalInstance()->waitForDone(); //TODO: optimize
 	delete d->m_rendererModule;
 	delete d->m_imageCache;
 	delete d;
@@ -212,7 +213,7 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 			kDebug() << "Theme newer than cache, checking graphics file";
 			if (rendererModule->isValid())
 			{
-				m_workerPool.waitForDone();
+				QThreadPool::globalInstance()->waitForDone(); //TODO: optimize
 				delete m_rendererModule;
 				m_rendererModule = rendererModule;
 				m_imageCache->insert(QString::fromLatin1("tagaro_timestamp"), QByteArray::number(fileTimestamp));
@@ -232,7 +233,7 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 		//theme is cached - just delete the old renderer after making sure that no worker threads are using it anymore
 		else if (m_theme != theme)
 		{
-			m_workerPool.waitForDone();
+			QThreadPool::globalInstance()->waitForDone(); //TODO: optimize
 			delete m_rendererModule;
 			m_rendererModule = rendererModule;
 		}
@@ -242,7 +243,7 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 		//load SVG file
 		if (rendererModule->isValid())
 		{
-			m_workerPool.waitForDone();
+			QThreadPool::globalInstance()->waitForDone(); //TODO: optimize
 			delete m_rendererModule;
 			m_rendererModule = rendererModule;
 		}
@@ -497,33 +498,29 @@ void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& 
 		return;
 	}
 	//create job
-	Tagaro::Internal::Job* job = new Tagaro::Internal::Job;
-	job->rendererModule = m_rendererModule;
-	job->cacheKey = cacheKey;
+	Tagaro::RenderJob* job = new Tagaro::RenderJob;
+	job->module = m_rendererModule;
+	job->size = spec.size;
 	job->elementKey = elementKey;
-	job->spec = spec;
 	const bool synchronous = !client;
-	Tagaro::Internal::Worker* worker = new Tagaro::Internal::Worker(job, synchronous, this);
 	if (synchronous || !(m_strategies & Tagaro::Renderer::UseRenderingThreads))
 	{
-		worker->run();
-		delete worker;
+		jobFinished(job, Tagaro::RenderWorker::run(job), true);
 		//if everything worked fine, result is in high-speed cache now
 		const QPixmap result = m_pixmapCache.value(cacheKey);
 		requestPixmap__propagateResult(result, client, synchronousResult);
 	}
 	else
 	{
-		m_workerPool.start(new Tagaro::Internal::Worker(job, !client, this));
+		QThreadPool::globalInstance()->start(new Tagaro::RenderWorker(job, this));
 		m_pendingRequests << cacheKey;
 	}
 }
 
-void Tagaro::RendererPrivate::jobFinished(Tagaro::Internal::Job* job, bool isSynchronous)
+void Tagaro::RendererPrivate::jobFinished(Tagaro::RenderJob* job, const QImage& result, bool isSynchronous)
 {
 	//read job
-	const QString cacheKey = job->cacheKey;
-	const QImage result = job->result;
+	const QString cacheKey = m_sizePrefix.arg(job->size.width()).arg(job->size.height()) + job->elementKey;
 	delete job;
 	//check who wanted this pixmap
 	m_pendingRequests.removeAll(cacheKey);
@@ -546,36 +543,6 @@ void Tagaro::RendererPrivate::jobFinished(Tagaro::Internal::Job* job, bool isSyn
 		requester->d->receivePixmapInternal(pixmap);
 	}
 }
-
-//BEGIN Tagaro::Internal::Job/Worker
-
-Tagaro::Internal::Worker::Worker(Tagaro::Internal::Job* job, bool isSynchronous, Tagaro::RendererPrivate* parent)
-	: m_job(job)
-	, m_synchronous(isSynchronous)
-	, m_parent(parent)
-{
-}
-
-static const uint transparentRgba = QColor(Qt::transparent).rgba();
-
-void Tagaro::Internal::Worker::run()
-{
-	QImage image(m_job->spec.size, QImage::Format_ARGB32_Premultiplied);
-	image.fill(transparentRgba);
-	//do renderering
-	QPainter painter(&image);
-	m_job->rendererModule->render(&painter, m_job->elementKey);
-	painter.end();
-	//talk back to the main thread
-	m_job->result = image;
-	QMetaObject::invokeMethod(
-		m_parent, "jobFinished", Qt::AutoConnection,
-		Q_ARG(Tagaro::Internal::Job*, m_job), Q_ARG(bool, m_synchronous)
-	);
-	//NOTE: Tagaro::Renderer::spritePixmap relies on Qt::DirectConnection when this method is run in the main thread.
-}
-
-//END Tagaro::Internal::Job/Worker
 
 #include "renderer.moc"
 #include "renderer_p.moc"
