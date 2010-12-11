@@ -1,0 +1,18 @@
+[Desktop Entry]
+Exec=kcmshell4 kcmtagaro
+Icon=games-config-custom
+
+X-DocPath=libtagaro/index.html
+
+Type=Service
+X-KDE-ServiceTypes=KCModule
+X-KDE-Library=kcmtagaro
+X-KDE-ParentApp=kcontrol
+
+# TODO: correct categorization
+X-KDE-System-Settings-Parent-Category=system-administration
+
+Name=KDE Games
+Comment=Configure general behavior of KDE games
+X-KDE-Keywords=games,graphics,rendering,tagaro,libtagaro
+Categories=Qt;KDE;X-KDE-settings-system;

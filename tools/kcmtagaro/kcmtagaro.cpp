@@ -16,33 +16,39 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
+#include "kcmtagaro.h"
+
 #include <KDE/KAboutData>
-#include <KDE/KApplication>
-#include <KDE/KCmdLineArgs>
-#include <KDE/KConfigDialog>
-#include <KDE/KLocale>
+#include <KDE/KConfigDialogManager>
+#include <KDE/KGenericFactory>
 
 #include <Tagaro/Settings>
 #include "ui_visuals.h"
 
-int main(int argc, char** argv)
+typedef KGenericFactory<KCMTagaro, QWidget> KCMTagaroFactory;
+K_EXPORT_COMPONENT_FACTORY(kcmtagaro, KCMTagaroFactory("kcmtagaro"))
+
+struct KCMTagaro::Private
 {
-	const KLocalizedString appName = ki18nc("application name", "TagaroSettings");
-	KAboutData about("tagarosettings", "libtagaro", appName, "0.1",
-		ki18n("Global configuration interface for libtagaro-based applications"),
+	Ui_Visuals m_visualsUi;
+};
+
+KCMTagaro::KCMTagaro(QWidget* parent, const QStringList& args)
+	: KCModule(KCMTagaroFactory::componentData(), parent)
+	, d(new Private)
+{
+	Q_UNUSED(args)
+	KAboutData* about = new KAboutData(
+		"kcmtagaro", "libtagaro", ki18nc("AboutData appname for KCM", "KDE games library configuration"),
+		"0.1", ki18nc("AboutData description for KCM", "Global configuration for KDE games"),
 		KAboutData::License_GPL, ki18n("Copyright 2010 Stefan Majewsky"));
-	about.addAuthor(ki18n("Stefan Majewsky"), KLocalizedString(), "majewsky@gmx.net");
-	KCmdLineArgs::init(argc, argv, &about);
+	setAboutData(about);
+	//setup configuration widgets
+	d->m_visualsUi.setupUi(this);
+	addConfig(Tagaro::Settings::self(), this);
+}
 
-	KApplication app;
-
-	KConfigDialog dialog(0, QString(), Tagaro::Settings::self());
-	QWidget* visualsPage = new QWidget;
-	Ui_Visuals visualsUi;
-	visualsUi.setupUi(visualsPage);
-	dialog.setWindowTitle(appName.toString());
-	dialog.addPage(visualsPage, i18nc("@item:inlistbox on the left pane of a config dialog", "Visuals"), "games-config-board", i18nc("@title:tab specifically the title of a config dialog page", "Configure advanced aspects of KDE games visuals"));
-
-	dialog.show();
-	return app.exec();
+KCMTagaro::~KCMTagaro()
+{
+	delete d;
 }

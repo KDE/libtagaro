@@ -1,1 +1,1 @@
-add_subdirectory(tagarosettings)
+add_subdirectory(kcmtagaro)
