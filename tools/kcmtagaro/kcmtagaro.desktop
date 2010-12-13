@@ -13,6 +13,16 @@ X-KDE-ParentApp=kcontrol
 X-KDE-System-Settings-Parent-Category=system-administration
 
 Name=KDE Games
+Name[pt]=Jogos do KDE
+Name[pt_BR]=Jogos do KDE
+Name[sv]=KDE:s spel
+Name[uk]=Ігри KDE
+Name[x-test]=xxKDE Gamesxx
 Comment=Configure general behavior of KDE games
+Comment[pt]=Configurar o comportamento geral dos jogos do KDE
+Comment[pt_BR]=Configura o comportamento geral dos jogos do KDE
+Comment[sv]=Anpassa det allmänna beteendet hos KDE:s spel
+Comment[uk]=Налаштування загальної поведінки ігор KDE
+Comment[x-test]=xxConfigure general behavior of KDE gamesxx
 X-KDE-Keywords=games,graphics,rendering,tagaro,libtagaro
 Categories=Qt;KDE;X-KDE-settings-system;
