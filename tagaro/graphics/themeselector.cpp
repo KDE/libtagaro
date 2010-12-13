@@ -47,9 +47,9 @@ Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider)
 	//setup theme list
 	m_themeList->setModel(provider->model());
 	m_themeList->setSelectionMode(QAbstractItemView::SingleSelection);
-	updateSelectedIndex(provider->selectedIndex());
+	updateSelectedTheme(provider->selectedTheme());
 	connect(m_themeList->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(storeSelection(QItemSelection)));
-	connect(provider, SIGNAL(selectedIndexChanged(int)), SLOT(updateSelectedIndex(int)));
+	connect(provider, SIGNAL(selectedThemeChanged(const Tagaro::Theme*)), SLOT(updateSelectedTheme(const Tagaro::Theme*)));
 	//setup appearance of theme list (minimum size = 4 items)
 	Tagaro::GraphicsDelegate* delegate = new Tagaro::GraphicsDelegate(m_themeList);
 	const QSize itemSizeHint = delegate->sizeHint(QStyleOptionViewItem(), QModelIndex());
@@ -62,15 +62,17 @@ Tagaro::ThemeProvider* Tagaro::ThemeSelector::provider() const
 	return m_provider;
 }
 
-void Tagaro::ThemeSelector::updateSelectedIndex(int selectedIndex)
+void Tagaro::ThemeSelector::updateSelectedTheme(const Tagaro::Theme* selectedTheme)
 {
+	const int selectedIndex = m_provider->themes().indexOf(selectedTheme);
 	const QModelIndex selectedModelIndex = m_themeList->model()->index(selectedIndex, 0);
 	m_themeList->selectionModel()->setCurrentIndex(selectedModelIndex, QItemSelectionModel::ClearAndSelect);
 }
 
 void Tagaro::ThemeSelector::storeSelection(const QItemSelection& selection)
 {
-	m_provider->setSelectedIndex(selection.indexes().value(0).row());
+	const int selectedIndex = selection.indexes().value(0).row();
+	m_provider->setSelectedTheme(m_provider->themes().value(selectedIndex));
 }
 
 #include "themeselector_p.moc"

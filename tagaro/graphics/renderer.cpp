@@ -66,7 +66,7 @@ Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, unsign
 		m_strategies |= Tagaro::Renderer::UseRenderingThreads;
 	}
 	qRegisterMetaType<Tagaro::RenderJob*>();
-	connect(m_themeProvider, SIGNAL(selectedIndexChanged(int)), SLOT(loadSelectedTheme()));
+	connect(m_themeProvider, SIGNAL(selectedThemeChanged(const Tagaro::Theme*)), SLOT(loadSelectedTheme()));
 }
 
 Tagaro::Renderer::Renderer(Tagaro::ThemeProvider* provider, unsigned cacheSize)
@@ -161,7 +161,7 @@ void Tagaro::RendererPrivate::setTheme(const Tagaro::Theme* theme)
 	kDebug() << "Setting theme:" << theme->identifier();
 	if (!setThemeInternal(theme))
 	{
-		const Tagaro::Theme* defaultTheme = m_themeProvider->theme(0);
+		const Tagaro::Theme* defaultTheme = m_themeProvider->defaultTheme();
 		if (theme != defaultTheme && defaultTheme)
 		{
 			kDebug() << "Falling back to default theme:" << defaultTheme->identifier();
@@ -186,7 +186,7 @@ void Tagaro::RendererPrivate::setTheme(const Tagaro::Theme* theme)
 
 void Tagaro::RendererPrivate::loadSelectedTheme()
 {
-	setTheme(m_themeProvider->theme(m_themeProvider->selectedIndex()));
+	setTheme(m_themeProvider->selectedTheme());
 }
 
 bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)

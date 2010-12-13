@@ -60,7 +60,7 @@ void Tagaro::GraphicsConfigDialog::addThemeSelector(Tagaro::ThemeProvider* provi
 	page->setHeader(header);
 	//hook up to dialog
 	d->m_selectors << selector;
-	connect(provider, SIGNAL(selectedIndexChanged(int)), SLOT(_k_selectionChanged()));
+	connect(provider, SIGNAL(selectedThemeChanged(const Tagaro::Theme*)), SLOT(_k_selectionChanged()));
 	d->_k_selectionChanged(); //determine state of "Default" button
 }
 
@@ -68,7 +68,7 @@ void Tagaro::GraphicsConfigDialog::Private::_k_restoreDefault()
 {
 	foreach (Tagaro::ThemeSelector* selector, m_selectors)
 	{
-		selector->provider()->setSelectedIndex(0);
+		selector->provider()->setSelectedTheme(selector->provider()->defaultTheme());
 	}
 }
 
@@ -76,7 +76,7 @@ void Tagaro::GraphicsConfigDialog::Private::_k_selectionChanged()
 {
 	foreach (Tagaro::ThemeSelector* selector, m_selectors)
 	{
-		if (selector->provider()->selectedIndex() != 0)
+		if (selector->provider()->selectedTheme() != selector->provider()->defaultTheme())
 		{
 			q->enableButton(KDialog::Default, true);
 			return;

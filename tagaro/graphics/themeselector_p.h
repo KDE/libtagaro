@@ -25,6 +25,7 @@ class QListView;
 
 namespace Tagaro {
 
+class Theme;
 class ThemeProvider;
 
 ///@internal
@@ -36,7 +37,7 @@ class ThemeSelector : public QWidget
 
 		Tagaro::ThemeProvider* provider() const;
 	private Q_SLOTS:
-		void updateSelectedIndex(int selectedIndex);
+		void updateSelectedTheme(const Tagaro::Theme* selectedTheme);
 		void storeSelection(const QItemSelection& selection);
 	private:
 		Tagaro::ThemeProvider* m_provider;

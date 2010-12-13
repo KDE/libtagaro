@@ -33,9 +33,13 @@ class Tagaro::ThemeProvider::Private : public QAbstractListModel
 {
 	public:
 		Tagaro::ThemeProvider* q;
-		int m_selectedIndex;
+		bool m_ownThemes;
 
-		Private(Tagaro::ThemeProvider* q_) : QAbstractListModel(q_), q(q_), m_selectedIndex(0) {}
+		QList<Tagaro::Theme*> m_themes;
+		QList<const Tagaro::Theme*> m_cThemes;
+		const Tagaro::Theme* m_selectedTheme;
+
+		Private(Tagaro::ThemeProvider* q_, bool ownThemes) : QAbstractListModel(q_), q(q_), m_ownThemes(ownThemes), m_selectedTheme(0) {}
 
 		virtual QVariant data(const QModelIndex& index, int role) const;
 		virtual Qt::ItemFlags flags(const QModelIndex& index) const;
@@ -46,7 +50,7 @@ class Tagaro::ThemeProvider::Private : public QAbstractListModel
 
 QVariant Tagaro::ThemeProvider::Private::data(const QModelIndex& index, int role) const
 {
-	const Tagaro::Theme* theme = q->theme(index.row());
+	const Tagaro::Theme* theme = m_cThemes.value(index.row());
 	return theme ? theme->data(role) : QVariant();
 }
 
@@ -58,17 +62,21 @@ Qt::ItemFlags Tagaro::ThemeProvider::Private::flags(const QModelIndex& index) co
 
 int Tagaro::ThemeProvider::Private::rowCount(const QModelIndex& index) const
 {
-	return index.isValid() ? 0 : q->themeCount();
+	return index.isValid() ? 0 : m_cThemes.count();
 }
 
-Tagaro::ThemeProvider::ThemeProvider(QObject* parent)
+Tagaro::ThemeProvider::ThemeProvider(bool ownThemes, QObject* parent)
 	: QObject(parent)
-	, d(new Private(this))
+	, d(new Private(this, ownThemes))
 {
 }
 
 Tagaro::ThemeProvider::~ThemeProvider()
 {
+	if (d->m_ownThemes)
+	{
+		qDeleteAll(d->m_themes);
+	}
 	delete d;
 }
 
@@ -77,66 +85,89 @@ QAbstractItemModel* Tagaro::ThemeProvider::model() const
 	return d;
 }
 
-int Tagaro::ThemeProvider::selectedIndex() const
+QList<const Tagaro::Theme*> Tagaro::ThemeProvider::themes() const
 {
-	return d->m_selectedIndex;
+	return d->m_cThemes;
 }
 
-void Tagaro::ThemeProvider::setSelectedIndex(int index)
+QList<Tagaro::Theme*> Tagaro::ThemeProvider::nonConstThemes()
 {
-	if (index < 0 || index >= themeCount())
+	return d->m_themes;
+}
+
+const Tagaro::Theme* Tagaro::ThemeProvider::defaultTheme() const
+{
+	return d->m_cThemes.value(0);
+}
+
+const Tagaro::Theme* Tagaro::ThemeProvider::selectedTheme() const
+{
+	return d->m_selectedTheme;
+}
+
+void Tagaro::ThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
+{
+	if (!d->m_cThemes.contains(theme))
 	{
-		//out of bounds
 		return;
 	}
-	if (d->m_selectedIndex != index)
+	if (d->m_selectedTheme != theme)
 	{
-		d->m_selectedIndex = index;
-		emit selectedIndexChanged(index);
+		d->m_selectedTheme = theme;
+		emit selectedThemeChanged(theme);
 	}
 }
 
-const Tagaro::Theme* Tagaro::ThemeProvider::theme(const QByteArray& identifier) const
+void Tagaro::ThemeProvider::setThemes(const QList<Tagaro::Theme*>& themes)
 {
-	const int count = themeCount();
-	for (int i = 0; i < count; ++i)
+	if (d->m_themes == themes)
 	{
-		const Tagaro::Theme* theme = this->theme(i);
-		if (theme->identifier() == identifier)
+		return;
+	}
+	emit themesAboutToBeChanged();
+	//find themes which can be deleted
+	if (d->m_ownThemes)
+	{
+		//keep only these themes which are still used
+		for (int i = 0; i < themes.size(); ++i)
 		{
-			return theme;
+			d->m_themes.removeAll(themes[i]);
 		}
 	}
-	//found no theme with this identifier
-	return 0;
-}
-
-void Tagaro::ThemeProvider::announceChange(int firstIndex, int lastIndex)
-{
-	const int themeCount = this->themeCount();
-	firstIndex = qBound(0, firstIndex, themeCount);
-	lastIndex = qBound(firstIndex, lastIndex, themeCount);
-	emit d->dataChanged(d->index(firstIndex), d->index(lastIndex));
-}
-
-void Tagaro::ThemeProvider::beginInsertThemes(int firstIndex, int lastIndex)
-{
-	d->beginInsertRows(QModelIndex(), firstIndex, lastIndex);
-}
-
-void Tagaro::ThemeProvider::beginRemoveThemes(int firstIndex, int lastIndex)
-{
-	d->beginRemoveRows(QModelIndex(), firstIndex, lastIndex);
-}
-
-void Tagaro::ThemeProvider::endInsertThemes()
-{
-	d->endInsertRows();
-}
-
-void Tagaro::ThemeProvider::endRemoveThemes()
-{
-	d->endRemoveRows();
+	else
+	{
+		d->m_themes.clear();
+	}
+	const QList<Tagaro::Theme*> deleteableThemes = d->m_themes;
+	//update theme list (and the const variant, which is built only once for speed)
+	d->m_themes = themes;
+	d->m_cThemes.clear();
+	for (int i = 0; i < themes.size(); ++i)
+	{
+		d->m_cThemes << themes[i];
+	}
+	//update theme selection
+	const Tagaro::Theme* oldSelected = d->m_selectedTheme;
+	if (!d->m_selectedTheme)
+	{
+		if (d->m_themes.size() > 0)
+		{
+			d->m_selectedTheme = defaultTheme();
+		}
+	}
+	else if (!d->m_cThemes.contains(d->m_selectedTheme))
+	{
+		//this also sets selection to null if d->m_themes.isEmpty()
+		d->m_selectedTheme = defaultTheme();
+	}
+	//announce changes
+	emit themesChanged();
+	if (d->m_selectedTheme != oldSelected)
+	{
+		emit selectedThemeChanged(d->m_selectedTheme);
+	}
+	//cleanup
+	qDeleteAll(deleteableThemes);
 }
 
 //END Tagaro::ThemeProvider
@@ -145,17 +176,14 @@ void Tagaro::ThemeProvider::endRemoveThemes()
 struct Tagaro::StandardThemeProvider::Private
 {
 	Tagaro::StandardThemeProvider* m_parent;
-	QVector<Tagaro::Theme*> m_themes;
+	QList<Tagaro::Theme*> m_themes;
 	QByteArray m_configKey;
 
 	Private(const QByteArray& configKey, Tagaro::StandardThemeProvider* parent) : m_parent(parent), m_configKey(configKey) {}
-	~Private() { qDeleteAll(m_themes); }
-
-	void _k_saveSelectedIndex(int index);
 };
 
 Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, QObject* parent)
-	: Tagaro::ThemeProvider(parent)
+	: Tagaro::ThemeProvider(true, parent)
 	, d(new Private(configKey, this))
 {
 	static const QString defaultTheme = QLatin1String("default.desktop");
@@ -168,6 +196,7 @@ Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey
 		ksdResource, ksdDirectory + "*.desktop",
 		KStandardDirs::NoDuplicates
 	);
+	//TODO cleanup StandardThemeProvider, integrate KNS
 	//create themes
 	foreach (const QString& themePath, themePaths)
 	{
@@ -182,16 +211,16 @@ Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey
 		{
 			d->m_themes.append(theme);
 		}
+		setThemes(d->m_themes);
 	}
 	//set selection index - if selected theme cannot be found, fall back to "default.desktop", then to index 0 (i.e. do nothing because that's the default already)
 	for (int i = 0; i < d->m_themes.count(); ++i)
 	{
 		if (d->m_themes[i]->identifier() == selectedTheme)
 		{
-			setSelectedIndex(i);
+			setSelectedTheme(d->m_themes[i]);
 		}
 	}
-	connect(this, SIGNAL(selectedIndexChanged(int)), SLOT(_k_saveSelectedIndex(int)));
 }
 
 Tagaro::StandardThemeProvider::~StandardThemeProvider()
@@ -199,25 +228,11 @@ Tagaro::StandardThemeProvider::~StandardThemeProvider()
 	delete d;
 }
 
-int Tagaro::StandardThemeProvider::themeCount() const
+void Tagaro::StandardThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
 {
-	return d->m_themes.count();
-}
-
-const Tagaro::Theme* Tagaro::StandardThemeProvider::theme(int index) const
-{
-	return d->m_themes.value(index, 0);
-}
-
-void Tagaro::StandardThemeProvider::Private::_k_saveSelectedIndex(int index)
-{
-	const Tagaro::Theme* theme = m_parent->Tagaro::StandardThemeProvider::theme(index);
-	if (!theme)
-	{
-		return;
-	}
+	Tagaro::ThemeProvider::setSelectedTheme(theme);
 	KConfigGroup config(KGlobal::config(), "Tagaro::StandardThemeProvider");
-	config.writeEntry(m_configKey.data(), theme->identifier());
+	config.writeEntry(d->m_configKey.data(), selectedTheme()->identifier());
 	KGlobal::config()->sync();
 }
 
@@ -238,26 +253,16 @@ struct Tagaro::FileThemeProvider::Private
 };
 
 Tagaro::FileThemeProvider::FileThemeProvider(const QString& file, QObject* parent)
-	: Tagaro::ThemeProvider(parent)
+	: Tagaro::ThemeProvider(false, parent)
 	, d(new Private(FileThemeProvider_identifier(file)))
 {
 	d->m_theme.setData(Tagaro::Theme::GraphicsFileRole, file);
+	setThemes(QList<Tagaro::Theme*>() << &d->m_theme);
 }
 
 Tagaro::FileThemeProvider::~FileThemeProvider()
 {
 	delete d;
-}
-
-int Tagaro::FileThemeProvider::themeCount() const
-{
-	return 1;
-}
-
-const Tagaro::Theme* Tagaro::FileThemeProvider::theme(int index) const
-{
-	Q_UNUSED(index)
-	return &d->m_theme;
 }
 
 //END Tagaro::FileThemeProvider

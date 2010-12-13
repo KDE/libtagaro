@@ -30,7 +30,7 @@ class ThemeProvider;
 /**
  * @class Tagaro::GraphicsConfigDialog graphicsconfigdialog.h <Tagaro/GraphicsConfigDialog>
  *
- * This dialog provides convenience functions for configuring graphical 
+ * This dialog provides convenience functions for configuring graphical
  * components.
  *
  * The following example code illustrates how to add a theme selector page:
@@ -44,7 +44,7 @@ class ThemeProvider;
  * Any Tagaro::Renderer instances connected to the @a themeProvider will pickup
  * selection changes automatically. If you need to be informed about the
  * selection change for some other reason, use the theme provider's
- * selectedIndexChanged() signal.
+ * selectedThemeChanged() signal.
  */
 class TAGARO_EXPORT GraphicsConfigDialog : public KPageDialog
 {

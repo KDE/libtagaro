@@ -40,7 +40,7 @@ class Theme;
  *
  * The theme provider has a selection, which is respected by Tagaro::Renderer
  * instances using this theme provider. If a subclass wants to save the
- * selection, it should connect to the selectedIndexChanged() signal.
+ * selection, it should connect to the selectedThemeChanged() signal.
  *
  * @see Tagaro::StandardThemeProvider
  */
@@ -49,50 +49,48 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 	Q_OBJECT
 	public:
 		///Creates a new Tagaro::ThemeProvider instance.
-		ThemeProvider(QObject* parent = 0);
+		///@param ownThemes whether the provider will take ownership of Theme
+		///                 instances passed to it
+		ThemeProvider(bool ownThemes, QObject* parent = 0);
 		///Destroys this Tagaro::ThemeProvider instance.
 		///@warning Subclasses have to take care that their themes are deleted,
 		///the Tagaro::ThemeProvider cannot do that by itself.
 		virtual ~ThemeProvider();
 
-		///@return the number of themes in this provider
-		virtual int themeCount() const = 0;
-		///@return the @a index-th theme in this provider. If @a index is
-		///negative, bigger than or equal to themeCount(), return 0.
-		virtual const Tagaro::Theme* theme(int index) const = 0;
-		///@return from this provider the theme with the given @a identifier,
-		///or 0 if no such theme can be found.
-		const Tagaro::Theme* theme(const QByteArray& identifier) const;
-
 		///@return a list-shaped model exposing the themes' data
 		QAbstractItemModel* model() const;
-		///@return the index of the selected theme, or 0 if nothing is selected
-		int selectedIndex() const;
+		///@return the themes in this provider
+		QList<const Tagaro::Theme*> themes() const;
+		///@return the default theme, or 0 if the provider does not contain any
+		///themes
+		const Tagaro::Theme* defaultTheme() const;
+		///@return the currently selected theme, or 0 if the provider does not
+		///contain any themes
+		const Tagaro::Theme* selectedTheme() const;
 	public Q_SLOTS:
-		///Selects the theme identified by the given @a index (unless @a index
-		///is out of bounds). If a Tagaro::Renderer instance is using this theme
-		///provider, it will load this theme automatically.
-		void setSelectedIndex(int index);
+		///Selects the given @a theme. If a Tagaro::Renderer instance is using
+		///this theme provider, it will load this theme automatically.
+		///
+		///Subclasses can reimplement this if there are special metathemes which
+		///cannot be selected, but trigger some operation when they are clicked
+		///in the theme selector (e.g. the KNewStuff metatheme provided by the
+		///Tagaro::StandardThemeProvider, which triggers a KNewStuff dialog).
+		virtual void setSelectedTheme(const Tagaro::Theme* theme);
 	Q_SIGNALS:
-		///This signal is emitted when the selected theme changes.
-		void selectedIndexChanged(int index);
 		///This signal is emitted when the selected theme changes, or when the
 		///currently selected theme is modified.
 		void selectedThemeChanged(const Tagaro::Theme* theme);
+		///This signal is emitted when the list of themes is about to change.
+		void themesAboutToBeChanged();
+		///This signal is emitted when the list of themes has changed.
+		void themesChanged();
 	protected:
-		///Announces that the data of the themes between @a firstIndex and
-		///@a lastIndex inclusive has changed.
-		void announceChange(int firstIndex, int lastIndex);
-		///Begins an insertion operation. The new themes will be inserted
-		///between @a firstIndex and @a lastIndex inclusive.
-		void beginInsertThemes(int firstIndex, int lastIndex);
-		///Begins a removal operation. The themes to be removed are those
-		///between @a firstIndex and @a lastIndex inclusive.
-		void beginRemoveThemes(int firstIndex, int lastIndex);
-		///Ends an insertion operation started by beginInsertThemes().
-		void endInsertThemes();
-		///Ends a removal operation started by beginRemoveThemes().
-		void endRemoveThemes();
+		///@return the themes in this provider
+		QList<Tagaro::Theme*> nonConstThemes();
+		///Sets the themes in this provider. It depends on what you specified
+		///the constructor whether the provider will take ownership of the
+		///themes.
+		void setThemes(const QList<Tagaro::Theme*>& themes);
 	private:
 		class Private;
 		Private* const d;
@@ -121,12 +119,10 @@ class TAGARO_EXPORT StandardThemeProvider : public Tagaro::ThemeProvider
 		///Destroys this Tagaro::StandardThemeProvider instance.
 		virtual ~StandardThemeProvider();
 
-		virtual int themeCount() const;
-		virtual const Tagaro::Theme* theme(int index) const;
+		virtual void setSelectedTheme(const Tagaro::Theme* theme);
 	private:
 		class Private;
 		Private* const d;
-		Q_PRIVATE_SLOT(d, void _k_saveSelectedIndex(int));
 };
 
 /**
@@ -145,9 +141,6 @@ class TAGARO_EXPORT FileThemeProvider : public Tagaro::ThemeProvider
 		FileThemeProvider(const QString& file, QObject* parent = 0);
 		///Destroys this Tagaro::FileThemeProvider instance.
 		virtual ~FileThemeProvider();
-
-		virtual int themeCount() const;
-		virtual const Tagaro::Theme* theme(int index) const;
 	private:
 		class Private;
 		Private* const d;
