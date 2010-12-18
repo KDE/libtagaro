@@ -21,7 +21,6 @@
 
 #include <QtGui/QGraphicsScene>
 
-#include "../objectpool.h" //for Tagaro::Renderer*
 #include <libtagaro_export.h>
 
 namespace Tagaro {
