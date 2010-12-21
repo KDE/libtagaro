@@ -18,7 +18,9 @@
 
 #include "renderer.h"
 #include "renderer_p.h"
+#include "renderbackends.h"
 #include "rendererclient.h"
+#include "renderermodule.h"
 #include "settings.h"
 #include "theme.h"
 #include "themeprovider.h"
@@ -38,39 +40,29 @@ static const QString cacheName(QString theme)
 	//e.g. "themes/foobar.desktop" -> "themes/foobar"
 	if (theme.endsWith(QLatin1String(".desktop")))
 		theme.truncate(theme.length() - 8); //8 = strlen(".desktop")
-	return QString::fromLatin1("tagarorenderer-%1-%2").arg(appName).arg(theme);
+	//"-old" avoids collision with CachedProxyRenderBackend
+	return QString::fromLatin1("tagarorenderer-old-%1-%2").arg(appName).arg(theme);
 }
 
-Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, unsigned cacheSize, Tagaro::Renderer* parent)
+Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior, Tagaro::Renderer* parent)
 	: m_parent(parent)
-	, m_frameSuffix(QString::fromLatin1("_%1"))
 	, m_sizePrefix(QString::fromLatin1("%1-%2-"))
 	, m_frameCountPrefix(QString::fromLatin1("fc-"))
 	, m_boundsPrefix(QString::fromLatin1("br-"))
-	//default cache size: 3 MiB = 3 << 20 bytes
-	, m_cacheSize((cacheSize == 0 ? 3 : cacheSize) << 20)
-	, m_strategies(0)
-	, m_frameBaseIndex(0)
 	, m_themeProvider(provider)
 	//theme will be loaded on first request (not immediately, because the calling context might want to disable some rendering strategies first)
 	, m_theme(0)
+	, m_behavior(behavior)
 	, m_rendererModule(0)
+	, m_backend(0)
 	, m_imageCache(0)
 {
-	if (Tagaro::Settings::useDiskCache())
-	{
-		m_strategies |= Tagaro::Renderer::UseDiskCache;
-	}
-	if (Tagaro::Settings::useRenderingThreads())
-	{
-		m_strategies |= Tagaro::Renderer::UseRenderingThreads;
-	}
 	qRegisterMetaType<Tagaro::RenderJob*>();
 	connect(m_themeProvider, SIGNAL(selectedThemeChanged(const Tagaro::Theme*)), SLOT(loadSelectedTheme()));
 }
 
-Tagaro::Renderer::Renderer(Tagaro::ThemeProvider* provider, unsigned cacheSize)
-	: d(new Tagaro::RendererPrivate(provider, cacheSize, this))
+Tagaro::Renderer::Renderer(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior)
+	: d(new Tagaro::RendererPrivate(provider, behavior, this))
 {
 }
 
@@ -89,52 +81,9 @@ Tagaro::Renderer::~Renderer()
 	//cleanup own stuff
 	QThreadPool::globalInstance()->waitForDone(); //TODO: optimize
 	delete d->m_rendererModule;
+	delete d->m_backend;
 	delete d->m_imageCache;
 	delete d;
-}
-
-int Tagaro::Renderer::frameBaseIndex() const
-{
-	return d->m_frameBaseIndex;
-}
-
-void Tagaro::Renderer::setFrameBaseIndex(int frameBaseIndex)
-{
-	d->m_frameBaseIndex = frameBaseIndex;
-}
-
-QString Tagaro::Renderer::frameSuffix() const
-{
-	return d->m_frameSuffix;
-}
-
-void Tagaro::Renderer::setFrameSuffix(const QString& suffix)
-{
-	d->m_frameSuffix = suffix.contains(QLatin1String("%1")) ? suffix : QLatin1String("_%1");
-}
-
-Tagaro::Renderer::Strategies Tagaro::Renderer::strategies() const
-{
-	return d->m_strategies;
-}
-
-void Tagaro::Renderer::setStrategyEnabled(Tagaro::Renderer::Strategy strategy, bool enabled)
-{
-	const bool oldEnabled = d->m_strategies & strategy;
-	if (enabled)
-	{
-		d->m_strategies |= strategy;
-	}
-	else
-	{
-		d->m_strategies &= ~strategy;
-	}
-	if (strategy == Tagaro::Renderer::UseDiskCache && oldEnabled != enabled)
-	{
-		const Tagaro::Theme* theme = d->m_theme;
-		d->m_theme = 0; //or setTheme() will return immediately
-		d->setTheme(theme);
-	}
 }
 
 Tagaro::ThemeProvider* Tagaro::Renderer::themeProvider() const
@@ -183,13 +132,14 @@ void Tagaro::RendererPrivate::loadSelectedTheme()
 bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 {
 	const QString graphicsPath = theme->data(Tagaro::Theme::GraphicsFileRole).toString();
+#if 1 //This #if marks the code that can be removed when RendererModule is removed.
 	Tagaro::RendererModule* rendererModule = Tagaro::RendererModule::fromFile(graphicsPath);
 	//open cache (and graphics file, if necessary)
-	if (m_strategies & Tagaro::Renderer::UseDiskCache)
+	if (m_behavior.cacheSize() > 0 && Tagaro::Settings::useDiskCache())
 	{
 		KImageCache* oldCache = m_imageCache;
 		const QString imageCacheName = cacheName(theme->identifier());
-		m_imageCache = new KImageCache(imageCacheName, m_cacheSize);
+		m_imageCache = new KImageCache(imageCacheName, m_behavior.cacheSize());
 		m_imageCache->setPixmapCaching(false); //see big comment in Tagaro::RendererPrivate class declaration
 		//check timestamp of cache vs. last write access to theme/graphics file
 		const uint fileTimestamp = theme->modificationTimestamp();
@@ -248,6 +198,19 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 		delete m_imageCache;
 		m_imageCache = 0;
 	}
+#endif
+	//instantiate backend
+	Tagaro::RenderBackend* backend1 = new Tagaro::QtSvgRenderBackend(graphicsPath, m_behavior);
+	Tagaro::RenderBackend* backend = new Tagaro::CachedProxyRenderBackend(backend1);
+	if (!backend->load())
+	{
+		kDebug() << "Theme change failed: Graphics source broken";
+		delete backend;
+		return false;
+	}
+	//drop old backend
+	delete m_backend;
+	m_backend = backend;
 	//clear in-process caches
 	m_pixmapCache.clear();
 	m_frameCountCache.clear();
@@ -255,6 +218,11 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 	//done
 	m_theme = theme;
 	return true;
+}
+
+Tagaro::RenderBackend* Tagaro::Renderer::backend() const
+{
+	return d->m_backend;
 }
 
 Tagaro::Sprite* Tagaro::Renderer::sprite(const QString& key) const
@@ -286,10 +254,11 @@ QString Tagaro::RendererPrivate::spriteFrameKey(const QString& key, int frame, b
 		}
 		else
 		{
-			frame = (frame - m_frameBaseIndex) % frameCount + m_frameBaseIndex;
+			const int fbi = m_behavior.frameBaseIndex();
+			frame = (frame - fbi) % frameCount + fbi;
 		}
 	}
-	return key + m_frameSuffix.arg(frame);
+	return key + m_behavior.frameSuffix().arg(frame);
 }
 
 int Tagaro::Renderer::frameCount(const QString& key) const
@@ -313,7 +282,7 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 	int count = -1;
 	bool countFound = false;
 	const QString cacheKey = d->m_frameCountPrefix + key;
-	if (!d->m_rendererModule->isLoaded() && (d->m_strategies & Tagaro::Renderer::UseDiskCache))
+	if (!d->m_rendererModule->isLoaded() && d->m_imageCache)
 	{
 		QByteArray buffer;
 		if (d->m_imageCache->find(cacheKey, &buffer))
@@ -326,12 +295,13 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 	if (!countFound)
 	{
 		//look for animated sprite first
-		count = d->m_frameBaseIndex;
+		const int fbi = d->m_behavior.frameBaseIndex();
+		count = fbi;
 		while (d->m_rendererModule->elementExists(d->spriteFrameKey(key, count, false)))
 		{
 			++count;
 		}
-		count -= d->m_frameBaseIndex;
+		count -= fbi;
 		//look for non-animated sprite instead
 		if (count == 0)
 		{
@@ -341,7 +311,7 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 			}
 		}
 		//save in shared cache for following requests
-		if (d->m_strategies & Tagaro::Renderer::UseDiskCache)
+		if (d->m_imageCache)
 		{
 			d->m_imageCache->insert(cacheKey, QByteArray::number(count));
 		}
@@ -372,7 +342,7 @@ QRectF Tagaro::Renderer::boundsOnSprite(const QString& key, int frame) const
 	QRectF bounds;
 	bool boundsFound = false;
 	const QString cacheKey = d->m_boundsPrefix + elementKey;
-	if (!d->m_rendererModule->isLoaded() && (d->m_strategies & Tagaro::Renderer::UseDiskCache))
+	if (!d->m_rendererModule->isLoaded() && d->m_imageCache)
 	{
 		QByteArray buffer;
 		if (d->m_imageCache->find(cacheKey, &buffer))
@@ -387,7 +357,7 @@ QRectF Tagaro::Renderer::boundsOnSprite(const QString& key, int frame) const
 	{
 		bounds = d->m_rendererModule->boundsOnElement(elementKey);
 		//save in shared cache for following requests
-		if (d->m_strategies & Tagaro::Renderer::UseDiskCache)
+		if (d->m_imageCache)
 		{
 			QByteArray buffer;
 			{
@@ -463,7 +433,7 @@ void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& 
 		return;
 	}
 	//try to serve from low-speed cache
-	if (m_strategies & Tagaro::Renderer::UseDiskCache)
+	if (m_imageCache)
 	{
 		QPixmap pix;
 		if (m_imageCache->findPixmap(cacheKey, &pix))
@@ -484,7 +454,7 @@ void Tagaro::RendererPrivate::requestPixmap(const Tagaro::Internal::ClientSpec& 
 	job->size = spec.size;
 	job->elementKey = elementKey;
 	const bool synchronous = !client;
-	if (synchronous || !(m_strategies & Tagaro::Renderer::UseRenderingThreads))
+	if (synchronous || !Tagaro::Settings::useRenderingThreads())
 	{
 		jobFinished(job, Tagaro::RenderWorker::run(job), true);
 		//if everything worked fine, result is in high-speed cache now
@@ -507,7 +477,7 @@ void Tagaro::RendererPrivate::jobFinished(Tagaro::RenderJob* job, const QImage& 
 	m_pendingRequests.removeAll(cacheKey);
 	const QList<Tagaro::RendererClient*> requesters = m_clients.keys(cacheKey);
 	//put result into image cache
-	if (m_strategies & Tagaro::Renderer::UseDiskCache)
+	if (m_imageCache)
 	{
 		m_imageCache->insertImage(cacheKey, result);
 		//convert result to pixmap (and put into pixmap cache) only if it is needed now

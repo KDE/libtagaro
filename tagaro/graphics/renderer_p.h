@@ -20,7 +20,7 @@
 #define TAGARO_RENDERER_P_H
 
 #include "renderer.h"
-#include "renderermodule.h"
+#include "renderbackend.h"
 #include "rendering_p.h"
 #include "sprite.h"
 
@@ -28,6 +28,8 @@
 #include <KDE/KImageCache>
 
 namespace Tagaro {
+
+class Theme;
 
 namespace Internal
 {
@@ -51,7 +53,7 @@ class RendererPrivate : public QObject
 {
 	Q_OBJECT
 	public:
-		RendererPrivate(Tagaro::ThemeProvider* provider, unsigned cacheSize, Tagaro::Renderer* parent);
+		RendererPrivate(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior, Tagaro::Renderer* parent);
 		void setTheme(const Tagaro::Theme* theme);
 		bool setThemeInternal(const Tagaro::Theme* theme);
 		inline QString spriteFrameKey(const QString& key, int frame, bool normalizeFrameNo = false) const;
@@ -64,14 +66,13 @@ class RendererPrivate : public QObject
 	public:
 		Tagaro::Renderer* m_parent;
 
-		QString m_frameSuffix, m_sizePrefix, m_frameCountPrefix, m_boundsPrefix;
-		unsigned m_cacheSize;
-		Tagaro::Renderer::Strategies m_strategies;
-		int m_frameBaseIndex;
+		QString m_sizePrefix, m_frameCountPrefix, m_boundsPrefix;
 		Tagaro::ThemeProvider* m_themeProvider;
 		const Tagaro::Theme* m_theme;
 
+		const Tagaro::RenderBehavior m_behavior;
 		Tagaro::RendererModule* m_rendererModule;
+		Tagaro::RenderBackend* m_backend;
 
 		QHash<QString, Tagaro::Sprite*> m_sprites; //maps sprite keys -> sprite instances
 		QHash<Tagaro::RendererClient*, QString> m_clients; //maps client -> cache key of current pixmap

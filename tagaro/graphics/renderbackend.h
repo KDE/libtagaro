@@ -51,6 +51,8 @@ class TAGARO_EXPORT RenderBehavior
 		///Sets the cache size in megabytes (default: 3 megabytes). This value
 		///is only used by backends which can use caches. Set to 0 megabytes to
 		///disable caching.
+		///
+		///@see Tagaro::CachedProxyRenderBackend
 		void setCacheSize(int cacheSize);
 		///@return the frame base index @see setFrameBaseIndex()
 		int frameBaseIndex() const;

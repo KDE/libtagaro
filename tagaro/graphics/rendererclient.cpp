@@ -99,7 +99,7 @@ void Tagaro::RendererClient::setFrame(int frame)
 		{
 			//NOTE: check for d->m_sprite == 0 not required because frameCount
 			//is -1 in this case, i.e. this branch is not chosen
-			const int frameBaseIndex = d->m_sprite->renderer()->frameBaseIndex();
+			const int frameBaseIndex = d->m_sprite->renderer()->backend()->behavior().frameBaseIndex();
 			frame = (frame - frameBaseIndex) % frameCount + frameBaseIndex;
 		}
 		if (d->m_spec.frame != frame)

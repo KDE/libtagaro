@@ -17,6 +17,7 @@ set(tagaro_LIB_SRCS
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/renderbackend.cpp
+	graphics/renderbackends.cpp
 	graphics/rendererclient.cpp
 	graphics/renderer.cpp
 	graphics/renderermodule.cpp

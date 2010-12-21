@@ -19,6 +19,8 @@
 #ifndef TAGARO_RENDERER_H
 #define TAGARO_RENDERER_H
 
+#include "renderbackend.h"
+
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtGui/QPixmap>
@@ -29,7 +31,6 @@ namespace Tagaro {
 
 class RendererClient;
 class RendererClientPrivate;
-class RendererModule;
 class RendererPrivate;
 class Sprite;
 class Theme;
@@ -116,46 +117,14 @@ class TAGARO_EXPORT Renderer : public QObject
 		///@param cacheSize the cache size per theme in megabytes (if not given,
 		///a sane default is used)
 		///@warning This constructor may only be called from the main thread.
-		explicit Renderer(Tagaro::ThemeProvider* provider, unsigned cacheSize = 0);
+		explicit Renderer(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior = Tagaro::RenderBehavior());
 		///Deletes this Tagaro::Renderer instance, and all clients using it.
 		virtual ~Renderer();
 
-		///@return the frame base index. @see setFrameBaseIndex()
-		int frameBaseIndex() const;
-		///Sets the frame base index, i.e. the lowest frame index. Usually,
-		///frame numbering starts at zero, so the frame base index is zero.
-		///
-		///For example, if you set the frame base index to 42, and use the
-		///default frame suffix, the 3 frames of an animated sprite "foo" are
-		///provided by the SVG elements "foo_42", "foo_43" and "foo_44".
-		///
-		///It is recommended not to alter the frame base index unless you need
-		///to support legacy themes.
-		void setFrameBaseIndex(int frameBaseIndex);
-		///@return the frame suffix. @see setFrameSuffix()
-		QString frameSuffix() const;
-		///Sets the frame suffix. This suffix will be added to a sprite key
-		///to create the corresponding SVG element key, after any occurrence of
-		///"%1" in the suffix has been replaced by the frame number.
-		///@note Giving a suffix which does not include "%1" will reset to the
-		///default suffix "_%1".
-		///
-		///For example, if the frame suffix is set to "_%1" (the default), the
-		///SVG element key for the frame no. 23 of the sprite "foo" is "foo_23".
-		///@note Frame numbering starts at zero unless you setFrameBaseIndex().
-		void setFrameSuffix(const QString& suffix);
-		///@return the optimization strategies used by this renderer
-		///@see setStrategyEnabled()
-		Strategies strategies() const;
-		///Enables/disables an optimization strategy for this renderer. By
-		///default, both the UseDiskCache and the UseRenderingThreads strategies
-		///are enabled. This is a sane default for 99% of all games. You might
-		///only want to disable optimizations if the graphics are so simple that
-		///the optimizations create an overhead in your special case.
-		void setStrategyEnabled(Strategy strategy, bool enabled = true);
-
 		///@return the theme provider for this renderer
 		Tagaro::ThemeProvider* themeProvider() const;
+		///@return the backend used by this renderer
+		Tagaro::RenderBackend* backend() const;
 
 		///@return a Tagaro::Sprite instance for the given @a spriteKey
 		Tagaro::Sprite* sprite(const QString& spriteKey) const;
