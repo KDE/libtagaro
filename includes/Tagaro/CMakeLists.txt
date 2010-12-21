@@ -2,15 +2,16 @@
 install(FILES
 	AudioScene
 	Board
+	CachedProxyRenderBackend
 	FileThemeProvider
 	GraphicsConfigDialog
 	MessageOverlay
 	ObjectPointer
 	ObjectPool
-	QSvgRendererModule
+	RenderBackend
+	RenderBehavior
 	Renderer
 	RendererClient
-	RendererModule
 	Scene
 	Settings
 	Sound

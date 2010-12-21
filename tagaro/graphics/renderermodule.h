@@ -23,8 +23,6 @@ class QPainter;
 #include <QtCore/QRectF>
 #include <QtCore/QString>
 
-#include <libtagaro_export.h>
-
 namespace Tagaro {
 
 /**
@@ -37,7 +35,7 @@ namespace Tagaro {
  *
  * @warning The implementation of all virtual methods has to be thread-safe!
  */
-class TAGARO_EXPORT RendererModule
+class RendererModule
 {
 	public:
 		///Creates a new Tagaro::RendererModule.
@@ -81,7 +79,7 @@ class TAGARO_EXPORT RendererModule
  * Tagaro::QSvgRendererModule is that the latter provides thread-safe
  * rendering.
  */
-class TAGARO_EXPORT QSvgRendererModule : public Tagaro::RendererModule
+class QSvgRendererModule : public Tagaro::RendererModule
 {
 	public:
 		QSvgRendererModule(const QString& file);

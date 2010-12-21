@@ -142,11 +142,6 @@ Tagaro::ThemeProvider* Tagaro::Renderer::themeProvider() const
 	return d->m_themeProvider;
 }
 
-const Tagaro::Theme* Tagaro::Renderer::theme() const
-{
-	return d->m_theme;
-}
-
 void Tagaro::RendererPrivate::setTheme(const Tagaro::Theme* theme)
 {
 	if (!theme)
@@ -170,11 +165,7 @@ void Tagaro::RendererPrivate::setTheme(const Tagaro::Theme* theme)
 	}
 	if (oldTheme != m_theme)
 	{
-		//announce change publicly
-		emit m_parent->themeChanged(m_theme);
-		//announce change to renderer clients (this is done *after* the
-		//public announcement because the application might want to do special
-		//preparations on the RendererModule before the rendering starts)
+		//announce change to renderer clients
 		QHash<Tagaro::RendererClient*, QString>::iterator it1 = m_clients.begin(), it2 = m_clients.end();
 		for (; it1 != it2; ++it1)
 		{
@@ -264,16 +255,6 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 	//done
 	m_theme = theme;
 	return true;
-}
-
-const Tagaro::RendererModule* Tagaro::Renderer::rendererModule() const
-{
-	return d->m_rendererModule;
-}
-
-Tagaro::RendererModule* Tagaro::Renderer::rendererModule()
-{
-	return d->m_rendererModule;
 }
 
 Tagaro::Sprite* Tagaro::Renderer::sprite(const QString& key) const

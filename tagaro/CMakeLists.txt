@@ -16,9 +16,10 @@ set(tagaro_LIB_SRCS
 	audio/sound.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
+	graphics/renderbackend.cpp
 	graphics/rendererclient.cpp
-	graphics/renderermodule.cpp
 	graphics/renderer.cpp
+	graphics/renderermodule.cpp
 	graphics/rendering.cpp
 	graphics/sprite.cpp
 	graphics/spriteitem.cpp
@@ -33,7 +34,7 @@ set(tagaro_LIB_SRCS
 kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
 
 kde4_add_library(tagaro SHARED ${tagaro_LIB_SRCS})
-target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${OPENAL_LIBRARY} ${SNDFILE_LIBRARIES})
+target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QCA2_LIBRARIES} ${OPENAL_LIBRARY} ${SNDFILE_LIBRARIES})
 target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
 
 set_target_properties(tagaro PROPERTIES
@@ -58,8 +59,8 @@ DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
 
 install(FILES
 	graphics/graphicsconfigdialog.h
+	graphics/renderbackend.h
 	graphics/rendererclient.h
-	graphics/renderermodule.h
 	graphics/renderer.h
 	graphics/sprite.h
 	graphics/spriteitem.h

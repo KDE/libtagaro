@@ -93,7 +93,6 @@ class ThemeProvider;
 class TAGARO_EXPORT Renderer : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(const Tagaro::Theme* theme READ theme NOTIFY themeChanged)
 	public:
 		///Describes the various strategies which Tagaro::Renderer can use to speed
 		///up rendering.
@@ -157,14 +156,6 @@ class TAGARO_EXPORT Renderer : public QObject
 
 		///@return the theme provider for this renderer
 		Tagaro::ThemeProvider* themeProvider() const;
-		///@return the theme currently used by this renderer
-		///To change this theme, use the selection functionality in
-		///Tagaro::ThemeProvider.
-		const Tagaro::Theme* theme() const;
-		///@return the renderer module currently used by this renderer
-		const Tagaro::RendererModule* rendererModule() const;
-		///@return the renderer module currently used by this renderer
-		Tagaro::RendererModule* rendererModule();
 
 		///@return a Tagaro::Sprite instance for the given @a spriteKey
 		Tagaro::Sprite* sprite(const QString& spriteKey) const;
@@ -194,14 +185,6 @@ class TAGARO_EXPORT Renderer : public QObject
 		///@param frame the number of the frame which you want
 		///@note  For non-animated frames, set @a frame to -1 or omit it.
 		QPixmap spritePixmap(const QString& key, const QSize& size, int frame = -1) const;
-	Q_SIGNALS:
-		///This signal is emitted when a new theme has been loaded, but
-		///@b before the active renderer clients are told to update their
-		///pixmaps.
-		///
-		///If you use Tagaro::RendererClient instances to retrieve pixmaps from
-		///the renderer, you will usually not need to react to this signal.
-		void themeChanged(const Tagaro::Theme* theme);
 	private:
 		friend class Tagaro::RendererPrivate;
 		friend class Tagaro::RendererClient;
