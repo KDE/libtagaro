@@ -47,8 +47,6 @@ static const QString cacheName(QString theme)
 Tagaro::RendererPrivate::RendererPrivate(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior, Tagaro::Renderer* parent)
 	: m_parent(parent)
 	, m_sizePrefix(QString::fromLatin1("%1-%2-"))
-	, m_frameCountPrefix(QString::fromLatin1("fc-"))
-	, m_boundsPrefix(QString::fromLatin1("br-"))
 	, m_themeProvider(provider)
 	//theme will be loaded on first request (not immediately, because the calling context might want to disable some rendering strategies first)
 	, m_theme(0)
@@ -213,8 +211,6 @@ bool Tagaro::RendererPrivate::setThemeInternal(const Tagaro::Theme* theme)
 	m_backend = backend;
 	//clear in-process caches
 	m_pixmapCache.clear();
-	m_frameCountCache.clear();
-	m_boundsCache.clear();
 	//done
 	m_theme = theme;
 	return true;
@@ -272,52 +268,8 @@ int Tagaro::Renderer::frameCount(const QString& key) const
 			return -1;
 		}
 	}
-	//look up in in-process cache
-	QHash<QString, int>::const_iterator it = d->m_frameCountCache.constFind(key);
-	if (it != d->m_frameCountCache.constEnd())
-	{
-		return it.value();
-	}
-	//look up in shared cache (if SVG is not yet loaded)
-	int count = -1;
-	bool countFound = false;
-	const QString cacheKey = d->m_frameCountPrefix + key;
-	if (!d->m_rendererModule->isLoaded() && d->m_imageCache)
-	{
-		QByteArray buffer;
-		if (d->m_imageCache->find(cacheKey, &buffer))
-		{
-			count = buffer.toInt();
-			countFound = true;
-		}
-	}
-	//determine from SVG
-	if (!countFound)
-	{
-		//look for animated sprite first
-		const int fbi = d->m_behavior.frameBaseIndex();
-		count = fbi;
-		while (d->m_rendererModule->elementExists(d->spriteFrameKey(key, count, false)))
-		{
-			++count;
-		}
-		count -= fbi;
-		//look for non-animated sprite instead
-		if (count == 0)
-		{
-			if (!d->m_rendererModule->elementExists(key))
-			{
-				count = -1;
-			}
-		}
-		//save in shared cache for following requests
-		if (d->m_imageCache)
-		{
-			d->m_imageCache->insert(cacheKey, QByteArray::number(count));
-		}
-	}
-	d->m_frameCountCache.insert(key, count);
-	return count;
+	//ask backend
+	return d->m_backend->frameCount(key);
 }
 
 QRectF Tagaro::Renderer::boundsOnSprite(const QString& key, int frame) const
@@ -332,43 +284,8 @@ QRectF Tagaro::Renderer::boundsOnSprite(const QString& key, int frame) const
 			return QRectF();
 		}
 	}
-	//look up in in-process cache
-	QHash<QString, QRectF>::const_iterator it = d->m_boundsCache.constFind(elementKey);
-	if (it != d->m_boundsCache.constEnd())
-	{
-		return it.value();
-	}
-	//look up in shared cache (if SVG is not yet loaded)
-	QRectF bounds;
-	bool boundsFound = false;
-	const QString cacheKey = d->m_boundsPrefix + elementKey;
-	if (!d->m_rendererModule->isLoaded() && d->m_imageCache)
-	{
-		QByteArray buffer;
-		if (d->m_imageCache->find(cacheKey, &buffer))
-		{
-			QDataStream stream(buffer);
-			stream >> bounds;
-			boundsFound = true;
-		}
-	}
-	//determine from SVG
-	if (!boundsFound)
-	{
-		bounds = d->m_rendererModule->boundsOnElement(elementKey);
-		//save in shared cache for following requests
-		if (d->m_imageCache)
-		{
-			QByteArray buffer;
-			{
-				QDataStream stream(&buffer, QIODevice::WriteOnly);
-				stream << bounds;
-			}
-			d->m_imageCache->insert(cacheKey, buffer);
-		}
-	}
-	d->m_boundsCache.insert(elementKey, bounds);
-	return bounds;
+	//ask backend
+	return d->m_backend->elementBounds(elementKey);
 }
 
 bool Tagaro::Renderer::spriteExists(const QString& key) const

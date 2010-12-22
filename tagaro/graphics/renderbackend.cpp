@@ -194,8 +194,14 @@ QString Tagaro::RenderBackend::frameElementKey(const QString& element, int frame
 struct Tagaro::CachedProxyRenderBackend::Private
 {
 	Tagaro::RenderBackend* m_backend;
+	//disk cache
 	KImageCache* m_cache;
-	bool m_valid, m_loaded, m_backendLoaded, m_useCache, m_useThreads;
+	//in-process cache
+	QHash<QString, QRectF> m_boundsCache;
+	QHash<QString, int> m_frameCountCache;
+	//state description
+	bool m_valid, m_loaded, m_backendLoaded, m_useCache;
+	//m_useCache refers to the disk cache only, not to the in-process cache
 
 	Private(Tagaro::RenderBackend* backend);
 
@@ -210,7 +216,6 @@ Tagaro::CachedProxyRenderBackend::Private::Private(Tagaro::RenderBackend* backen
 	, m_loaded(false)
 	, m_backendLoaded(false)
 	, m_useCache(Tagaro::Settings::useDiskCache() && backend->behavior().cacheSize() > 0)
-	, m_useThreads(Tagaro::Settings::useRenderingThreads())
 {
 }
 
@@ -325,12 +330,20 @@ QRectF Tagaro::CachedProxyRenderBackend::elementBounds(const QString& element) c
 	{
 		return QRectF();
 	}
-	//the no-cache case
+	//check fast cache
+	QHash<QString, QRectF>::const_iterator it = d->m_boundsCache.constFind(element);
+	if (it != d->m_boundsCache.constEnd())
+	{
+		return it.value();
+	}
+	//if there's no slow cache...
 	if (!d->m_cache)
 	{
-		return d->elementBounds(element);
+		const QRectF bounds = d->elementBounds(element);
+		d->m_boundsCache.insert(element, bounds);
+		return bounds;
 	}
-	//check cache
+	//...else check slow cache
 	const QString key = QLatin1String("br-") + element;
 	QByteArray buffer;
 	if (d->m_cache->find(key, &buffer))
@@ -338,6 +351,7 @@ QRectF Tagaro::CachedProxyRenderBackend::elementBounds(const QString& element) c
 		QDataStream stream(buffer);
 		QRectF bounds;
 		stream >> bounds;
+		d->m_boundsCache.insert(element, bounds);
 		return bounds;
 	}
 	//ask backend and cache for following requests
@@ -348,6 +362,7 @@ QRectF Tagaro::CachedProxyRenderBackend::elementBounds(const QString& element) c
 		stream << bounds;
 	}
 	d->m_cache->insert(key, buffer);
+	d->m_boundsCache.insert(element, bounds);
 	return bounds;
 }
 
@@ -424,12 +439,20 @@ int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
 	{
 		return -1;
 	}
-	//the no-cache case
+	//check fast cache
+	QHash<QString, int>::const_iterator it = d->m_frameCountCache.constFind(element);
+	if (it != d->m_frameCountCache.constEnd())
+	{
+		return it.value();
+	}
+	//if there's no slow cache...
 	if (!d->m_cache)
 	{
-		return Tagaro::RenderBackend::frameCount(element);
+		const int count = Tagaro::RenderBackend::frameCount(element);
+		d->m_frameCountCache.insert(element, count);
+		return count;
 	}
-	//check cache
+	//...else check slow cache
 	const QString key = QLatin1String("fc-") + element;
 	QByteArray buffer;
 	if (d->m_cache->find(key, &buffer))
@@ -439,6 +462,7 @@ int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
 	//ask backend and cache for following requests
 	const int count = Tagaro::RenderBackend::frameCount(element);
 	d->m_cache->insert(key, QByteArray::number(count));
+	d->m_frameCountCache.insert(key, count);
 	return count;
 }
 

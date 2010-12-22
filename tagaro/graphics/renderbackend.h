@@ -160,6 +160,9 @@ class TAGARO_EXPORT RenderBackend
 		///does not exist, do not return an invalid (i.e. default-constructed)
 		///QImage instance, but a fully transparent image with the correct
 		///@a size.
+		///
+		///@warning This method must be thread-safe when @a timeConstraint is
+		///false.
 		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const = 0;
 		///@return the frame count of the given @a element
 		///
@@ -189,6 +192,7 @@ class TAGARO_EXPORT RenderBackend
  * @class Tagaro::CachedProxyRenderBackend renderbackend.h <Tagaro/CachedProxyRenderBackend>
  *
  * Provides disk caching for backends with complex graphics sources.
+ * In-process caches are provided for element metadata, but not for images.
  */
 class TAGARO_EXPORT CachedProxyRenderBackend : public Tagaro::RenderBackend
 {
@@ -196,7 +200,7 @@ class TAGARO_EXPORT CachedProxyRenderBackend : public Tagaro::RenderBackend
 		///Creates a new Tagaro::CachedProxyRenderBackend. The given @a backend
 		///will be used to actually do the rendering work. The proxy takes
 		///ownership of the given @a backend.
-		CachedProxyRenderBackend(Tagaro::RenderBackend* backend);
+		explicit CachedProxyRenderBackend(Tagaro::RenderBackend* backend);
 		///Destroys this Tagaro::CachedProxyRenderBackend, and the backend
 		///behind it.
 		virtual ~CachedProxyRenderBackend();

@@ -80,7 +80,7 @@ void Tagaro::QtSvgRenderBackend::Private::freeRenderer(QSvgRenderer* renderer)
 }
 
 Tagaro::QtSvgRenderBackend::QtSvgRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior)
-	: Tagaro::RenderBackend(path, behavior)
+	: Tagaro::RenderBackend(QFileInfo(path).absoluteFilePath(), behavior)
 	, d(new Private(path))
 {
 }
