@@ -210,20 +210,6 @@ class TAGARO_EXPORT CachedProxyRenderBackend : public Tagaro::RenderBackend
 		virtual bool elementExists(const QString& element) const;
 		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
 		virtual int frameCount(const QString& element) const;
-
-		///@return the backend which is wrapped by this proxy
-		const Tagaro::RenderBackend* proxiedBackend() const;
-		///@overload
-		Tagaro::RenderBackend* proxiedBackend();
-		///Inserts the given @a image into the image cache, assuming that it
-		///corresponds to the given @a element, rendered in the given @a size.
-		///
-		///This API is provided for Tagaro::Sprite, which may render images
-		///in separate worker threads. To establish thread-safety in accesses
-		///to the proxy's cache, the worker threads bypass the proxy for
-		///rendering operations, and the cache is updated by the main thread
-		///through this method.
-		void insertIntoCache(const QString& element, const QSize& size, const QImage& image);
 	private:
 		class Private;
 		Private* const d;

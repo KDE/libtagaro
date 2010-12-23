@@ -25,10 +25,8 @@
 
 namespace Tagaro {
 
-class RendererClientPrivate;
-class Renderer;
-class RendererPrivate;
 class Sprite;
+class SpriteFetcher;
 
 /**
  * @class Tagaro::RendererClient rendererclient.h <Tagaro/RendererClient>
@@ -90,10 +88,9 @@ class TAGARO_EXPORT RendererClient
 		///client (esp. after theme changes and calls to the client's setters).
 		virtual void receivePixmap(const QPixmap& pixmap) = 0;
 	private:
-		friend class Tagaro::RendererClientPrivate;
-		friend class Tagaro::Renderer;
-		friend class Tagaro::RendererPrivate;
-		Tagaro::RendererClientPrivate* const d;
+		friend class Tagaro::SpriteFetcher;
+		class Private;
+		Private* const d;
 };
 
 } //namespace Tagaro

@@ -25,6 +25,9 @@
 namespace Tagaro {
 
 class Renderer;
+class RendererClient;
+class RendererPrivate;
+class SpriteFetcher;
 
 /**
  * @class Tagaro::Sprite sprite.h <Tagaro/Sprite>
@@ -71,8 +74,6 @@ class TAGARO_EXPORT Sprite
 		int frameCount() const;
 		///@return the name of this sprite
 		QString key() const;
-		///@return the renderer which renders this sprite
-		Tagaro::Renderer* renderer() const;
 
 		///@return a rendered pixmap
 		///@param size the size of the resulting pixmap
@@ -84,12 +85,15 @@ class TAGARO_EXPORT Sprite
 		///thread.
 		QPixmap pixmap(const QSize& size, int frame = -1) const;
 	private:
-		friend class Tagaro::Renderer;
-		Sprite(Tagaro::Renderer* renderer, const QString& key);
-		~Sprite();
-
 		class Private;
 		Private* const d;
+
+		friend class Tagaro::Renderer;
+		friend class Tagaro::RendererClient;
+		friend class Tagaro::RendererPrivate;
+		friend class Tagaro::SpriteFetcher;
+		Sprite();
+		~Sprite();
 };
 
 } //namespace Tagaro

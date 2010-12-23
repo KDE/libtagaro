@@ -17,37 +17,41 @@
  ***************************************************************************/
 
 #include "rendererclient.h"
-#include "renderer.h"
-#include "renderer_p.h"
+#include "sprite.h"
+#include "sprite_p.h"
 
 #include <QtCore/QTimer>
 
 //WARNING: d->m_sprite == 0 is allowed, and used actively by Tagaro::Scene.
 
-Tagaro::RendererClientPrivate::RendererClientPrivate(Tagaro::Sprite* sprite, Tagaro::RendererClient* parent)
-	: m_parent(parent)
+Tagaro::RendererClient::Private::Private(Tagaro::Sprite* sprite, Tagaro::RendererClient* q)
+	: q(q)
 	, m_sprite(sprite)
-	, m_spec(sprite ? sprite->key() : QString(), -1, QSize())
-	, m_fetching(sprite && !sprite->key().isEmpty())
+	, m_fetcher(0)
+	, m_frame(-1)
 {
 }
 
 Tagaro::RendererClient::RendererClient(Tagaro::Sprite* sprite)
-	: d(new Tagaro::RendererClientPrivate(sprite, this))
+	: d(new Private(sprite, this))
 {
 	if (sprite)
 	{
-		sprite->renderer()->d->m_clients.insert(this, QString());
+		sprite->d->addClient(this);
 	}
-	//The following may not be triggered directly because it may call receivePixmap() which is a pure virtual method at this point.
-	QTimer::singleShot(0, d, SLOT(fetchPixmap()));
 }
 
 Tagaro::RendererClient::~RendererClient()
 {
+	//This is setSprite(0), but that can't be called directly because this might
+	//call receivePixmap() which is pure virtual at this point.
 	if (d->m_sprite)
 	{
-		d->m_sprite->renderer()->d->m_clients.remove(this);
+		if (d->m_fetcher)
+		{
+			d->m_fetcher->removeClient(this);
+		}
+		d->m_sprite->d->removeClient(this);
 	}
 	delete d;
 }
@@ -63,64 +67,74 @@ void Tagaro::RendererClient::setSprite(Tagaro::Sprite* sprite)
 	{
 		if (d->m_sprite)
 		{
-			d->m_sprite->renderer()->d->m_clients.remove(this);
+			if (d->m_fetcher)
+			{
+				d->m_fetcher->removeClient(this);
+			}
+			d->m_sprite->d->removeClient(this);
 		}
 		d->m_sprite = sprite;
+		d->m_fetcher = 0;
 		if (sprite)
 		{
-			d->m_spec.spriteKey = sprite->key();
-			d->m_fetching = !d->m_spec.spriteKey.isEmpty();
+			sprite->d->addClient(this);
+			d->m_fetcher = sprite->d->fetcher(d->m_size);
+		}
+		if (d->m_fetcher)
+		{
+			d->m_fetcher->addClient(this);
 		}
 		else
 		{
-			d->m_spec.spriteKey.clear();
-			d->m_fetching = false;
+			d->receivePixmap(QPixmap());
 		}
-		d->fetchPixmap();
 	}
 }
 
 int Tagaro::RendererClient::frame() const
 {
-	return d->m_spec.frame;
+	return d->m_frame;
 }
 
 void Tagaro::RendererClient::setFrame(int frame)
 {
-	if (d->m_spec.frame != frame)
+	if (d->m_frame != frame)
 	{
-		//do some normalization ourselves
-		const int frameCount = d->m_sprite ? d->m_sprite->frameCount() : -1;
-		if (frameCount <= 0 || frame <= 0)
+		d->m_frame = frame;
+		if (d->m_fetcher)
 		{
-			frame = -1;
-		}
-		else
-		{
-			//NOTE: check for d->m_sprite == 0 not required because frameCount
-			//is -1 in this case, i.e. this branch is not chosen
-			const int frameBaseIndex = d->m_sprite->renderer()->backend()->behavior().frameBaseIndex();
-			frame = (frame - frameBaseIndex) % frameCount + frameBaseIndex;
-		}
-		if (d->m_spec.frame != frame)
-		{
-			d->m_spec.frame = frame;
-			d->fetchPixmap();
+			d->m_fetcher->updateClient(this);
 		}
 	}
 }
 
 QSize Tagaro::RendererClient::renderSize() const
 {
-	return d->m_spec.size;
+	return d->m_size;
 }
 
-void Tagaro::RendererClient::setRenderSize(const QSize& renderSize)
+void Tagaro::RendererClient::setRenderSize(const QSize& size)
 {
-	if (d->m_spec.size != renderSize)
+	if (d->m_size != size)
 	{
-		d->m_spec.size = renderSize;
-		d->fetchPixmap();
+		d->m_size = size;
+		Tagaro::SpriteFetcher* fetcher = d->m_sprite ? d->m_sprite->d->fetcher(size) : 0;
+		if (d->m_fetcher != fetcher)
+		{
+			if (d->m_fetcher)
+			{
+				d->m_fetcher->removeClient(this);
+			}
+			d->m_fetcher = fetcher;
+			if (fetcher)
+			{
+				fetcher->addClient(this);
+			}
+			else
+			{
+				d->receivePixmap(QPixmap());
+			}
+		}
 	}
 }
 
@@ -129,20 +143,8 @@ QPixmap Tagaro::RendererClient::pixmap() const
 	return d->m_pixmap;
 }
 
-void Tagaro::RendererClientPrivate::fetchPixmap()
-{
-	if (m_fetching)
-	{
-		m_sprite->renderer()->d->requestPixmap(m_spec, m_parent);
-	}
-	else
-	{
-		receivePixmapInternal(QPixmap());
-	}
-}
-
-void Tagaro::RendererClientPrivate::receivePixmapInternal(const QPixmap& pixmap)
+void Tagaro::RendererClient::Private::receivePixmap(const QPixmap& pixmap)
 {
 	m_pixmap = pixmap;
-	m_parent->receivePixmap(pixmap);
+	q->receivePixmap(pixmap);
 }

@@ -21,7 +21,6 @@
 
 #include "renderer.h"
 #include "renderbackend.h"
-#include "rendering_p.h"
 #include "sprite.h"
 
 #include <QtCore/QHash>
@@ -56,48 +55,18 @@ class RendererPrivate : public QObject
 		RendererPrivate(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior, Tagaro::Renderer* parent);
 		void setTheme(const Tagaro::Theme* theme);
 		bool setThemeInternal(const Tagaro::Theme* theme);
-		inline QString spriteFrameKey(const QString& key, int frame, bool normalizeFrameNo = false) const;
-		void requestPixmap(const Internal::ClientSpec& spec, Tagaro::RendererClient* client, QPixmap* synchronousResult = 0);
-	private:
-		inline void requestPixmap__propagateResult(const QPixmap& pixmap, Tagaro::RendererClient* client, QPixmap* synchronousResult);
 	public Q_SLOTS:
 		void loadSelectedTheme();
-		void jobFinished(Tagaro::RenderJob* job, const QImage& result, bool isSynchronous); //NOTE: This is invoked from Tagaro::RenderWorker::run.
 	public:
 		Tagaro::Renderer* m_parent;
 
-		QString m_sizePrefix;
 		Tagaro::ThemeProvider* m_themeProvider;
 		const Tagaro::Theme* m_theme;
 
 		const Tagaro::RenderBehavior m_behavior;
-		Tagaro::RendererModule* m_rendererModule;
 		Tagaro::RenderBackend* m_backend;
 
 		QHash<QString, Tagaro::Sprite*> m_sprites; //maps sprite keys -> sprite instances
-		QHash<Tagaro::RendererClient*, QString> m_clients; //maps client -> cache key of current pixmap
-		QStringList m_pendingRequests; //cache keys of pixmaps which are currently being rendered
-
-		KImageCache* m_imageCache;
-		QHash<QString, QPixmap> m_pixmapCache;
-};
-
-class RendererClientPrivate : public QObject
-{
-	Q_OBJECT
-	public:
-		RendererClientPrivate(Tagaro::Sprite* sprite, Tagaro::RendererClient* parent);
-
-		void receivePixmapInternal(const QPixmap& pixmap);
-	public Q_SLOTS:
-		void fetchPixmap();
-	public:
-		Tagaro::RendererClient* m_parent;
-		Tagaro::Sprite* m_sprite;
-
-		QPixmap m_pixmap;
-		Internal::ClientSpec m_spec;
-		bool m_fetching;
 };
 
 } //namespace Tagaro

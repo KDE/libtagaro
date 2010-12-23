@@ -20,8 +20,6 @@ set(tagaro_LIB_SRCS
 	graphics/renderbackends.cpp
 	graphics/rendererclient.cpp
 	graphics/renderer.cpp
-	graphics/renderermodule.cpp
-	graphics/rendering.cpp
 	graphics/sprite.cpp
 	graphics/spriteitem.cpp
 	graphics/spriteobjectitem.cpp

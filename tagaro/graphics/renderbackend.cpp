@@ -422,16 +422,6 @@ QImage Tagaro::CachedProxyRenderBackend::elementImage(const QString& element, co
 	return result;
 }
 
-void Tagaro::CachedProxyRenderBackend::insertIntoCache(const QString& element, const QSize& size, const QImage& image)
-{
-	if (image.size() == size && d->m_cache)
-	{
-		static const QString prefix = QLatin1String("%1-%2-");
-		const QString key = prefix.arg(size.width()).arg(size.height()) + element;
-		d->m_cache->insertImage(key, image);
-	}
-}
-
 int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
@@ -464,16 +454,6 @@ int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
 	d->m_cache->insert(key, QByteArray::number(count));
 	d->m_frameCountCache.insert(key, count);
 	return count;
-}
-
-const Tagaro::RenderBackend* Tagaro::CachedProxyRenderBackend::proxiedBackend() const
-{
-	return d->m_backend;
-}
-
-Tagaro::RenderBackend* Tagaro::CachedProxyRenderBackend::proxiedBackend()
-{
-	return d->m_backend;
 }
 
 //END Tagaro::CachedProxyRenderBackend
