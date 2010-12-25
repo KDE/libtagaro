@@ -148,3 +148,36 @@ QImage Tagaro::QtSvgRenderBackend::elementImage(const QString& element, const QS
 }
 
 //END Tagaro::QtSvgRenderBackend
+//BEGIN Tagaro::ColorRenderBackend
+
+struct Tagaro::ColorRenderBackend::Private
+{
+	//reserved for later use
+};
+
+Tagaro::ColorRenderBackend::ColorRenderBackend(const Tagaro::RenderBehavior& behavior)
+	: Tagaro::RenderBackend("color", behavior)
+	, d(0)
+{
+}
+
+Tagaro::ColorRenderBackend::~ColorRenderBackend()
+{
+	delete d;
+}
+
+bool Tagaro::ColorRenderBackend::elementExists(const QString& element) const
+{
+	return QColor::isValidColor(element);
+}
+
+QImage Tagaro::ColorRenderBackend::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+{
+	Q_UNUSED(timeConstraint) //constructing plain color images is not expensive (compared to setting up a renderer thread)
+	QColor color = QColor::isValidColor(element) ? QColor(element) : QColor(Qt::transparent);
+	QImage image(size, QImage::Format_ARGB32_Premultiplied);
+	image.fill(color.rgba());
+	return image;
+}
+
+//END Tagaro::ColorRenderBackend

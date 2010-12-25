@@ -21,6 +21,8 @@
 
 #include "renderbackend.h"
 
+//TODO: document the available backends (where?)
+
 namespace Tagaro {
 
 class QtSvgRenderBackend : public Tagaro::RenderBackend
@@ -35,6 +37,19 @@ class QtSvgRenderBackend : public Tagaro::RenderBackend
 		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
 	protected:
 		virtual bool load();
+	private:
+		class Private;
+		Private* const d;
+};
+
+class ColorRenderBackend : public Tagaro::RenderBackend
+{
+	public:
+		ColorRenderBackend(const Tagaro::RenderBehavior& behavior);
+		virtual ~ColorRenderBackend();
+
+		virtual bool elementExists(const QString& element) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
 	private:
 		class Private;
 		Private* const d;

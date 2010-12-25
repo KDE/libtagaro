@@ -222,7 +222,7 @@ Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey
 		ksdResource, ksdDirectory + "*.desktop",
 		KStandardDirs::NoDuplicates
 	);
-	//TODO cleanup StandardThemeProvider, integrate KNS
+	//TODO cleanup StandardTheme and StandardThemeProvider, integrate KNS
 	//create themes
 	foreach (const QString& themePath, themePaths)
 	{

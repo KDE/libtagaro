@@ -20,14 +20,16 @@
 #include "renderbackends.h"
 #include "themeprovider.h"
 
-#include <QtCore/QDateTime>
-#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtGui/QPixmap>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KDebug>
 #include <KDE/KStandardDirs>
+
+//TODO: load multiple backends and routes in StandardTheme, add more backends (at least image and solid color)
+//TODO: share identical backends between Themes at least in the same ThemeProvider -> move backend instantiation to ThemeProvider?
+//TODO: add API to RenderBackend to read backend-specific configuration from desktop file
 
 //BEGIN Tagaro::Theme
 
@@ -194,11 +196,19 @@ void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& spec
 	//further format of specification depends on chosen type, so resolve type if not done yet
 	if (type == QLatin1String("auto"))
 	{
-		QFileInfo file(spec);
-		const QStringList suffixes = file.completeSuffix().split(QChar('.'));
-		if (suffixes.contains(QLatin1String("svg")) || suffixes.contains(QLatin1String("svgz")))
+		if (spec == QLatin1String("color"))
 		{
-			type = "svg";
+			type = spec;
+		}
+		else
+		{
+			//resolve specs that represent graphics files
+			QFileInfo file(spec);
+			const QStringList suffixes = file.completeSuffix().split(QChar('.'));
+			if (suffixes.contains(QLatin1String("svg")) || suffixes.contains(QLatin1String("svgz")))
+			{
+				type = "svg";
+			}
 		}
 	}
 	//resolve specifications - Add new types below here.
@@ -207,6 +217,10 @@ void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& spec
 		const QString path = resolveRelativePath(spec, refDirs);
 		Tagaro::QtSvgRenderBackend* svgBackend = new Tagaro::QtSvgRenderBackend(path, d->m_provider->behavior());
 		addBackend(identifier, new Tagaro::CachedProxyRenderBackend(svgBackend));
+	}
+	else if (type == QLatin1String("color"))
+	{
+		addBackend(identifier, new Tagaro::ColorRenderBackend(d->m_provider->behavior()));
 	}
 	else
 	{
