@@ -3,7 +3,6 @@ install(FILES
 	AudioScene
 	Board
 	CachedProxyRenderBackend
-	FileThemeProvider
 	GraphicsConfigDialog
 	MessageOverlay
 	ObjectPointer
@@ -14,6 +13,7 @@ install(FILES
 	RendererClient
 	Scene
 	Settings
+	SimpleThemeProvider
 	Sound
 	Sprite
 	SpriteItem

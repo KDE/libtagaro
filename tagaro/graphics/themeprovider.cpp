@@ -17,6 +17,8 @@
  ***************************************************************************/
 
 #include "themeprovider.h"
+#include "graphicsdelegate_p.h"
+#include "renderbackend.h"
 #include "theme.h"
 
 #include <QtCore/QAbstractListModel>
@@ -34,12 +36,13 @@ class Tagaro::ThemeProvider::Private : public QAbstractListModel
 	public:
 		Tagaro::ThemeProvider* q;
 		bool m_ownThemes;
+		Tagaro::RenderBehavior m_behavior;
 
 		QList<Tagaro::Theme*> m_themes;
 		QList<const Tagaro::Theme*> m_cThemes;
 		const Tagaro::Theme* m_selectedTheme;
 
-		Private(Tagaro::ThemeProvider* q_, bool ownThemes) : QAbstractListModel(q_), q(q_), m_ownThemes(ownThemes), m_selectedTheme(0) {}
+		Private(Tagaro::ThemeProvider* q, bool ownThemes, const Tagaro::RenderBehavior& behavior) : QAbstractListModel(q), q(q), m_ownThemes(ownThemes), m_behavior(behavior), m_selectedTheme(0) {}
 
 		virtual QVariant data(const QModelIndex& index, int role) const;
 		virtual Qt::ItemFlags flags(const QModelIndex& index) const;
@@ -51,7 +54,25 @@ class Tagaro::ThemeProvider::Private : public QAbstractListModel
 QVariant Tagaro::ThemeProvider::Private::data(const QModelIndex& index, int role) const
 {
 	const Tagaro::Theme* theme = m_cThemes.value(index.row());
-	return theme ? theme->data(role) : QVariant();
+	if (!theme)
+	{
+		return QVariant();
+	}
+	switch (role)
+	{
+		case Qt::DisplayRole:
+			return theme->name();
+		case Qt::DecorationRole:
+			return theme->preview();
+		case Tagaro::GraphicsDelegate::DescriptionRole:
+			return theme->description();
+		case Tagaro::GraphicsDelegate::AuthorRole:
+			return theme->author();
+		case Tagaro::GraphicsDelegate::AuthorEmailRole:
+			return theme->authorEmail();
+		default:
+			return QVariant();
+	}
 }
 
 Qt::ItemFlags Tagaro::ThemeProvider::Private::flags(const QModelIndex& index) const
@@ -65,9 +86,9 @@ int Tagaro::ThemeProvider::Private::rowCount(const QModelIndex& index) const
 	return index.isValid() ? 0 : m_cThemes.count();
 }
 
-Tagaro::ThemeProvider::ThemeProvider(bool ownThemes, QObject* parent)
+Tagaro::ThemeProvider::ThemeProvider(bool ownThemes, const Tagaro::RenderBehavior& behavior, QObject* parent)
 	: QObject(parent)
-	, d(new Private(this, ownThemes))
+	, d(new Private(this, ownThemes, behavior))
 {
 }
 
@@ -83,6 +104,11 @@ Tagaro::ThemeProvider::~ThemeProvider()
 QAbstractItemModel* Tagaro::ThemeProvider::model() const
 {
 	return d;
+}
+
+const Tagaro::RenderBehavior& Tagaro::ThemeProvider::behavior() const
+{
+	return d->m_behavior;
 }
 
 QList<const Tagaro::Theme*> Tagaro::ThemeProvider::themes() const
@@ -182,8 +208,8 @@ struct Tagaro::StandardThemeProvider::Private
 	Private(const QByteArray& configKey, Tagaro::StandardThemeProvider* parent) : m_parent(parent), m_configKey(configKey) {}
 };
 
-Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, QObject* parent)
-	: Tagaro::ThemeProvider(true, parent)
+Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, const Tagaro::RenderBehavior& behavior, QObject* parent)
+	: Tagaro::ThemeProvider(true, behavior, parent)
 	, d(new Private(configKey, this))
 {
 	static const QString defaultTheme = QLatin1String("default.desktop");
@@ -201,7 +227,7 @@ Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey
 	foreach (const QString& themePath, themePaths)
 	{
 		const QString themeFile = QFileInfo(themePath).fileName();
-		Tagaro::Theme* theme = new Tagaro::StandardTheme(ksdResource, ksdDirectory, themeFile);
+		Tagaro::Theme* theme = new Tagaro::StandardTheme(ksdResource, ksdDirectory, themeFile, this);
 		//insert theme into list, place theme with hard-coded default name at the beginning
 		if (themeFile == defaultTheme)
 		{
@@ -237,34 +263,29 @@ void Tagaro::StandardThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
 }
 
 //END Tagaro::StandardThemeProvider
+//BEGIN Tagaro::SimpleThemeProvider
 
-//BEGIN Tagaro::FileThemeProvider
-
-static QByteArray FileThemeProvider_identifier(const QString& file)
+struct Tagaro::SimpleThemeProvider::Private
 {
-	return file.section(QChar('/'), -1).toUtf8();
-}
-
-struct Tagaro::FileThemeProvider::Private
-{
-	Tagaro::Theme m_theme;
-
-	Private(const QByteArray& key) : m_theme(key) {}
+	QList<Tagaro::Theme*> m_themes;
 };
 
-Tagaro::FileThemeProvider::FileThemeProvider(const QString& file, QObject* parent)
-	: Tagaro::ThemeProvider(false, parent)
-	, d(new Private(FileThemeProvider_identifier(file)))
+Tagaro::SimpleThemeProvider::SimpleThemeProvider(const Tagaro::RenderBehavior& behavior, QObject* parent)
+	: Tagaro::ThemeProvider(true, behavior, parent)
+	, d(new Private)
 {
-	d->m_theme.setData(Tagaro::Theme::GraphicsFileRole, file);
-	setThemes(QList<Tagaro::Theme*>() << &d->m_theme);
 }
 
-Tagaro::FileThemeProvider::~FileThemeProvider()
+Tagaro::SimpleThemeProvider::~SimpleThemeProvider()
 {
 	delete d;
 }
 
-//END Tagaro::FileThemeProvider
+void Tagaro::SimpleThemeProvider::addTheme(Tagaro::Theme* theme)
+{
+	setThemes(d->m_themes << theme);
+}
+
+//END Tagaro::SimpleThemeProvider
 
 #include "themeprovider.moc"

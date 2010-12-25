@@ -61,7 +61,7 @@ class SpriteFetcher : public QObject
 struct Sprite::Private
 {
 	public:
-		void setBackend(Tagaro::RenderBackend* backend, const QString& element);
+		void setBackend(const Tagaro::RenderBackend* backend, const QString& element);
 
 		void addClient(Tagaro::RendererClient* client);
 		void removeClient(Tagaro::RendererClient* client);
@@ -71,7 +71,7 @@ struct Sprite::Private
 		friend class Tagaro::SpriteFetcher;
 		Private();
 
-		Tagaro::RenderBackend* m_backend;
+		const Tagaro::RenderBackend* m_backend;
 		QString m_element;
 	
 		QHash<QSize, SpriteFetcher*> m_fetchers;

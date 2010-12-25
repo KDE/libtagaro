@@ -119,15 +119,10 @@ class TAGARO_EXPORT RenderBackend
 		///RenderBackends, but it must also stay the same for each backend over
 		///multiple application runs (in order to reuse existing caches).
 		QString identifier() const;
+		///@return whether the backend's graphical sources could be loaded
+		///successfully
+		bool isValid() const;
 
-		///Load graphical elements from external resources (if there are any).
-		///It is guaranteed that this method will be called before any call to
-		///elementBounds(), elementExists(), elementImage(), frameCount() and
-		///frameElementKey() with @a useFrameCount == true.
-		///
-		///The default implementation assumes that there are no external
-		///resources, and does nothing (returning true).
-		virtual bool load();
 		///If graphical elements are loaded from external resources, return
 		///the UNIX timestamp of when these resources were modified last. This
 		///is used by the CachedProxyRenderBackend to invalidate its caches
@@ -183,6 +178,15 @@ class TAGARO_EXPORT RenderBackend
 		///normalizations. If called from frameCount(), the last argument must
 		///therefore be set to true to avoid infinite recursion.
 		QString frameElementKey(const QString& element, int frame, bool useFrameCount = true) const;
+	protected:
+		///Load graphical elements from external resources (if there are any).
+		///It is guaranteed that this method will be called before any call to
+		///elementBounds(), elementExists(), elementImage(), frameCount() and
+		///frameElementKey() with @a useFrameCount == true.
+		///
+		///The default implementation assumes that there are no external
+		///resources, and does nothing (returning true).
+		virtual bool load();
 	private:
 		class Private;
 		Private* const d;
@@ -205,11 +209,12 @@ class TAGARO_EXPORT CachedProxyRenderBackend : public Tagaro::RenderBackend
 		///behind it.
 		virtual ~CachedProxyRenderBackend();
 
-		virtual bool load();
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
 		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
 		virtual int frameCount(const QString& element) const;
+	protected:
+		virtual bool load();
 	private:
 		class Private;
 		Private* const d;

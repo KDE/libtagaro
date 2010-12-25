@@ -26,10 +26,16 @@
 namespace Tagaro {
 
 //This delegate can be used in list views which allow to select graphical components (such as themes).
-//For allowed roles, see Tagaro::Theme::Roles enum.
 class GraphicsDelegate : public QStyledItemDelegate
 {
 	public:
+		enum Roles
+		{
+			DescriptionRole = Qt::UserRole,
+			AuthorRole,
+			AuthorEmailRole
+		};
+
 		GraphicsDelegate(QObject* parent = 0);
 		virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 		///@note The implementation is independent of @a option and @a index.

@@ -26,6 +26,7 @@ class QAbstractItemModel;
 
 namespace Tagaro {
 
+class RenderBehavior;
 class Theme;
 
 /**
@@ -51,12 +52,15 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		///Creates a new Tagaro::ThemeProvider instance.
 		///@param ownThemes whether the provider will take ownership of Theme
 		///                 instances passed to it
-		ThemeProvider(bool ownThemes, QObject* parent = 0);
+		///@param behavior  the behavior of RenderBackends created by the
+		///                 themes in this ThemeProvider
+		ThemeProvider(bool ownThemes, const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
 		///Destroys this Tagaro::ThemeProvider instance.
-		///@warning Subclasses have to take care that their themes are deleted,
-		///the Tagaro::ThemeProvider cannot do that by itself.
 		virtual ~ThemeProvider();
 
+		///@return the behavior of RenderBackends created by the themes in this
+		///ThemeProvider
+		const Tagaro::RenderBehavior& behavior() const;
 		///@return a list-shaped model exposing the themes' data
 		QAbstractItemModel* model() const;
 		///@return the themes in this provider
@@ -115,7 +119,7 @@ class TAGARO_EXPORT StandardThemeProvider : public Tagaro::ThemeProvider
 		///@code
 		///KGlobal::dirs()->findAllResources(ksdResource, ksdDirectory + "/*.desktop");
 		///@endcode
-		StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, QObject* parent = 0);
+		StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
 		///Destroys this Tagaro::StandardThemeProvider instance.
 		virtual ~StandardThemeProvider();
 
@@ -126,21 +130,25 @@ class TAGARO_EXPORT StandardThemeProvider : public Tagaro::ThemeProvider
 };
 
 /**
- * @class Tagaro::FileThemeProvider themeprovider.h <Tagaro/FileThemeProvider>
+ * @class Tagaro::SimpleThemeProvider themeprovider.h <Tagaro/SimpleThemeProvider>
  *
- * This theme provider provides exactly one theme, which consists only of a
- * single graphics file. You may use this provider if you do not have multiple
- * themes to offer and want to avoid the need to create .desktop theme files.
+ * This theme provider can be filled with themes manually. This is especially
+ * useful if your application ships only one theme and you want to avoid the
+ * need to create
  */
-class TAGARO_EXPORT FileThemeProvider : public Tagaro::ThemeProvider
+class TAGARO_EXPORT SimpleThemeProvider : public Tagaro::ThemeProvider
 {
 	Q_OBJECT
 	public:
-		///Creates a new Tagaro::FileThemeProvider instance, which provides the
-		///given graphics @a file.
-		FileThemeProvider(const QString& file, QObject* parent = 0);
-		///Destroys this Tagaro::FileThemeProvider instance.
-		virtual ~FileThemeProvider();
+		///Creates a new Tagaro::SimpleThemeProvider instance.
+		SimpleThemeProvider(const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
+		///Destroys this Tagaro::SimpleThemeProvider instance.
+		virtual ~SimpleThemeProvider();
+
+		///Adds a @a theme to this provider. The theme must be initialized with
+		///this provider passed in the constructor. The provider takes
+		///ownership of the theme.
+		void addTheme(Tagaro::Theme* theme);
 	private:
 		class Private;
 		Private* const d;

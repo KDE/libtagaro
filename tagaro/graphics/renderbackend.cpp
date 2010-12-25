@@ -101,8 +101,9 @@ struct Tagaro::RenderBackend::Private
 {
 	Tagaro::RenderBehavior m_behavior;
 	QString m_identifier;
+	bool m_valid, m_loaded;
 
-	Private(const QString& identifier, const Tagaro::RenderBehavior& behavior) : m_behavior(behavior), m_identifier(identifier) {}
+	Private(const QString& identifier, const Tagaro::RenderBehavior& behavior) : m_behavior(behavior), m_identifier(identifier), m_loaded(false) {}
 };
 
 Tagaro::RenderBackend::RenderBackend(const QString& identifier, const Tagaro::RenderBehavior& behavior)
@@ -123,6 +124,17 @@ const Tagaro::RenderBehavior& Tagaro::RenderBackend::behavior() const
 QString Tagaro::RenderBackend::identifier() const
 {
 	return d->m_identifier;
+}
+
+bool Tagaro::RenderBackend::isValid() const
+{
+	//ensure that load() is only called once
+	if (!d->m_loaded)
+	{
+		d->m_valid = const_cast<Tagaro::RenderBackend*>(this)->load();
+		d->m_loaded = true;
+	}
+	return d->m_valid;
 }
 
 bool Tagaro::RenderBackend::load()
@@ -255,7 +267,7 @@ bool Tagaro::CachedProxyRenderBackend::load()
 	if (!d->m_useCache)
 	{
 		d->m_backendLoaded = true;
-		return d->m_valid = d->m_backend->load();
+		return d->m_valid = d->m_backend->isValid();
 	}
 	//hash identifier to find name for cache
 	const QString cacheHash = g_qcaStuff->hash.hashToString(identifier().toUtf8());
@@ -272,7 +284,7 @@ bool Tagaro::CachedProxyRenderBackend::load()
 	{
 		kDebug() << "Cache does not exist, checking graphics source immediately";
 		d->m_backendLoaded = true;
-		d->m_valid = d->m_backend->load();
+		d->m_valid = d->m_backend->isValid();
 		if (!d->m_valid)
 		{
 			return d->m_valid;
@@ -288,7 +300,7 @@ bool Tagaro::CachedProxyRenderBackend::load()
 		d->m_cache->clear();
 		kDebug() << "Theme newer than cache, checking graphics file immediately";
 		d->m_backendLoaded = true;
-		d->m_valid = d->m_backend->load();
+		d->m_valid = d->m_backend->isValid();
 	}
 	return d->m_valid;
 }
@@ -318,7 +330,7 @@ QRectF Tagaro::CachedProxyRenderBackend::Private::elementBounds(const QString& e
 	if (!m_backendLoaded)
 	{
 		m_backendLoaded = true;
-		m_valid = m_backend->load();
+		m_valid = m_backend->isValid();
 	}
 	return m_valid ? m_backend->elementBounds(element) : QRectF();
 }
@@ -377,7 +389,7 @@ bool Tagaro::CachedProxyRenderBackend::elementExists(const QString& element) con
 	if (!d->m_backendLoaded)
 	{
 		d->m_backendLoaded = true;
-		d->m_valid = d->m_backend->load();
+		d->m_valid = d->m_backend->isValid();
 	}
 	//ask backend
 	return d->m_valid ? d->m_backend->elementExists(element) : false;
@@ -388,7 +400,7 @@ QImage Tagaro::CachedProxyRenderBackend::Private::elementImage(const QString& el
 	if (!m_backendLoaded)
 	{
 		m_backendLoaded = true;
-		m_valid = m_backend->load();
+		m_valid = m_backend->isValid();
 	}
 	return m_valid ? m_backend->elementImage(element, size, timeConstraint) : QImage();
 }

@@ -19,80 +19,99 @@
 #ifndef TAGARO_THEME_H
 #define TAGARO_THEME_H
 
+#include <QtCore/QDir>
 #include <QtCore/QVariant>
 
 #include <libtagaro_export.h>
 
 namespace Tagaro {
 
+class RenderBackend;
+class ThemeProvider;
+
 /**
  * @class Tagaro::Theme theme.h <Tagaro/Theme>
  *
- * A theme is an entity which essentially represents an SVG file plus some
- * metadata. Tagaro::Theme instances are usually created and managed by a
- * Tagaro::ThemeProvider.
+ * A theme is an entity consisting of graphics sources and metadata. Theme
+ * instances are usually created and managed by a Tagaro::ThemeProvider.
+ *
+ * The most important part of a theme is its routing table: The routing table
+ * maps the keys of sprites used by the game to elements in graphics sources.
  */
 class TAGARO_EXPORT Theme
 {
 	Q_DISABLE_COPY(Theme)
 	public:
-		///Each theme has a set of data elements associated with it, each with
-		///its own role. The data in given roles is used by user interfaces to
-		///display information about the themes, or to determine the files
-		///associated with this theme.
-		///@see setData(), data()
-		///
-		///The roles are aligned with Qt::ItemDataRole because of
-		///Tagaro::ThemeProvider::model(). Themes behave similar to
-		///QStandardItems in this regard.
-		enum Roles
-		{
-			///The name of this theme.
-			NameRole = Qt::DisplayRole,
-			///(optional) A preview image showing the visual appearance of the
-			///theme.
-			PreviewRole = Qt::DecorationRole,
-			///This role *must* be filled with the path of the SVG file which is
-			///represented by this theme. If this role is empty or the data is
-			///invalid, loading the theme into a Tagaro::Renderer will fail.
-			GraphicsFileRole = Qt::UserRole,
-			///If the data in this Tagaro::Theme instance was read from a file,
-			///this role may contain the path to that file.
-			ThemeFileRole,
-			///An additional description which goes beyond the Name.
-			DescriptionRole,
-			///(optional) The name of this theme's author.
-			AuthorRole,
-			///(optional) The email address of this theme's author.
-			AuthorEmailRole
-		};
-
 		///Creates a new Tagaro::Theme with the given @a identifier. The
 		///identifier must be application-unique.
-		///@warning The @a identifier is sometimes used as part of a file path,
-		///and should therefore not contain any characters which are not allowed
-		///in file paths. (The slash, or backslash on Windows, is allowed.)
-		Theme(const QByteArray& identifier);
+		Theme(const QByteArray& identifier, const Tagaro::ThemeProvider* provider);
 		///Destroys this Tagaro::Theme instance.
 		~Theme();
 
-		///@return the data stored unter the given @a role, or the given
-		///@a defaultValue if no data is stored
-		///@see Tagaro::Theme::Roles
-		QVariant data(int role, const QVariant& defaultValue = QVariant()) const;
-		///@overload for custom data
-		QVariant data(const QByteArray& key, const QVariant& defaultValue = QVariant()) const;
-		///Stores the given @a value unter the given @a role.
-		///@see Tagaro::Theme::Roles
-		void setData(int role, const QVariant& value);
-		///@overload for custom data
-		void setData(const QByteArray& key, const QVariant& value);
 		///@return the internal identifier for this theme
 		QByteArray identifier() const;
+		///@return the provider which manages this theme
+		const Tagaro::ThemeProvider* provider() const;
+		///@return whether all graphics sources could be loaded successfully
+		bool isValid() const;
 
-		///@return the time (as a UNIX timestamp) when the SVG file and other
-		///files associated with this time have been modified last
-		uint modificationTimestamp() const;
+		///@return the name of this theme
+		QString name() const;
+		///@see name()
+		void setName(const QString& name);
+		///@return an additional description beyond the name()
+		QString description() const;
+		///@see description()
+		void setDescription(const QString& description);
+		///@return the name of the theme author
+		QString author() const;
+		///@see author()
+		void setAuthor(const QString& author);
+		///@return the email address of the theme author
+		QString authorEmail() const;
+		///@see authorEmail()
+		void setAuthorEmail(const QString& authorEmail);
+		///@return a preview image showing the visual appearance of the theme
+		QPixmap preview() const;
+		///@see preview()
+		void setPreview(const QPixmap& preview);
+
+		///@return custom data
+		///
+		///This API is provided for theme files which contains additional
+		///application-specific metadata.
+		QMap<QString, QString> customData() const;
+		///@see customData()
+		void setCustomData(const QMap<QString, QString>& customData);
+
+		///Adds a new @a backend to this theme. If @a identifier is empty, it
+		///is replaced by the default identifier "default".
+		void addBackend(const QByteArray& identifier, Tagaro::RenderBackend* backend);
+		///Adds a new backend to this theme by instantiating one with the given
+		///@a specification. Relative file paths are resolved against the
+		///reference directories in the @a refDirs parameter. If the
+		///specification is invalid, a null backend is created to indicate that
+		///the theme could not be loaded properly.
+		void addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs);
+		///@return the backend with the given @a identifier, or 0 if no such
+		///backend exists
+		///
+		///If @a identifier is empty, it is replaced by the default identifier
+		///"default".
+		const Tagaro::RenderBackend* backend(const QByteArray& identifier) const;
+		///Adds a new route to this theme's routing table.
+		///@param spriteKey  a regular expression matching the sprite keys
+		///                  affected by this route (the sprite key is what you
+		///                  give to Tagaro::Renderer::sprite())
+		///@param elementKey the element key for the graphics source (this is
+		///                  what you give to Tagaro::RenderBackend methods);
+		///                  the argument can contain "%0", "%1", "%2", ...
+		///                  which are replaced by the regexp's capturedTexts()
+		///@param backend    the backend which serves the matching elements
+		void addRoute(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::RenderBackend* backend);
+		///Resolve sprite keys to backends and element keys with the routing
+		///table of this theme.
+		QPair<const Tagaro::RenderBackend*, QString> mapSpriteKey(const QString& spriteKey) const;
 	private:
 		class Private;
 		Private* const d;
@@ -112,7 +131,7 @@ class TAGARO_EXPORT StandardTheme : public Tagaro::Theme
 	public:
 		///Creates a new Tagaro::StandardTheme instance by reading in the
 		///desktop file at the given @a filePath.
-		StandardTheme(const QString& filePath);
+		StandardTheme(const QString& filePath, const Tagaro::ThemeProvider* provider);
 		///Creates a new Tagaro::StandardTheme instance by reading in the
 		///desktop file at
 		///@code
@@ -121,7 +140,7 @@ class TAGARO_EXPORT StandardTheme : public Tagaro::Theme
 		///The important difference to the single-argument constructor is that
 		///references to graphics files are also resolved via
 		///KStandardDirs::locate rather than just looking in the same directory.
-		StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName);
+		StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName, const Tagaro::ThemeProvider* provider);
 	private:
 		class Private;
 		Private* const d;

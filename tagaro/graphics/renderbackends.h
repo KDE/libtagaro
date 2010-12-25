@@ -29,11 +29,12 @@ class QtSvgRenderBackend : public Tagaro::RenderBackend
 		QtSvgRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior);
 		virtual ~QtSvgRenderBackend();
 
-		virtual bool load();
 		virtual uint lastModified() const;
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
 		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
+	protected:
+		virtual bool load();
 	private:
 		class Private;
 		Private* const d;

@@ -93,20 +93,13 @@ class TAGARO_EXPORT Renderer : public QObject
 {
 	Q_OBJECT
 	public:
-		///Constructs a new Tagaro::Renderer.
-		///@param provider the theme provider to be used by this renderer
-		///@param cacheSize the cache size per theme in megabytes (if not given,
-		///a sane default is used)
-		///@warning This constructor may only be called from the main thread.
-		explicit Renderer(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior = Tagaro::RenderBehavior());
-		///Deletes this Tagaro::Renderer instance, and all clients using it.
+		///Constructs a new Tagaro::Renderer for the given theme provider.
+		explicit Renderer(Tagaro::ThemeProvider* provider);
+		///Deletes this Tagaro::Renderer instance, and all sprites using it.
 		virtual ~Renderer();
 
 		///@return the theme provider for this renderer
 		Tagaro::ThemeProvider* themeProvider() const;
-		///@return the backend used by this renderer
-		Tagaro::RenderBackend* backend() const;
-
 		///@return a Tagaro::Sprite instance for the given @a spriteKey
 		Tagaro::Sprite* sprite(const QString& spriteKey) const;
 	private:

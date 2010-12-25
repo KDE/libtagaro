@@ -59,7 +59,7 @@ void Tagaro::Sprite::Private::removeClient(Tagaro::RendererClient* client)
 	m_clients.removeAll(client);
 }
 
-void Tagaro::Sprite::Private::setBackend(Tagaro::RenderBackend* backend, const QString& element)
+void Tagaro::Sprite::Private::setBackend(const Tagaro::RenderBackend* backend, const QString& element)
 {
 	if (m_backend != backend || m_element != element)
 	{
@@ -180,13 +180,13 @@ namespace Tagaro {
 	class SpriteFetcherWorker : public QRunnable
 	{
 		private:
-			Tagaro::RenderBackend* m_backend;
+			const Tagaro::RenderBackend* m_backend;
 			QString m_element;
 			int m_frame;
 			QSize m_size;
 			Tagaro::SpriteFetcher* m_receiver;
 		public:
-			SpriteFetcherWorker(Tagaro::RenderBackend* backend, const QString& element, int frame, const QSize& size, Tagaro::SpriteFetcher* receiver)
+			SpriteFetcherWorker(const Tagaro::RenderBackend* backend, const QString& element, int frame, const QSize& size, Tagaro::SpriteFetcher* receiver)
 				: m_backend(backend)
 				  //DO NOT do the following in the worker thread. frameElementKey() is not guaranteed to be thread-safe!
 				, m_element(m_backend->frameElementKey(element, frame))

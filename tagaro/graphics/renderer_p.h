@@ -52,19 +52,14 @@ class RendererPrivate : public QObject
 {
 	Q_OBJECT
 	public:
-		RendererPrivate(Tagaro::ThemeProvider* provider, const Tagaro::RenderBehavior& behavior, Tagaro::Renderer* parent);
+		RendererPrivate(Tagaro::ThemeProvider* provider);
 		void setTheme(const Tagaro::Theme* theme);
 		bool setThemeInternal(const Tagaro::Theme* theme);
 	public Q_SLOTS:
 		void loadSelectedTheme();
 	public:
-		Tagaro::Renderer* m_parent;
-
 		Tagaro::ThemeProvider* m_themeProvider;
 		const Tagaro::Theme* m_theme;
-
-		const Tagaro::RenderBehavior m_behavior;
-		Tagaro::RenderBackend* m_backend;
 
 		QHash<QString, Tagaro::Sprite*> m_sprites; //maps sprite keys -> sprite instances
 };

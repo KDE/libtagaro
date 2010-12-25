@@ -73,14 +73,14 @@ void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 		texts << name;
 		QFont theFont(painter->font()); theFont.setBold(true); fonts << theFont;
 	}{
-		QString comment = index.data(Tagaro::Theme::DescriptionRole).toString();
+		QString comment = index.data(DescriptionRole).toString();
 		if (!comment.isEmpty())
 		{
 			texts << comment;
 			fonts << painter->font();
 		}
 	}{
-		QString author = index.data(Tagaro::Theme::AuthorRole).toString();
+		QString author = index.data(AuthorRole).toString();
 		if (!author.isEmpty())
 		{
 			const QString authorString = ki18nc("Author attribution, e.g. \"by Jack\"", "by %1").subs(author).toString();
@@ -88,7 +88,7 @@ void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 			QFont theFont(painter->font()); theFont.setItalic(true); fonts << theFont;
 		}
 	}
-	//TODO: display Tagaro::Theme::AuthorEmailRole
+	//TODO: display AuthorEmailRole
 	QList<QRect> textRects; int totalTextHeight = 0;
 	for (int i = 0; i < texts.count(); ++i)
 	{
