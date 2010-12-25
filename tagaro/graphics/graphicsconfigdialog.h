@@ -51,7 +51,7 @@ class TAGARO_EXPORT GraphicsConfigDialog : public KPageDialog
 	Q_OBJECT
 	public:
 		///Creates a new Tagaro::GraphicsConfigDialog.
-		GraphicsConfigDialog(const QString& title = QString(), QWidget* parent = 0);
+		explicit GraphicsConfigDialog(const QString& title = QString(), QWidget* parent = 0);
 		///Destroys this Tagaro::ConfigDialog instance.
 		virtual ~GraphicsConfigDialog();
 

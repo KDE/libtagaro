@@ -56,7 +56,7 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Re
 	Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
 	public:
 		///Creates a new Tagaro::SpriteObjectItem which renders the given @sprite.
-		SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
+		explicit SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
 		virtual ~SpriteObjectItem();
 
 		///@return the item's offset, which defines the point of the top-left
@@ -66,14 +66,14 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Re
 		///corner of the bounding rect, in local coordinates.
 		void setOffset(const QPointF& offset);
 		///@overload
-		inline void setOffset(qreal x, qreal y);
+		inline void setOffset(qreal x, qreal y); //krazy:exclude=inline
 		///@return the size of the item's bounding rect
 		QSizeF size() const;
 		///Sets the size of the item's bounding rect. The rendered pixmap is
 		///scaled to fit in this size, regardless of the render size.
 		void setSize(const QSizeF& size);
 		///@overload
-		inline void setSize(qreal width, qreal height);
+		inline void setSize(qreal width, qreal height); //krazy:exclude=inline
 
 		//QGraphicsItem reimplementations (see comment in source file for why we need all of this)
 		virtual QRectF boundingRect() const;

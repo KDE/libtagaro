@@ -40,7 +40,7 @@ class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::Rend
 {
 	public:
 		///Creates a new Tagaro::SpriteItem which renders the given @a sprite.
-		SpriteItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
+		explicit SpriteItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
 		virtual ~SpriteItem();
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);

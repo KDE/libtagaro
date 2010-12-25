@@ -141,7 +141,7 @@ class TAGARO_EXPORT SimpleThemeProvider : public Tagaro::ThemeProvider
 	Q_OBJECT
 	public:
 		///Creates a new Tagaro::SimpleThemeProvider instance.
-		SimpleThemeProvider(const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
+		explicit SimpleThemeProvider(const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
 		///Destroys this Tagaro::SimpleThemeProvider instance.
 		virtual ~SimpleThemeProvider();
 
