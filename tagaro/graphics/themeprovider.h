@@ -27,6 +27,7 @@ class QAbstractItemModel;
 namespace Tagaro {
 
 class RenderBehavior;
+class Sprite;
 class Theme;
 
 /**
@@ -61,6 +62,9 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		///@return the behavior of RenderBackends created by the themes in this
 		///ThemeProvider
 		const Tagaro::RenderBehavior& behavior() const;
+		///@return a Tagaro::Sprite instance for the given @a spriteKey
+		Tagaro::Sprite* sprite(const QString& spriteKey) const;
+
 		///@return a list-shaped model exposing the themes' data
 		QAbstractItemModel* model() const;
 		///@return the themes in this provider

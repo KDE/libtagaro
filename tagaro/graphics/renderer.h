@@ -16,24 +16,6 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_RENDERER_H
-#define TAGARO_RENDERER_H
-
-#include "renderbackend.h"
-
-#include <QtCore/QHash>
-#include <QtCore/QObject>
-#include <QtGui/QPixmap>
-
-#include <libtagaro_export.h>
-
-namespace Tagaro {
-
-class RendererPrivate;
-class Sprite;
-class Theme;
-class ThemeProvider;
-
 /**
  * @class Tagaro::Renderer renderer.h <Tagaro/Renderer>
  * @brief Cache-enabled rendering of SVG themes.
@@ -89,24 +71,3 @@ class ThemeProvider;
  * change these properties in new applications.
  *
  */
-class TAGARO_EXPORT Renderer : public QObject
-{
-	Q_OBJECT
-	public:
-		///Constructs a new Tagaro::Renderer for the given theme provider.
-		explicit Renderer(Tagaro::ThemeProvider* provider);
-		///Deletes this Tagaro::Renderer instance, and all sprites using it.
-		virtual ~Renderer();
-
-		///@return the theme provider for this renderer
-		Tagaro::ThemeProvider* themeProvider() const;
-		///@return a Tagaro::Sprite instance for the given @a spriteKey
-		Tagaro::Sprite* sprite(const QString& spriteKey) const;
-	private:
-		friend class Tagaro::RendererPrivate;
-		Tagaro::RendererPrivate* const d;
-};
-
-} //namespace Tagaro
-
-#endif // TAGARO_RENDERER_H

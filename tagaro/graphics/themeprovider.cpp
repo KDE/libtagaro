@@ -19,10 +19,14 @@
 #include "themeprovider.h"
 #include "graphicsdelegate_p.h"
 #include "renderbackend.h"
+#include "settings.h"
+#include "sprite.h"
+#include "sprite_p.h"
 #include "theme.h"
 
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QFileInfo>
+#include <QtCore/QThreadPool>
 #include <QtCore/QVector>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
@@ -37,6 +41,7 @@ class Tagaro::ThemeProvider::Private : public QAbstractListModel
 		Tagaro::ThemeProvider* q;
 		bool m_ownThemes;
 		Tagaro::RenderBehavior m_behavior;
+		QHash<QString, Tagaro::Sprite*> m_sprites;
 
 		QList<Tagaro::Theme*> m_themes;
 		QList<const Tagaro::Theme*> m_cThemes;
@@ -94,11 +99,31 @@ Tagaro::ThemeProvider::ThemeProvider(bool ownThemes, const Tagaro::RenderBehavio
 
 Tagaro::ThemeProvider::~ThemeProvider()
 {
+	//cleanup sprites (without qDeleteAll because that's not a friend of Sprite)
+	QHash<QString, Tagaro::Sprite*>::const_iterator it1 = d->m_sprites.constBegin(),
+	                                                it2 = d->m_sprites.constEnd();
+	for (; it1 != it2; ++it1)
+		delete it1.value();
+	//cleanup themes
 	if (d->m_ownThemes)
 	{
 		qDeleteAll(d->m_themes);
 	}
+	//cleanup the rest
 	delete d;
+}
+
+Tagaro::Sprite* Tagaro::ThemeProvider::sprite(const QString& spriteKey) const
+{
+	Tagaro::Sprite*& sprite = d->m_sprites[spriteKey];
+	if (!sprite)
+	{
+		//instantiate on first use
+		sprite = new Tagaro::Sprite;
+		const QPair<const Tagaro::RenderBackend*, QString> renderElement = d->m_selectedTheme->mapSpriteKey(spriteKey);
+		sprite->d->setBackend(renderElement.first, renderElement.second);
+	}
+	return sprite;
 }
 
 QAbstractItemModel* Tagaro::ThemeProvider::model() const
@@ -137,10 +162,23 @@ void Tagaro::ThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
 	{
 		return;
 	}
-	if (d->m_selectedTheme != theme)
+	if (d->m_selectedTheme != theme && theme->isValid())
 	{
+		//if necessary, clear rendering threads
+		if (Tagaro::Settings::useRenderingThreads())
+		{
+			QThreadPool::globalInstance()->waitForDone(); //TODO: optimize
+		}
+		//do theme change
 		d->m_selectedTheme = theme;
 		emit selectedThemeChanged(theme);
+		//announce change to sprites
+		QHash<QString, Tagaro::Sprite*>::const_iterator it1 = d->m_sprites.constBegin(), it2 = d->m_sprites.constEnd();
+		for (; it1 != it2; ++it1)
+		{
+			const QPair<const Tagaro::RenderBackend*, QString> renderElement = theme->mapSpriteKey(it1.key());
+			it1.value()->d->setBackend(renderElement.first, renderElement.second);
+		}
 	}
 }
 

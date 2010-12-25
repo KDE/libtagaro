@@ -24,10 +24,9 @@
 
 namespace Tagaro {
 
-class Renderer;
 class RendererClient;
-class RendererPrivate;
 class SpriteFetcher;
+class ThemeProvider;
 
 /**
  * @class Tagaro::Sprite sprite.h <Tagaro/Sprite>
@@ -42,7 +41,7 @@ class SpriteFetcher;
  * key in the theme file. The element keys for the pixmaps of an animated
  * sprite are produced by appending the renderer()'s frameSuffix().
  *
- * Tagaro::Sprite instances can be obtained from a Tagaro::Renderer.
+ * Tagaro::Sprite instances can be obtained from a Tagaro::ThemeProvider.
  */
 class TAGARO_EXPORT Sprite
 {
@@ -88,10 +87,9 @@ class TAGARO_EXPORT Sprite
 		class Private;
 		Private* const d;
 
-		friend class Tagaro::Renderer;
 		friend class Tagaro::RendererClient;
-		friend class Tagaro::RendererPrivate;
 		friend class Tagaro::SpriteFetcher;
+		friend class Tagaro::ThemeProvider;
 		Sprite();
 		~Sprite();
 };

@@ -17,7 +17,6 @@
  ***************************************************************************/
 
 #include "spriteobjectitem.h"
-#include "renderer.h"
 
 #include <QtCore/qmath.h>
 #include <QtGui/QGraphicsScene>

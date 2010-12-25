@@ -9,7 +9,6 @@ install(FILES
 	ObjectPool
 	RenderBackend
 	RenderBehavior
-	Renderer
 	RendererClient
 	Scene
 	Settings
