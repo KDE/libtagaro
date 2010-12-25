@@ -122,6 +122,10 @@ class TAGARO_EXPORT RenderBackend
 		///@return whether the backend's graphical sources could be loaded
 		///successfully
 		bool isValid() const;
+		///The theme can use this hook to supply backend-specific configuration
+		///values. The default implementation does nothing, because the meaning
+		///of the @a configuration depends on the type of backend.
+		virtual void addConfiguration(const QMap<QString, QString>& configuration);
 
 		///If graphical elements are loaded from external resources, return
 		///the UNIX timestamp of when these resources were modified last. This

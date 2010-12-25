@@ -142,6 +142,11 @@ bool Tagaro::RenderBackend::load()
 	return true;
 }
 
+void Tagaro::RenderBackend::addConfiguration(const QMap<QString, QString>& configuration)
+{
+	Q_UNUSED(configuration)
+}
+
 uint Tagaro::RenderBackend::lastModified() const
 {
 	//see documentation

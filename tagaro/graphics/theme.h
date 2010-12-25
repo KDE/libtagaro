@@ -91,8 +91,9 @@ class TAGARO_EXPORT Theme
 		///@a specification. Relative file paths are resolved against the
 		///reference directories in the @a refDirs parameter. If the
 		///specification is invalid, a null backend is created to indicate that
-		///the theme could not be loaded properly.
-		void addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs);
+		///the theme could not be loaded properly. The @a backendConfig is
+		///passed to Tagaro::RenderBackend::addConfiguration.
+		void addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& backendConfig);
 		///@return the backend with the given @a identifier, or 0 if no such
 		///backend exists
 		///

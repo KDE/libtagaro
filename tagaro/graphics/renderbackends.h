@@ -55,6 +55,23 @@ class ColorRenderBackend : public Tagaro::RenderBackend
 		Private* const d;
 };
 
+class ImageRenderBackend : public Tagaro::RenderBackend
+{
+	public:
+		ImageRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior);
+		virtual ~ImageRenderBackend();
+
+		virtual void addConfiguration(const QMap<QString, QString>& configuration);
+		virtual bool load();
+
+		virtual QRectF elementBounds(const QString& element) const;
+		virtual bool elementExists(const QString& element) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
+	private:
+		class Private;
+		Private* const d;
+};
+
 } //namespace Tagaro
 
 #endif // TAGARO_RENDERBACKENDS_H

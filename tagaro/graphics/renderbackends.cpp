@@ -181,3 +181,69 @@ QImage Tagaro::ColorRenderBackend::elementImage(const QString& element, const QS
 }
 
 //END Tagaro::ColorRenderBackend
+//BEGIN Tagaro::ImageRenderBackend
+
+struct Tagaro::ImageRenderBackend::Private
+{
+	QString m_path;
+	QImage m_image;
+	QHash<QString, QRect> m_elements;
+
+	Private(const QString& path) : m_path(path) {}
+};
+
+Tagaro::ImageRenderBackend::ImageRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior)
+	: Tagaro::RenderBackend(QFileInfo(path).absoluteFilePath(), behavior)
+	, d(new Private(path))
+{
+}
+
+Tagaro::ImageRenderBackend::~ImageRenderBackend()
+{
+	delete d;
+}
+
+void Tagaro::ImageRenderBackend::addConfiguration(const QMap<QString, QString>& configuration)
+{
+	//TODO: Tagaro::ImageRenderBackend::addConfiguration
+}
+
+bool Tagaro::ImageRenderBackend::load()
+{
+	if (!d->m_image.load(d->m_path))
+	{
+		return false;
+	}
+	d->m_elements.insert(QLatin1String("full"), d->m_image.rect());
+	return true;
+}
+
+QRectF Tagaro::ImageRenderBackend::elementBounds(const QString& element) const
+{
+	return d->m_elements.value(element);
+}
+
+bool Tagaro::ImageRenderBackend::elementExists(const QString& element) const
+{
+	return d->m_elements.contains(element);
+}
+
+QImage Tagaro::ImageRenderBackend::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+{
+	Q_UNUSED(timeConstraint) //simple copying of images is not expensive (compared to setting up a renderer thread)
+	QImage image(size, QImage::Format_ARGB32_Premultiplied);
+	QHash<QString, QRect>::const_iterator it = d->m_elements.constFind(element);
+	if (it == d->m_elements.constEnd())
+	{
+		//unknown element -> return empty image
+		image.fill(QColor(Qt::transparent).rgba());
+		return image;
+	}
+	//copy the part of the image which is specified by this element
+	QPainter p(&image);
+	p.drawImage(image.rect(), d->m_image, it.value());
+	p.end();
+	return image;
+}
+
+//END Tagaro::ImageRenderBackend

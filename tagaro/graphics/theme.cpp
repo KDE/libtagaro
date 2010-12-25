@@ -21,6 +21,7 @@
 #include "themeprovider.h"
 
 #include <QtCore/QFileInfo>
+#include <QtGui/QImageReader>
 #include <QtGui/QPixmap>
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
@@ -181,7 +182,7 @@ static QString resolveRelativePath(const QString& fileName, const QList<QDir>& r
 	return file.absoluteFilePath();
 }
 
-void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs)
+void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& backendConfig)
 {
 	const QChar typeSymbol(':');
 	QString spec(specification), type(QLatin1String("auto"));
@@ -208,24 +209,48 @@ void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& spec
 			{
 				type = "svg";
 			}
+			else
+			{
+				const QList<QByteArray> imageFormats = QImageReader::supportedImageFormats();
+				foreach (const QString& suffix, suffixes)
+				{
+					if (imageFormats.contains(suffix.toUtf8()))
+					{
+						type = "image";
+						break;
+					}
+				}
+			}
 		}
 	}
 	//resolve specifications - Add new types below here.
+	Tagaro::RenderBackend* backend;
 	if (type == QLatin1String("svg"))
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
 		Tagaro::QtSvgRenderBackend* svgBackend = new Tagaro::QtSvgRenderBackend(path, d->m_provider->behavior());
-		addBackend(identifier, new Tagaro::CachedProxyRenderBackend(svgBackend));
+		backend = new Tagaro::CachedProxyRenderBackend(svgBackend);
+	}
+	else if (type == QLatin1String("image"))
+	{
+		const QString path = resolveRelativePath(spec, refDirs);
+		backend = new Tagaro::ImageRenderBackend(path, d->m_provider->behavior());
 	}
 	else if (type == QLatin1String("color"))
 	{
-		addBackend(identifier, new Tagaro::ColorRenderBackend(d->m_provider->behavior()));
+		backend = new Tagaro::ColorRenderBackend(d->m_provider->behavior());
 	}
 	else
 	{
 		kDebug() << "Failed to create RenderBackend from specification:" << specification;
-		addBackend(identifier, 0);
+		backend = 0;
 	}
+	//add created backend to theme
+	if (backend)
+	{
+		backend->addConfiguration(backendConfig);
+	}
+	addBackend(identifier, backend);
 }
 
 const Tagaro::RenderBackend* Tagaro::Theme::backend(const QByteArray& identifier_) const
@@ -317,7 +342,7 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 	const QString graphicsFile = themeConfig.readEntry("FileName", QString());
 	if (!graphicsFile.isEmpty())
 	{
-		theme->addBackend(QByteArray(), graphicsFile, m_directories);
+		theme->addBackend(QByteArray(), graphicsFile, m_directories, QMap<QString, QString>());
 	}
 	theme->setName(themeConfig.readEntry("Name", QString()));
 	theme->setDescription(themeConfig.readEntry("Description", QString()));
@@ -347,9 +372,10 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 		//create source
 		const KConfigGroup sourceConfig(&sourcesConfig, sourceName);
 		const QString sourceSpec = sourceConfig.readEntry("SourceType", QString());
-		theme->addBackend(sourceNameRaw, sourceSpec, m_directories);
+		QMap<QString, QString> sourceConfigMap = sourceConfig.entryMap();
+		sourceConfigMap.remove(QLatin1String("SourceType"));
+		theme->addBackend(sourceNameRaw, sourceSpec, m_directories, sourceConfigMap);
 		const Tagaro::RenderBackend* backend = theme->backend(sourceNameRaw);
-		//TODO: give other entries in sourceConfig to RenderBackend (as backend-specific configuration)
 		//read mappings; each mapping is stored as two key-value pairs
 		//   N-from=SOURCEKEY
 		//   N-to=ELEMENTKEY
