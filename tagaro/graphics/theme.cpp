@@ -27,9 +27,8 @@
 #include <KDE/KDebug>
 #include <KDE/KStandardDirs>
 
-//TODO: load multiple backends and routes in StandardTheme, add more backends (at least image and solid color)
 //TODO: share identical backends between Themes at least in the same ThemeProvider -> move backend instantiation to ThemeProvider?
-//TODO: add API to RenderBackend to read backend-specific configuration from desktop file
+//TODO: add API to RenderBackend to read backend-specific configuration from desktop file, create image backend that uses this for sprites
 
 //BEGIN Tagaro::Theme
 
@@ -312,8 +311,8 @@ Tagaro::StandardTheme::StandardTheme(const QByteArray& ksdResource, const QStrin
 void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QString& filePath)
 {
 	//open configuration
-	KConfig themeConfigFile(filePath, KConfig::SimpleConfig);
-	KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
+	const KConfig themeConfigFile(filePath, KConfig::SimpleConfig);
+	const KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
 	//read standard properties
 	const QString graphicsFile = themeConfig.readEntry("FileName", QString());
 	if (!graphicsFile.isEmpty())
@@ -338,6 +337,46 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 	entries.remove(QLatin1String("AuthorEmail"));
 	entries.remove(QLatin1String("Preview"));
 	theme->setCustomData(entries);
+	//read sources and mappings
+	const KConfigGroup sourcesConfig(&themeConfigFile, "Sources");
+	const KConfigGroup mappingsConfig(&themeConfigFile, "Mappings");
+	const QStringList sourceList = sourcesConfig.groupList();
+	foreach (const QString& sourceName, sourceList)
+	{
+		const QByteArray sourceNameRaw = sourceName.toUtf8();
+		//create source
+		const KConfigGroup sourceConfig(&sourcesConfig, sourceName);
+		const QString sourceSpec = sourceConfig.readEntry("SourceType", QString());
+		theme->addBackend(sourceNameRaw, sourceSpec, m_directories);
+		const Tagaro::RenderBackend* backend = theme->backend(sourceNameRaw);
+		//TODO: give other entries in sourceConfig to RenderBackend (as backend-specific configuration)
+		//read mappings; each mapping is stored as two key-value pairs
+		//   N-from=SOURCEKEY
+		//   N-to=ELEMENTKEY
+		//where N is an integer; these integers establish a precedence (lower N
+		//are evaluated first) which cannot be done by KConfig itself because
+		//it reads the key-value pairs into a QMap whose internal order is
+		//unrelated to the order in the file)
+		const KConfigGroup mappingConfig(&mappingsConfig, sourceName);
+		const QMap<QString, QString> mapData = mappingConfig.entryMap();
+		QMap<QString, QString>::const_iterator it1 = mapData.constBegin(), it2 = mapData.constEnd();
+		const QRegExp exp("([0-9]*)-from");
+		QList<int> nums;
+		for (; it1 != it2; ++it1)
+		{
+			if (exp.exactMatch(it1.key()))
+			{
+				nums << exp.cap(1).toInt();
+			}
+		}
+		qSort(nums);
+		foreach (int num, nums)
+		{
+			const QString spriteKey = mapData.value(QString::fromLatin1("%1-from").arg(num));
+			const QString elementKey = mapData.value(QString::fromLatin1("%1-to").arg(num));
+			theme->addRoute(QRegExp(spriteKey), elementKey, backend);
+		}
+	}
 }
 
 //END Tagaro::StandardTheme
