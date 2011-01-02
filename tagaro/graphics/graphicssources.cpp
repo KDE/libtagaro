@@ -16,7 +16,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "renderbackends.h"
+#include "graphicssources.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
@@ -26,9 +26,9 @@
 #include <QtGui/QPainter>
 #include <QtSvg/QSvgRenderer>
 
-//BEGIN Tagaro::QtSvgRenderBackend
+//BEGIN Tagaro::QtSvgGraphicsSource
 
-struct Tagaro::QtSvgRenderBackend::Private
+struct Tagaro::QtSvgGraphicsSource::Private
 {
 	Private(const QString& path) : m_path(path), m_checked(false), m_invalid(false) {}
 
@@ -46,7 +46,7 @@ struct Tagaro::QtSvgRenderBackend::Private
 	inline void freeRenderer(QSvgRenderer* renderer);
 };
 
-QSvgRenderer* Tagaro::QtSvgRenderBackend::Private::allocRenderer()
+QSvgRenderer* Tagaro::QtSvgGraphicsSource::Private::allocRenderer()
 {
 	//quick check: was the file found to be invalid already?
 	if (m_checked && m_invalid)
@@ -72,20 +72,20 @@ QSvgRenderer* Tagaro::QtSvgRenderBackend::Private::allocRenderer()
 	return m_invalid ? 0 : renderer;
 }
 
-void Tagaro::QtSvgRenderBackend::Private::freeRenderer(QSvgRenderer* renderer)
+void Tagaro::QtSvgGraphicsSource::Private::freeRenderer(QSvgRenderer* renderer)
 {
 	//mark renderer as available
 	QMutexLocker locker(&m_mutex);
 	m_hash.insert(renderer, 0);
 }
 
-Tagaro::QtSvgRenderBackend::QtSvgRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior)
-	: Tagaro::RenderBackend(QFileInfo(path).absoluteFilePath(), behavior)
+Tagaro::QtSvgGraphicsSource::QtSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config)
+	: Tagaro::GraphicsSource(QFileInfo(path).absoluteFilePath(), config)
 	, d(new Private(path))
 {
 }
 
-Tagaro::QtSvgRenderBackend::~QtSvgRenderBackend()
+Tagaro::QtSvgGraphicsSource::~QtSvgGraphicsSource()
 {
 	{
 		QMutexLocker l(&d->m_mutex);
@@ -99,7 +99,7 @@ Tagaro::QtSvgRenderBackend::~QtSvgRenderBackend()
 	delete d;
 }
 
-bool Tagaro::QtSvgRenderBackend::load()
+bool Tagaro::QtSvgGraphicsSource::load()
 {
 	if (!d->m_checked)
 	{
@@ -109,12 +109,12 @@ bool Tagaro::QtSvgRenderBackend::load()
 	return !d->m_invalid;
 }
 
-uint Tagaro::QtSvgRenderBackend::lastModified() const
+uint Tagaro::QtSvgGraphicsSource::lastModified() const
 {
 	return QFileInfo(d->m_path).lastModified().toTime_t();
 }
 
-QRectF Tagaro::QtSvgRenderBackend::elementBounds(const QString& element) const
+QRectF Tagaro::QtSvgGraphicsSource::elementBounds(const QString& element) const
 {
 	QSvgRenderer* r = d->allocRenderer();
 	const QRectF result = r->boundsOnElement(element);
@@ -122,7 +122,7 @@ QRectF Tagaro::QtSvgRenderBackend::elementBounds(const QString& element) const
 	return result;
 }
 
-bool Tagaro::QtSvgRenderBackend::elementExists(const QString& element) const
+bool Tagaro::QtSvgGraphicsSource::elementExists(const QString& element) const
 {
 	QSvgRenderer* r = d->allocRenderer();
 	const bool result = r->elementExists(element);
@@ -130,7 +130,7 @@ bool Tagaro::QtSvgRenderBackend::elementExists(const QString& element) const
 	return result;
 }
 
-QImage Tagaro::QtSvgRenderBackend::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::QtSvgGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
 {
 	if (timeConstraint)
 	{
@@ -147,31 +147,31 @@ QImage Tagaro::QtSvgRenderBackend::elementImage(const QString& element, const QS
 	return image;
 }
 
-//END Tagaro::QtSvgRenderBackend
-//BEGIN Tagaro::ColorRenderBackend
+//END Tagaro::QtSvgGraphicsSource
+//BEGIN Tagaro::ColorGraphicsSource
 
-struct Tagaro::ColorRenderBackend::Private
+struct Tagaro::ColorGraphicsSource::Private
 {
 	//reserved for later use
 };
 
-Tagaro::ColorRenderBackend::ColorRenderBackend(const Tagaro::RenderBehavior& behavior)
-	: Tagaro::RenderBackend("color", behavior)
+Tagaro::ColorGraphicsSource::ColorGraphicsSource(const Tagaro::GraphicsSourceConfig& config)
+	: Tagaro::GraphicsSource("color", config)
 	, d(0)
 {
 }
 
-Tagaro::ColorRenderBackend::~ColorRenderBackend()
+Tagaro::ColorGraphicsSource::~ColorGraphicsSource()
 {
 	delete d;
 }
 
-bool Tagaro::ColorRenderBackend::elementExists(const QString& element) const
+bool Tagaro::ColorGraphicsSource::elementExists(const QString& element) const
 {
 	return QColor::isValidColor(element);
 }
 
-QImage Tagaro::ColorRenderBackend::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::ColorGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
 {
 	Q_UNUSED(timeConstraint) //constructing plain color images is not expensive (compared to setting up a renderer thread)
 	QColor color = QColor::isValidColor(element) ? QColor(element) : QColor(Qt::transparent);
@@ -180,10 +180,10 @@ QImage Tagaro::ColorRenderBackend::elementImage(const QString& element, const QS
 	return image;
 }
 
-//END Tagaro::ColorRenderBackend
-//BEGIN Tagaro::ImageRenderBackend
+//END Tagaro::ColorGraphicsSource
+//BEGIN Tagaro::ImageGraphicsSource
 
-struct Tagaro::ImageRenderBackend::Private
+struct Tagaro::ImageGraphicsSource::Private
 {
 	QString m_path;
 	QImage m_image;
@@ -192,23 +192,23 @@ struct Tagaro::ImageRenderBackend::Private
 	Private(const QString& path) : m_path(path) {}
 };
 
-Tagaro::ImageRenderBackend::ImageRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior)
-	: Tagaro::RenderBackend(QFileInfo(path).absoluteFilePath(), behavior)
+Tagaro::ImageGraphicsSource::ImageGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config)
+	: Tagaro::GraphicsSource(QFileInfo(path).absoluteFilePath(), config)
 	, d(new Private(path))
 {
 }
 
-Tagaro::ImageRenderBackend::~ImageRenderBackend()
+Tagaro::ImageGraphicsSource::~ImageGraphicsSource()
 {
 	delete d;
 }
 
-void Tagaro::ImageRenderBackend::addConfiguration(const QMap<QString, QString>& configuration)
+void Tagaro::ImageGraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
 {
-	//TODO: Tagaro::ImageRenderBackend::addConfiguration
+	//TODO: Tagaro::ImageGraphicsSource::addConfiguration
 }
 
-bool Tagaro::ImageRenderBackend::load()
+bool Tagaro::ImageGraphicsSource::load()
 {
 	if (!d->m_image.load(d->m_path))
 	{
@@ -218,17 +218,17 @@ bool Tagaro::ImageRenderBackend::load()
 	return true;
 }
 
-QRectF Tagaro::ImageRenderBackend::elementBounds(const QString& element) const
+QRectF Tagaro::ImageGraphicsSource::elementBounds(const QString& element) const
 {
 	return d->m_elements.value(element);
 }
 
-bool Tagaro::ImageRenderBackend::elementExists(const QString& element) const
+bool Tagaro::ImageGraphicsSource::elementExists(const QString& element) const
 {
 	return d->m_elements.contains(element);
 }
 
-QImage Tagaro::ImageRenderBackend::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::ImageGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
 {
 	Q_UNUSED(timeConstraint) //simple copying of images is not expensive (compared to setting up a renderer thread)
 	QImage image(size, QImage::Format_ARGB32_Premultiplied);
@@ -246,4 +246,4 @@ QImage Tagaro::ImageRenderBackend::elementImage(const QString& element, const QS
 	return image;
 }
 
-//END Tagaro::ImageRenderBackend
+//END Tagaro::ImageGraphicsSource

@@ -26,7 +26,7 @@
 namespace Tagaro {
 
 class MessageOverlay;
-class RendererClient;
+class SpriteClient;
 class Sprite;
 
 /**
@@ -35,7 +35,7 @@ class Sprite;
  *
  * This QGraphicsScene subclass provides integration with Tagaro and
  * miscellaneous convenience features:
- * @li It acts as a Tagaro::RendererClient to fetch a scene background pixmap.
+ * @li It acts as a Tagaro::SpriteClient to fetch a scene background pixmap.
  * @li It can be used to keep the QGraphicsScene's sceneRect() in sync
  *     with the rect() of a QGraphicsView instance (the "main view").
  * @li It can display Tagaro::MessageOverlay instances.
@@ -70,7 +70,7 @@ class TAGARO_EXPORT Scene : public QGraphicsScene
 		///@warning Do not call setRenderSize() on this instance! The render
 		///size is managed by the scene. Use setBackgroundBrushRenderSize()
 		///instead.
-		Tagaro::RendererClient* backgroundBrushClient() const;
+		Tagaro::SpriteClient* backgroundBrushClient() const;
 		///@return the background brush's render size
 		///
 		///If the render size is determined from the size of the sceneRect()

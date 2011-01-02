@@ -2,19 +2,19 @@
 install(FILES
 	AudioScene
 	Board
-	CachedProxyRenderBackend
+	CachedProxyGraphicsSource
 	GraphicsConfigDialog
+	GraphicsSource
+	GraphicsSourceConfig
 	MessageOverlay
 	ObjectPointer
 	ObjectPool
-	RenderBackend
-	RenderBehavior
-	RendererClient
 	Scene
 	Settings
 	SimpleThemeProvider
 	Sound
 	Sprite
+	SpriteClient
 	SpriteItem
 	SpriteObjectItem
 	StandardTheme

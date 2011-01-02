@@ -25,7 +25,7 @@ class Tagaro::SpriteItemPrivate
 
 Tagaro::SpriteItem::SpriteItem(Tagaro::Sprite* sprite, QGraphicsItem* parent)
 	: QGraphicsPixmapItem(parent)
-	, Tagaro::RendererClient(sprite)
+	, Tagaro::SpriteClient(sprite)
 	, d(0)
 {
 	setCacheMode(QGraphicsItem::DeviceCoordinateCache);

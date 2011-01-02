@@ -21,6 +21,5 @@ add_subdirectory(includes)
 
 add_subdirectory(tools)
 add_subdirectory(cmake)
-add_subdirectory(doc)
 
 install(FILES libtagaro_export.h DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)

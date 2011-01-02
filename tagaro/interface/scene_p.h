@@ -20,9 +20,9 @@
 #define TAGARO_SCENE_P_H
 
 #include "scene.h"
-#include "../graphics/rendererclient.h"
+#include "../graphics/spriteclient.h"
 
-struct Tagaro::Scene::Private : public Tagaro::RendererClient
+struct Tagaro::Scene::Private : public Tagaro::SpriteClient
 {
 	public:
 		Private(Tagaro::Sprite* backgroundSprite, Tagaro::Scene* parent);

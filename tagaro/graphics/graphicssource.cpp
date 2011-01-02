@@ -16,7 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "renderbackend.h"
+#include "graphicssource.h"
+#include "graphicssourceconfig.h"
 #include "settings.h"
 
 #include <QtCore/QCoreApplication>
@@ -26,143 +27,74 @@
 #include <KDE/KImageCache>
 #include <KDE/KStandardDirs>
 
-//BEGIN Tagaro::RenderBehavior
+//BEGIN Tagaro::GraphicsSource
 
-struct Tagaro::RenderBehavior::Private
+struct Tagaro::GraphicsSource::Private
 {
-	int m_cacheSize, m_frameBaseIndex;
-	QString m_frameSuffix;
-
-	Private();
-};
-
-Tagaro::RenderBehavior::Private::Private()
-	: m_cacheSize(3) //in megabytes
-	, m_frameBaseIndex(0)
-	, m_frameSuffix(QLatin1String("_%1"))
-{
-}
-
-Tagaro::RenderBehavior::RenderBehavior()
-	: d(new Private)
-{
-}
-
-Tagaro::RenderBehavior::RenderBehavior(const Tagaro::RenderBehavior& other)
-	: d(new Private(*other.d))
-{
-}
-
-Tagaro::RenderBehavior& Tagaro::RenderBehavior::operator=(const Tagaro::RenderBehavior& other)
-{
-	*d = *other.d;
-	return *this;
-}
-
-Tagaro::RenderBehavior::~RenderBehavior()
-{
-	delete d;
-}
-
-int Tagaro::RenderBehavior::cacheSize() const
-{
-	return d->m_cacheSize;
-}
-
-void Tagaro::RenderBehavior::setCacheSize(int cacheSize)
-{
-	d->m_cacheSize = cacheSize;
-}
-
-int Tagaro::RenderBehavior::frameBaseIndex() const
-{
-	return d->m_frameBaseIndex;
-}
-
-void Tagaro::RenderBehavior::setFrameBaseIndex(int frameBaseIndex)
-{
-	d->m_frameBaseIndex = frameBaseIndex;
-}
-
-QString Tagaro::RenderBehavior::frameSuffix() const
-{
-	return d->m_frameSuffix;
-}
-
-void Tagaro::RenderBehavior::setFrameSuffix(const QString& suffix)
-{
-	d->m_frameSuffix = suffix.contains(QLatin1String("%1")) ? suffix : QLatin1String("_%1");
-}
-
-//END Tagaro::RenderBehavior
-//BEGIN Tagaro::RenderBackend
-
-struct Tagaro::RenderBackend::Private
-{
-	Tagaro::RenderBehavior m_behavior;
+	Tagaro::GraphicsSourceConfig m_config;
 	QString m_identifier;
 	bool m_valid, m_loaded;
 
-	Private(const QString& identifier, const Tagaro::RenderBehavior& behavior) : m_behavior(behavior), m_identifier(identifier), m_loaded(false) {}
+	Private(const QString& identifier, const Tagaro::GraphicsSourceConfig& config) : m_config(config), m_identifier(identifier), m_loaded(false) {}
 };
 
-Tagaro::RenderBackend::RenderBackend(const QString& identifier, const Tagaro::RenderBehavior& behavior)
-	: d(new Private(identifier, behavior))
+Tagaro::GraphicsSource::GraphicsSource(const QString& identifier, const Tagaro::GraphicsSourceConfig& config)
+	: d(new Private(identifier, config))
 {
 }
 
-Tagaro::RenderBackend::~RenderBackend()
+Tagaro::GraphicsSource::~GraphicsSource()
 {
 	delete d;
 }
 
-const Tagaro::RenderBehavior& Tagaro::RenderBackend::behavior() const
+const Tagaro::GraphicsSourceConfig& Tagaro::GraphicsSource::config() const
 {
-	return d->m_behavior;
+	return d->m_config;
 }
 
-QString Tagaro::RenderBackend::identifier() const
+QString Tagaro::GraphicsSource::identifier() const
 {
 	return d->m_identifier;
 }
 
-bool Tagaro::RenderBackend::isValid() const
+bool Tagaro::GraphicsSource::isValid() const
 {
 	//ensure that load() is only called once
 	if (!d->m_loaded)
 	{
-		d->m_valid = const_cast<Tagaro::RenderBackend*>(this)->load();
+		d->m_valid = const_cast<Tagaro::GraphicsSource*>(this)->load();
 		d->m_loaded = true;
 	}
 	return d->m_valid;
 }
 
-bool Tagaro::RenderBackend::load()
+bool Tagaro::GraphicsSource::load()
 {
 	return true;
 }
 
-void Tagaro::RenderBackend::addConfiguration(const QMap<QString, QString>& configuration)
+void Tagaro::GraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
 {
 	Q_UNUSED(configuration)
 }
 
-uint Tagaro::RenderBackend::lastModified() const
+uint Tagaro::GraphicsSource::lastModified() const
 {
 	//see documentation
 	return 0;
 }
 
-QRectF Tagaro::RenderBackend::elementBounds(const QString& element) const
+QRectF Tagaro::GraphicsSource::elementBounds(const QString& element) const
 {
 	Q_UNUSED(element)
 	return QRectF();
 }
 
-int Tagaro::RenderBackend::frameCount(const QString& element) const
+int Tagaro::GraphicsSource::frameCount(const QString& element) const
 {
 	//look for animated sprite first
-	const int fbi = d->m_behavior.frameBaseIndex();
+	const int fbi = d->m_config.frameBaseIndex();
 	int count = fbi;
 	while (elementExists(frameElementKey(element, count, false)))
 	{
@@ -180,7 +112,7 @@ int Tagaro::RenderBackend::frameCount(const QString& element) const
 	return count;
 }
 
-QString Tagaro::RenderBackend::frameElementKey(const QString& element, int frame, bool useFrameCount) const
+QString Tagaro::GraphicsSource::frameElementKey(const QString& element, int frame, bool useFrameCount) const
 {
 	//fast path for non-animated sprites
 	if (frame < 0)
@@ -198,53 +130,53 @@ QString Tagaro::RenderBackend::frameElementKey(const QString& element, int frame
 		}
 		else
 		{
-			const int fbi = d->m_behavior.frameBaseIndex();
+			const int fbi = d->m_config.frameBaseIndex();
 			frame = (frame - fbi) % frameCount + fbi;
 		}
 	}
-	return element + d->m_behavior.frameSuffix().arg(frame);
+	return element + d->m_config.frameSuffix().arg(frame);
 }
 
-//END Tagaro::RenderBackend
-//BEGIN Tagaro::CachedProxyRenderBackend
+//END Tagaro::GraphicsSource
+//BEGIN Tagaro::CachedProxyGraphicsSource
 
-struct Tagaro::CachedProxyRenderBackend::Private
+struct Tagaro::CachedProxyGraphicsSource::Private
 {
-	Tagaro::RenderBackend* m_backend;
+	Tagaro::GraphicsSource* m_source;
 	//disk cache
 	KImageCache* m_cache;
 	//in-process cache
 	QHash<QString, QRectF> m_boundsCache;
 	QHash<QString, int> m_frameCountCache;
 	//state description
-	bool m_valid, m_loaded, m_backendLoaded, m_useCache;
+	bool m_valid, m_loaded, m_sourceLoaded, m_useCache;
 	//m_useCache refers to the disk cache only, not to the in-process cache
 
-	Private(Tagaro::RenderBackend* backend);
+	Private(Tagaro::GraphicsSource* source);
 
 	QRectF elementBounds(const QString& element);
 	QImage elementImage(const QString& element, const QSize& size, bool timeConstraint);
 };
 
-Tagaro::CachedProxyRenderBackend::Private::Private(Tagaro::RenderBackend* backend)
-	: m_backend(backend)
+Tagaro::CachedProxyGraphicsSource::Private::Private(Tagaro::GraphicsSource* source)
+	: m_source(source)
 	, m_cache(0)
 	, m_valid(false)
 	, m_loaded(false)
-	, m_backendLoaded(false)
-	, m_useCache(Tagaro::Settings::useDiskCache() && backend->behavior().cacheSize() > 0)
+	, m_sourceLoaded(false)
+	, m_useCache(Tagaro::Settings::useDiskCache() && source->config().cacheSize() > 0)
 {
 }
 
-Tagaro::CachedProxyRenderBackend::CachedProxyRenderBackend(Tagaro::RenderBackend* backend)
-	: Tagaro::RenderBackend(backend->identifier(), backend->behavior())
-	, d(new Private(backend))
+Tagaro::CachedProxyGraphicsSource::CachedProxyGraphicsSource(Tagaro::GraphicsSource* source)
+	: Tagaro::GraphicsSource(source->identifier(), source->config())
+	, d(new Private(source))
 {
 }
 
-Tagaro::CachedProxyRenderBackend::~CachedProxyRenderBackend()
+Tagaro::CachedProxyGraphicsSource::~CachedProxyGraphicsSource()
 {
-	delete d->m_backend;
+	delete d->m_source;
 	delete d->m_cache;
 	delete d;
 }
@@ -261,18 +193,18 @@ struct Tagaro_QCAStuff : public QCA::Initializer
 };
 K_GLOBAL_STATIC(Tagaro_QCAStuff, g_qcaStuff)
 
-bool Tagaro::CachedProxyRenderBackend::load()
+bool Tagaro::CachedProxyGraphicsSource::load()
 {
 	if (d->m_loaded)
 	{
 		return d->m_valid;
 	}
 	d->m_loaded = true; //because we're doing it now
-	//no caching -> just forward call to proxied backend
+	//no caching -> just forward call to proxied source
 	if (!d->m_useCache)
 	{
-		d->m_backendLoaded = true;
-		return d->m_valid = d->m_backend->isValid();
+		d->m_sourceLoaded = true;
+		return d->m_valid = d->m_source->isValid();
 	}
 	//hash identifier to find name for cache
 	const QString cacheHash = g_qcaStuff->hash.hashToString(identifier().toUtf8());
@@ -288,8 +220,8 @@ bool Tagaro::CachedProxyRenderBackend::load()
 	else
 	{
 		kDebug() << "Cache does not exist, checking graphics source immediately";
-		d->m_backendLoaded = true;
-		d->m_valid = d->m_backend->isValid();
+		d->m_sourceLoaded = true;
+		d->m_valid = d->m_source->isValid();
 		if (!d->m_valid)
 		{
 			return d->m_valid;
@@ -297,15 +229,14 @@ bool Tagaro::CachedProxyRenderBackend::load()
 	}
 	//open cache, check timestamp vs. last write access to graphics file
 	//(shift by 20 converts megabytes to bytes)
-	d->m_cache = new KImageCache(cacheName, behavior().cacheSize() << 20);
+	d->m_cache = new KImageCache(cacheName, config().cacheSize() << 20);
 	d->m_cache->setPixmapCaching(false); //see comment below this method
-	//TODO: use Tagaro::Theme::modificationTimestamp()
-	if (d->m_cache->timestamp() < d->m_backend->lastModified())
+	if (d->m_cache->timestamp() < d->m_source->lastModified())
 	{
 		d->m_cache->clear();
 		kDebug() << "Theme newer than cache, checking graphics file immediately";
-		d->m_backendLoaded = true;
-		d->m_valid = d->m_backend->isValid();
+		d->m_sourceLoaded = true;
+		d->m_valid = d->m_source->isValid();
 	}
 	return d->m_valid;
 }
@@ -330,17 +261,17 @@ bool Tagaro::CachedProxyRenderBackend::load()
 //As you see, implementing an own pixmap cache saves us one conversion. We
 //therefore disable KIC's pixmap cache because we do not need it.
 
-QRectF Tagaro::CachedProxyRenderBackend::Private::elementBounds(const QString& element)
+QRectF Tagaro::CachedProxyGraphicsSource::Private::elementBounds(const QString& element)
 {
-	if (!m_backendLoaded)
+	if (!m_sourceLoaded)
 	{
-		m_backendLoaded = true;
-		m_valid = m_backend->isValid();
+		m_sourceLoaded = true;
+		m_valid = m_source->isValid();
 	}
-	return m_valid ? m_backend->elementBounds(element) : QRectF();
+	return m_valid ? m_source->elementBounds(element) : QRectF();
 }
 
-QRectF Tagaro::CachedProxyRenderBackend::elementBounds(const QString& element) const
+QRectF Tagaro::CachedProxyGraphicsSource::elementBounds(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -371,7 +302,7 @@ QRectF Tagaro::CachedProxyRenderBackend::elementBounds(const QString& element) c
 		d->m_boundsCache.insert(element, bounds);
 		return bounds;
 	}
-	//ask backend and cache for following requests
+	//ask source and cache for following requests
 	const QRectF bounds = d->elementBounds(element);
 	buffer.clear();
 	{
@@ -383,34 +314,34 @@ QRectF Tagaro::CachedProxyRenderBackend::elementBounds(const QString& element) c
 	return bounds;
 }
 
-bool Tagaro::CachedProxyRenderBackend::elementExists(const QString& element) const
+bool Tagaro::CachedProxyGraphicsSource::elementExists(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
 	{
 		return false;
 	}
-	//load backend if not loaded yet
-	if (!d->m_backendLoaded)
+	//load source if not loaded yet
+	if (!d->m_sourceLoaded)
 	{
-		d->m_backendLoaded = true;
-		d->m_valid = d->m_backend->isValid();
+		d->m_sourceLoaded = true;
+		d->m_valid = d->m_source->isValid();
 	}
-	//ask backend
-	return d->m_valid ? d->m_backend->elementExists(element) : false;
+	//ask source
+	return d->m_valid ? d->m_source->elementExists(element) : false;
 }
 
-QImage Tagaro::CachedProxyRenderBackend::Private::elementImage(const QString& element, const QSize& size, bool timeConstraint)
+QImage Tagaro::CachedProxyGraphicsSource::Private::elementImage(const QString& element, const QSize& size, bool timeConstraint)
 {
-	if (!m_backendLoaded)
+	if (!m_sourceLoaded)
 	{
-		m_backendLoaded = true;
-		m_valid = m_backend->isValid();
+		m_sourceLoaded = true;
+		m_valid = m_source->isValid();
 	}
-	return m_valid ? m_backend->elementImage(element, size, timeConstraint) : QImage();
+	return m_valid ? m_source->elementImage(element, size, timeConstraint) : QImage();
 }
 
-QImage Tagaro::CachedProxyRenderBackend::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::CachedProxyGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -439,7 +370,7 @@ QImage Tagaro::CachedProxyRenderBackend::elementImage(const QString& element, co
 	return result;
 }
 
-int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
+int Tagaro::CachedProxyGraphicsSource::frameCount(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -455,7 +386,7 @@ int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
 	//if there's no slow cache...
 	if (!d->m_cache)
 	{
-		const int count = Tagaro::RenderBackend::frameCount(element);
+		const int count = Tagaro::GraphicsSource::frameCount(element);
 		d->m_frameCountCache.insert(element, count);
 		return count;
 	}
@@ -466,11 +397,11 @@ int Tagaro::CachedProxyRenderBackend::frameCount(const QString& element) const
 	{
 		return buffer.toInt();
 	}
-	//ask backend and cache for following requests
-	const int count = Tagaro::RenderBackend::frameCount(element);
+	//ask source and cache for following requests
+	const int count = Tagaro::GraphicsSource::frameCount(element);
 	d->m_cache->insert(key, QByteArray::number(count));
 	d->m_frameCountCache.insert(key, count);
 	return count;
 }
 
-//END Tagaro::CachedProxyRenderBackend
+//END Tagaro::CachedProxyGraphicsSource

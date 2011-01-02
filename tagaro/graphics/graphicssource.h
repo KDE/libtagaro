@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_RENDERBACKEND_H
-#define TAGARO_RENDERBACKEND_H
+#ifndef TAGARO_GRAPHICSSOURCE_H
+#define TAGARO_GRAPHICSSOURCE_H
 
 #include <QtGui/QImage>
 
@@ -25,111 +25,53 @@
 
 namespace Tagaro {
 
-/**
- * @class Tagaro::RenderBehavior renderbackend.h <Tagaro/RenderBehavior>
- *
- * This class represents general configurable parameters for
- * Tagaro::RenderBackends.
- */
-class TAGARO_EXPORT RenderBehavior
-{
-	public:
-		///Creates a new Tagaro::RenderBehavior instance with default values:
-		///@li cacheSize() == 3 (megabytes)
-		///@li frameBaseIndex() == 0
-		///@li frameSuffix() = "_%1"
-		RenderBehavior();
-		///Copies the given behavior.
-		RenderBehavior(const Tagaro::RenderBehavior& other);
-		///Copies the given behavior.
-		Tagaro::RenderBehavior& operator=(const Tagaro::RenderBehavior& other);
-		///Destroys this Tagaro::RenderBehavior instance.
-		~RenderBehavior();
-
-		///@return the cache size in megabytes @see setCacheSize
-		int cacheSize() const;
-		///Sets the cache size in megabytes (default: 3 megabytes). This value
-		///is only used by backends which can use caches. Set to 0 megabytes to
-		///disable caching.
-		///
-		///@see Tagaro::CachedProxyRenderBackend
-		void setCacheSize(int cacheSize);
-		///@return the frame base index @see setFrameBaseIndex()
-		int frameBaseIndex() const;
-		///Sets the frame base index, i.e. the lowest frame index. Usually,
-		///frame numbering starts at zero, so the frame base index is zero.
-		///
-		///For example, if you set the frame base index to 42, and use the
-		///default frame suffix, the 3 frames of an animated sprite "foo" are
-		///provided by the SVG elements "foo_42", "foo_43" and "foo_44".
-		///
-		///It is recommended not to alter the frame base index unless you need
-		///to support legacy themes.
-		void setFrameBaseIndex(int frameBaseIndex);
-		///@return the frame suffix @see setFrameSuffix()
-		QString frameSuffix() const;
-		///Sets the frame suffix. This suffix will be added to a sprite key
-		///to create the corresponding SVG element key, after any occurrence of
-		///"%1" in the suffix has been replaced by the frame number.
-		///
-		///For example, if the frame suffix is set to "_%1" (the default), the
-		///SVG element key for the frame no. 23 of the sprite "foo" is "foo_23".
-		///@note Frame numbering starts at zero unless you setFrameBaseIndex().
-		///
-		///It is recommended not to alter the frame suffix unless you need to
-		///support legacy themes. Giving a @a suffix which does not include
-		///the pattern "%1" will reset to the default suffix "_%1".
-		void setFrameSuffix(const QString& suffix);
-	private:
-		class Private;
-		Private* const d;
-};
+class GraphicsSourceConfig;
 
 /**
- * @class Tagaro::RenderBackend renderbackend.h <Tagaro/RenderBackend>
+ * @class Tagaro::GraphicsSource graphicssource.h <Tagaro/GraphicsSource>
  *
- * A RenderBackend represents a source of graphical elements, e.g. a graphics
+ * A GraphicsSource represents a source of graphical elements, e.g. a graphics
  * file. (When we talk about "elements", we only mean renderable elements which
  * have been assigned a QString key.)
  *
- * @see Tagaro::CachedProxyRenderBackend for sources with complex internal structure
+ * @see Tagaro::CachedProxyGraphicsSource for sources with complex internal structure
  *
  * Subclasses which load graphical elements from external resources (e.g.
  * files) shall not load these resources in the constructor, but in the load()
- * method. This allows the CachedProxyRenderBackend to skip the loading when
+ * method. This allows the CachedProxyGraphicsSource to skip the loading when
  * the graphical elements or metadata are available from the cache.
  */
-class TAGARO_EXPORT RenderBackend
+class TAGARO_EXPORT GraphicsSource
 {
-	Q_DISABLE_COPY(RenderBackend)
+	Q_DISABLE_COPY(GraphicsSource)
 	public:
-		///Creates a new Tagaro::RenderBackend with the given @a behavior.
+		///Creates a new Tagaro::GraphicsSource with the given @a config.
 		///
 		///See identifier() for the meaning of the @a identifier.
-		RenderBackend(const QString& identifier, const Tagaro::RenderBehavior& behavior);
-		///Destroys this Tagaro::RenderBackend.
-		virtual ~RenderBackend();
+		GraphicsSource(const QString& identifier, const Tagaro::GraphicsSourceConfig& config);
+		///Destroys this Tagaro::GraphicsSource.
+		virtual ~GraphicsSource();
 
-		///@return this backend's rendering behavior
-		const Tagaro::RenderBehavior& behavior() const;
-		///@return the backend identifier
+		///@return this source's config
+		const Tagaro::GraphicsSourceConfig& config() const;
+		///@return the source identifier
 		///
-		///The identifier is used by CachedProxyRenderBackend to determine the
+		///The identifier is used by CachedProxyGraphicsSource to determine the
 		///cache name. It must therefore be unique among all active non-proxy
-		///RenderBackends, but it must also stay the same for each backend over
+		///GraphicsSources, but it must also stay the same for each source over
 		///multiple application runs (in order to reuse existing caches).
 		QString identifier() const;
-		///@return whether the backend's graphical sources could be loaded
+		///@return whether the source's graphical sources could be loaded
 		///successfully
 		bool isValid() const;
-		///The theme can use this hook to supply backend-specific configuration
+		///The theme can use this hook to supply source-specific configuration
 		///values. The default implementation does nothing, because the meaning
-		///of the @a configuration depends on the type of backend.
+		///of the @a configuration depends on the type of source.
 		virtual void addConfiguration(const QMap<QString, QString>& configuration);
 
 		///If graphical elements are loaded from external resources, return
 		///the UNIX timestamp of when these resources were modified last. This
-		///is used by the CachedProxyRenderBackend to invalidate its caches
+		///is used by the CachedProxyGraphicsSource to invalidate its caches
 		///when the external resources are updated.
 		///
 		///The default implementation returns 0, which is interpreted as the
@@ -138,7 +80,7 @@ class TAGARO_EXPORT RenderBackend
 		///@return the bounding rectangle of this @a element
 		///
 		///The default implementation returns QRectF(). Reimplement this method
-		///only if it is meaningful, i.e. if your rendering backend places the
+		///only if it is meaningful, i.e. if your rendering source places the
 		///single elements on a canvas.
 		virtual QRectF elementBounds(const QString& element) const;
 		///@return whether this @a element exists in the loaded file
@@ -197,21 +139,21 @@ class TAGARO_EXPORT RenderBackend
 };
 
 /**
- * @class Tagaro::CachedProxyRenderBackend renderbackend.h <Tagaro/CachedProxyRenderBackend>
+ * @class Tagaro::CachedProxyGraphicsSource graphicssource.h <Tagaro/CachedProxyGraphicsSource>
  *
- * Provides disk caching for backends with complex graphics sources.
+ * Provides disk caching for sources with complex graphics sources.
  * In-process caches are provided for element metadata, but not for images.
  */
-class TAGARO_EXPORT CachedProxyRenderBackend : public Tagaro::RenderBackend
+class TAGARO_EXPORT CachedProxyGraphicsSource : public Tagaro::GraphicsSource
 {
 	public:
-		///Creates a new Tagaro::CachedProxyRenderBackend. The given @a backend
+		///Creates a new Tagaro::CachedProxyGraphicsSource. The given @a source
 		///will be used to actually do the rendering work. The proxy takes
-		///ownership of the given @a backend.
-		explicit CachedProxyRenderBackend(Tagaro::RenderBackend* backend);
-		///Destroys this Tagaro::CachedProxyRenderBackend, and the backend
+		///ownership of the given @a source.
+		explicit CachedProxyGraphicsSource(Tagaro::GraphicsSource* source);
+		///Destroys this Tagaro::CachedProxyGraphicsSource, and the source
 		///behind it.
-		virtual ~CachedProxyRenderBackend();
+		virtual ~CachedProxyGraphicsSource();
 
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
@@ -226,4 +168,4 @@ class TAGARO_EXPORT CachedProxyRenderBackend : public Tagaro::RenderBackend
 
 } //namespace Tagaro
 
-#endif // TAGARO_RENDERBACKEND_H
+#endif // TAGARO_GRAPHICSSOURCE_H

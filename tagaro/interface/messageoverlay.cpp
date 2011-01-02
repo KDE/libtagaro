@@ -124,3 +124,5 @@ void Tagaro::MessageOverlay::timerEvent(QTimerEvent* event)
 	d->m_visible = false;
 	emit visibleChanged(false);
 }
+
+#include "messageoverlay.moc"

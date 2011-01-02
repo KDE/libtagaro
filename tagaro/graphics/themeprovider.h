@@ -19,6 +19,8 @@
 #ifndef TAGARO_THEMEPROVIDER_H
 #define TAGARO_THEMEPROVIDER_H
 
+#include "graphicssourceconfig.h"
+
 class QAbstractItemModel;
 #include <QtCore/QObject>
 
@@ -26,7 +28,6 @@ class QAbstractItemModel;
 
 namespace Tagaro {
 
-class RenderBehavior;
 class Sprite;
 class Theme;
 
@@ -53,15 +54,15 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		///Creates a new Tagaro::ThemeProvider instance.
 		///@param ownThemes whether the provider will take ownership of Theme
 		///                 instances passed to it
-		///@param behavior  the behavior of RenderBackends created by the
+		///@param config    the config of GraphicsSources created by the
 		///                 themes in this ThemeProvider
-		ThemeProvider(bool ownThemes, const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
+		explicit ThemeProvider(bool ownThemes, QObject* parent = 0, const Tagaro::GraphicsSourceConfig& config = Tagaro::GraphicsSourceConfig());
 		///Destroys this Tagaro::ThemeProvider instance.
 		virtual ~ThemeProvider();
 
-		///@return the behavior of RenderBackends created by the themes in this
+		///@return the config of GraphicsSources created by the themes in this
 		///ThemeProvider
-		const Tagaro::RenderBehavior& behavior() const;
+		const Tagaro::GraphicsSourceConfig& config() const;
 		///@return a Tagaro::Sprite instance for the given @a spriteKey
 		Tagaro::Sprite* sprite(const QString& spriteKey) const;
 
@@ -123,7 +124,7 @@ class TAGARO_EXPORT StandardThemeProvider : public Tagaro::ThemeProvider
 		///@code
 		///KGlobal::dirs()->findAllResources(ksdResource, ksdDirectory + "/*.desktop");
 		///@endcode
-		StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
+		StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory, QObject* parent = 0, const Tagaro::GraphicsSourceConfig& config = Tagaro::GraphicsSourceConfig());
 		///Destroys this Tagaro::StandardThemeProvider instance.
 		virtual ~StandardThemeProvider();
 
@@ -145,7 +146,7 @@ class TAGARO_EXPORT SimpleThemeProvider : public Tagaro::ThemeProvider
 	Q_OBJECT
 	public:
 		///Creates a new Tagaro::SimpleThemeProvider instance.
-		explicit SimpleThemeProvider(const Tagaro::RenderBehavior& behavior, QObject* parent = 0);
+		explicit SimpleThemeProvider(QObject* parent = 0, const Tagaro::GraphicsSourceConfig& config = Tagaro::GraphicsSourceConfig());
 		///Destroys this Tagaro::SimpleThemeProvider instance.
 		virtual ~SimpleThemeProvider();
 

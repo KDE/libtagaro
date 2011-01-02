@@ -16,7 +16,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "rendererclient.h"
+#include "spriteclient.h"
 #include "sprite.h"
 #include "sprite_p.h"
 
@@ -24,7 +24,7 @@
 
 //WARNING: d->m_sprite == 0 is allowed, and used actively by Tagaro::Scene.
 
-Tagaro::RendererClient::Private::Private(Tagaro::Sprite* sprite, Tagaro::RendererClient* q)
+Tagaro::SpriteClient::Private::Private(Tagaro::Sprite* sprite, Tagaro::SpriteClient* q)
 	: q(q)
 	, m_sprite(sprite)
 	, m_fetcher(0)
@@ -32,7 +32,7 @@ Tagaro::RendererClient::Private::Private(Tagaro::Sprite* sprite, Tagaro::Rendere
 {
 }
 
-Tagaro::RendererClient::RendererClient(Tagaro::Sprite* sprite)
+Tagaro::SpriteClient::SpriteClient(Tagaro::Sprite* sprite)
 	: d(new Private(sprite, this))
 {
 	if (sprite)
@@ -41,7 +41,7 @@ Tagaro::RendererClient::RendererClient(Tagaro::Sprite* sprite)
 	}
 }
 
-Tagaro::RendererClient::~RendererClient()
+Tagaro::SpriteClient::~SpriteClient()
 {
 	//This is setSprite(0), but that can't be called directly because this might
 	//call receivePixmap() which is pure virtual at this point.
@@ -56,12 +56,12 @@ Tagaro::RendererClient::~RendererClient()
 	delete d;
 }
 
-Tagaro::Sprite* Tagaro::RendererClient::sprite() const
+Tagaro::Sprite* Tagaro::SpriteClient::sprite() const
 {
 	return d->m_sprite;
 }
 
-void Tagaro::RendererClient::setSprite(Tagaro::Sprite* sprite)
+void Tagaro::SpriteClient::setSprite(Tagaro::Sprite* sprite)
 {
 	if (d->m_sprite != sprite)
 	{
@@ -91,12 +91,12 @@ void Tagaro::RendererClient::setSprite(Tagaro::Sprite* sprite)
 	}
 }
 
-int Tagaro::RendererClient::frame() const
+int Tagaro::SpriteClient::frame() const
 {
 	return d->m_frame;
 }
 
-void Tagaro::RendererClient::setFrame(int frame)
+void Tagaro::SpriteClient::setFrame(int frame)
 {
 	if (d->m_frame != frame)
 	{
@@ -108,12 +108,12 @@ void Tagaro::RendererClient::setFrame(int frame)
 	}
 }
 
-QSize Tagaro::RendererClient::renderSize() const
+QSize Tagaro::SpriteClient::renderSize() const
 {
 	return d->m_size;
 }
 
-void Tagaro::RendererClient::setRenderSize(const QSize& size)
+void Tagaro::SpriteClient::setRenderSize(const QSize& size)
 {
 	if (d->m_size != size)
 	{
@@ -138,12 +138,12 @@ void Tagaro::RendererClient::setRenderSize(const QSize& size)
 	}
 }
 
-QPixmap Tagaro::RendererClient::pixmap() const
+QPixmap Tagaro::SpriteClient::pixmap() const
 {
 	return d->m_pixmap;
 }
 
-void Tagaro::RendererClient::Private::receivePixmap(const QPixmap& pixmap)
+void Tagaro::SpriteClient::Private::receivePixmap(const QPixmap& pixmap)
 {
 	m_pixmap = pixmap;
 	q->receivePixmap(pixmap);

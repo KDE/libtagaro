@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2010 Stefan Majewsky <majewsky@gmx.net>                     *
+ *   Copyright 2010-2011 Stefan Majewsky <majewsky@gmx.net>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -17,7 +17,7 @@
  ***************************************************************************/
 
 #include "theme.h"
-#include "renderbackends.h"
+#include "graphicssources.h"
 #include "themeprovider.h"
 
 #include <QtCore/QFileInfo>
@@ -28,16 +28,15 @@
 #include <KDE/KDebug>
 #include <KDE/KStandardDirs>
 
-//TODO: share identical backends between Themes at least in the same ThemeProvider -> move backend instantiation to ThemeProvider?
-//TODO: add API to RenderBackend to read backend-specific configuration from desktop file, create image backend that uses this for sprites
+//TODO: share identical sources between Themes at least in the same ThemeProvider -> move source instantiation to ThemeProvider?
 
 //BEGIN Tagaro::Theme
 
-struct ThemeRoute
+struct ThemeMapping
 {
 	QRegExp spriteKey;
 	QString elementKey;
-	const Tagaro::RenderBackend* backend;
+	const Tagaro::GraphicsSource* source;
 };
 
 struct Tagaro::Theme::Private
@@ -49,11 +48,11 @@ struct Tagaro::Theme::Private
 	QPixmap m_preview;
 	QMap<QString, QString> m_customData;
 	//routing table
-	QHash<QByteArray, Tagaro::RenderBackend*> m_backends;
-	QList<ThemeRoute> m_routes;
+	QHash<QByteArray, Tagaro::GraphicsSource*> m_sources;
+	QList<ThemeMapping> m_mappings;
 
 	Private(const QByteArray& identifier, const Tagaro::ThemeProvider* provider) : m_identifier(identifier), m_provider(provider) {}
-	~Private() { qDeleteAll(m_backends); }
+	~Private() { qDeleteAll(m_sources); }
 };
 
 Tagaro::Theme::Theme(const QByteArray& identifier, const Tagaro::ThemeProvider* provider)
@@ -78,7 +77,7 @@ const Tagaro::ThemeProvider* Tagaro::Theme::provider() const
 
 bool Tagaro::Theme::isValid() const
 {
-	QHash<QByteArray, Tagaro::RenderBackend*>::const_iterator it1 = d->m_backends.constBegin(), it2 = d->m_backends.constEnd();
+	QHash<QByteArray, Tagaro::GraphicsSource*>::const_iterator it1 = d->m_sources.constBegin(), it2 = d->m_sources.constEnd();
 	for (; it1 != it2; ++it1)
 	{
 		if (!(it1.value() && it1.value()->isValid()))
@@ -149,15 +148,15 @@ void Tagaro::Theme::setCustomData(const QMap<QString, QString>& customData)
 	d->m_customData = customData;
 }
 
-void Tagaro::Theme::addBackend(const QByteArray& identifier_, Tagaro::RenderBackend* backend)
+void Tagaro::Theme::addSource(const QByteArray& identifier_, Tagaro::GraphicsSource* source)
 {
 	const QByteArray identifier = (identifier_ == "default") ? QByteArray() : identifier_;
-	QHash<QByteArray, Tagaro::RenderBackend*>::const_iterator it = d->m_backends.constFind(identifier);
-	if (it != d->m_backends.constEnd())
+	QHash<QByteArray, Tagaro::GraphicsSource*>::const_iterator it = d->m_sources.constFind(identifier);
+	if (it != d->m_sources.constEnd())
 	{
 		delete it.value();
 	}
-	d->m_backends.insert(identifier, backend);
+	d->m_sources.insert(identifier, source);
 }
 
 static QString resolveRelativePath(const QString& fileName, const QList<QDir>& refDirs)
@@ -182,7 +181,7 @@ static QString resolveRelativePath(const QString& fileName, const QList<QDir>& r
 	return file.absoluteFilePath();
 }
 
-void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& backendConfig)
+void Tagaro::Theme::addSource(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& sourceConfig)
 {
 	const QChar typeSymbol(':');
 	QString spec(specification), type(QLatin1String("auto"));
@@ -224,46 +223,46 @@ void Tagaro::Theme::addBackend(const QByteArray& identifier, const QString& spec
 		}
 	}
 	//resolve specifications - Add new types below here.
-	Tagaro::RenderBackend* backend;
+	Tagaro::GraphicsSource* source;
 	if (type == QLatin1String("svg"))
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
-		Tagaro::QtSvgRenderBackend* svgBackend = new Tagaro::QtSvgRenderBackend(path, d->m_provider->behavior());
-		backend = new Tagaro::CachedProxyRenderBackend(svgBackend);
+		Tagaro::QtSvgGraphicsSource* svgSource = new Tagaro::QtSvgGraphicsSource(path, d->m_provider->config());
+		source = new Tagaro::CachedProxyGraphicsSource(svgSource);
 	}
 	else if (type == QLatin1String("image"))
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
-		backend = new Tagaro::ImageRenderBackend(path, d->m_provider->behavior());
+		source = new Tagaro::ImageGraphicsSource(path, d->m_provider->config());
 	}
 	else if (type == QLatin1String("color"))
 	{
-		backend = new Tagaro::ColorRenderBackend(d->m_provider->behavior());
+		source = new Tagaro::ColorGraphicsSource(d->m_provider->config());
 	}
 	else
 	{
-		kDebug() << "Failed to create RenderBackend from specification:" << specification;
-		backend = 0;
+		kDebug() << "Failed to create GraphicsSource from specification:" << specification;
+		source = 0;
 	}
-	//add created backend to theme
-	if (backend)
+	//add created source to theme
+	if (source)
 	{
-		backend->addConfiguration(backendConfig);
+		source->addConfiguration(sourceConfig);
 	}
-	addBackend(identifier, backend);
+	addSource(identifier, source);
 }
 
-const Tagaro::RenderBackend* Tagaro::Theme::backend(const QByteArray& identifier_) const
+const Tagaro::GraphicsSource* Tagaro::Theme::source(const QByteArray& identifier_) const
 {
 	const QByteArray identifier = (identifier_ == "default") ? QByteArray() : identifier_;
-	return d->m_backends.value(identifier);
+	return d->m_sources.value(identifier);
 }
 
-void Tagaro::Theme::addRoute(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::RenderBackend* backend)
+void Tagaro::Theme::addMapping(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::GraphicsSource* source)
 {
-	Q_ASSERT(d->m_backends.contains(const_cast<Tagaro::RenderBackend*>(backend)));
-	ThemeRoute route = { spriteKey, elementKey, backend };
-	d->m_routes << route;
+	Q_ASSERT(d->m_sources.contains(const_cast<Tagaro::GraphicsSource*>(source)));
+	ThemeMapping mapping = { spriteKey, elementKey, source };
+	d->m_mappings << mapping;
 }
 
 static void resolveCaptures(QString& pattern, const QStringList& captures)
@@ -277,23 +276,23 @@ static void resolveCaptures(QString& pattern, const QStringList& captures)
 	}
 }
 
-QPair<const Tagaro::RenderBackend*, QString> Tagaro::Theme::mapSpriteKey(const QString& spriteKey) const
+QPair<const Tagaro::GraphicsSource*, QString> Tagaro::Theme::mapSpriteKey(const QString& spriteKey) const
 {
 	//check routing table
-	const int routeCount = d->m_routes.count();
-	for (int i = 0; i < routeCount; ++i)
+	const int mappingCount = d->m_mappings.count();
+	for (int i = 0; i < mappingCount; ++i)
 	{
-		const ThemeRoute& route = d->m_routes[i];
-		if (route.spriteKey.exactMatch(spriteKey))
+		const ThemeMapping& mapping = d->m_mappings[i];
+		if (mapping.spriteKey.exactMatch(spriteKey))
 		{
-			//route matches -> determine mapped element key
-			QString elementKey(route.elementKey);
-			resolveCaptures(elementKey, route.spriteKey.capturedTexts());
-			return qMakePair(route.backend, elementKey);
+			//mapping matches -> determine mapped element key
+			QString elementKey(mapping.elementKey);
+			resolveCaptures(elementKey, mapping.spriteKey.capturedTexts());
+			return qMakePair(mapping.source, elementKey);
 		}
 	}
-	//implicit default route: use default backend and unchanged sprite key
-	return qMakePair(backend(QByteArray()), spriteKey);
+	//implicit default mapping: use default source and unchanged sprite key
+	return qMakePair(source(QByteArray()), spriteKey);
 }
 
 //END Tagaro::Theme
@@ -337,12 +336,22 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 {
 	//open configuration
 	const KConfig themeConfigFile(filePath, KConfig::SimpleConfig);
-	const KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
+	//find group with theme properties
+	const char* groupName = 0;
+	if (themeConfigFile.hasGroup("Tagaro Theme"))
+	{
+		groupName = "Tagaro Theme";
+	}
+	else if (themeConfigFile.hasGroup("KGameTheme"))
+	{
+		groupName = "KGameTheme";
+	}
+	const KConfigGroup themeConfig(&themeConfigFile, groupName);
 	//read standard properties
 	const QString graphicsFile = themeConfig.readEntry("FileName", QString());
 	if (!graphicsFile.isEmpty())
 	{
-		theme->addBackend(QByteArray(), graphicsFile, m_directories, QMap<QString, QString>());
+		theme->addSource(QByteArray(), graphicsFile, m_directories, QMap<QString, QString>());
 	}
 	theme->setName(themeConfig.readEntry("Name", QString()));
 	theme->setDescription(themeConfig.readEntry("Description", QString()));
@@ -374,11 +383,11 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 		const QString sourceSpec = sourceConfig.readEntry("SourceType", QString());
 		QMap<QString, QString> sourceConfigMap = sourceConfig.entryMap();
 		sourceConfigMap.remove(QLatin1String("SourceType"));
-		theme->addBackend(sourceNameRaw, sourceSpec, m_directories, sourceConfigMap);
-		const Tagaro::RenderBackend* backend = theme->backend(sourceNameRaw);
+		theme->addSource(sourceNameRaw, sourceSpec, m_directories, sourceConfigMap);
+		const Tagaro::GraphicsSource* source = theme->source(sourceNameRaw);
 		//read mappings; each mapping is stored as two key-value pairs
-		//   N-from=SOURCEKEY
-		//   N-to=ELEMENTKEY
+		//   N-sprite=SPRITEKEY (as QRegExp)
+		//   N-element=ELEMENTKEY (with %0, %1, %2, etc. corresponding to the captured texts)
 		//where N is an integer; these integers establish a precedence (lower N
 		//are evaluated first) which cannot be done by KConfig itself because
 		//it reads the key-value pairs into a QMap whose internal order is
@@ -386,7 +395,7 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 		const KConfigGroup mappingConfig(&mappingsConfig, sourceName);
 		const QMap<QString, QString> mapData = mappingConfig.entryMap();
 		QMap<QString, QString>::const_iterator it1 = mapData.constBegin(), it2 = mapData.constEnd();
-		const QRegExp exp("([0-9]*)-from");
+		const QRegExp exp("([0-9]*)-sprite");
 		QList<int> nums;
 		for (; it1 != it2; ++it1)
 		{
@@ -398,9 +407,9 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 		qSort(nums);
 		foreach (int num, nums)
 		{
-			const QString spriteKey = mapData.value(QString::fromLatin1("%1-from").arg(num));
-			const QString elementKey = mapData.value(QString::fromLatin1("%1-to").arg(num));
-			theme->addRoute(QRegExp(spriteKey), elementKey, backend);
+			const QString spriteKey = mapData.value(QString::fromLatin1("%1-sprite").arg(num));
+			const QString elementKey = mapData.value(QString::fromLatin1("%1-element").arg(num));
+			theme->addMapping(QRegExp(spriteKey), elementKey, source);
 		}
 	}
 }

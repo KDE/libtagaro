@@ -18,7 +18,7 @@
 
 #include "themeprovider.h"
 #include "graphicsdelegate_p.h"
-#include "renderbackend.h"
+#include "graphicssource.h"
 #include "settings.h"
 #include "sprite.h"
 #include "sprite_p.h"
@@ -40,14 +40,14 @@ class Tagaro::ThemeProvider::Private : public QAbstractListModel
 	public:
 		Tagaro::ThemeProvider* q;
 		bool m_ownThemes;
-		Tagaro::RenderBehavior m_behavior;
+		Tagaro::GraphicsSourceConfig m_config;
 		QHash<QString, Tagaro::Sprite*> m_sprites;
 
 		QList<Tagaro::Theme*> m_themes;
 		QList<const Tagaro::Theme*> m_cThemes;
 		const Tagaro::Theme* m_selectedTheme;
 
-		Private(Tagaro::ThemeProvider* q, bool ownThemes, const Tagaro::RenderBehavior& behavior) : QAbstractListModel(q), q(q), m_ownThemes(ownThemes), m_behavior(behavior), m_selectedTheme(0) {}
+		Private(Tagaro::ThemeProvider* q, bool ownThemes, const Tagaro::GraphicsSourceConfig& config) : QAbstractListModel(q), q(q), m_ownThemes(ownThemes), m_config(config), m_selectedTheme(0) {}
 
 		virtual QVariant data(const QModelIndex& index, int role) const;
 		virtual Qt::ItemFlags flags(const QModelIndex& index) const;
@@ -91,9 +91,9 @@ int Tagaro::ThemeProvider::Private::rowCount(const QModelIndex& index) const
 	return index.isValid() ? 0 : m_cThemes.count();
 }
 
-Tagaro::ThemeProvider::ThemeProvider(bool ownThemes, const Tagaro::RenderBehavior& behavior, QObject* parent)
+Tagaro::ThemeProvider::ThemeProvider(bool ownThemes, QObject* parent, const Tagaro::GraphicsSourceConfig& config)
 	: QObject(parent)
-	, d(new Private(this, ownThemes, behavior))
+	, d(new Private(this, ownThemes, config))
 {
 }
 
@@ -120,8 +120,8 @@ Tagaro::Sprite* Tagaro::ThemeProvider::sprite(const QString& spriteKey) const
 	{
 		//instantiate on first use
 		sprite = new Tagaro::Sprite;
-		const QPair<const Tagaro::RenderBackend*, QString> renderElement = d->m_selectedTheme->mapSpriteKey(spriteKey);
-		sprite->d->setBackend(renderElement.first, renderElement.second);
+		const QPair<const Tagaro::GraphicsSource*, QString> renderElement = d->m_selectedTheme->mapSpriteKey(spriteKey);
+		sprite->d->setSource(renderElement.first, renderElement.second);
 	}
 	return sprite;
 }
@@ -131,9 +131,9 @@ QAbstractItemModel* Tagaro::ThemeProvider::model() const
 	return d;
 }
 
-const Tagaro::RenderBehavior& Tagaro::ThemeProvider::behavior() const
+const Tagaro::GraphicsSourceConfig& Tagaro::ThemeProvider::config() const
 {
-	return d->m_behavior;
+	return d->m_config;
 }
 
 QList<const Tagaro::Theme*> Tagaro::ThemeProvider::themes() const
@@ -176,8 +176,8 @@ void Tagaro::ThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
 		QHash<QString, Tagaro::Sprite*>::const_iterator it1 = d->m_sprites.constBegin(), it2 = d->m_sprites.constEnd();
 		for (; it1 != it2; ++it1)
 		{
-			const QPair<const Tagaro::RenderBackend*, QString> renderElement = theme->mapSpriteKey(it1.key());
-			it1.value()->d->setBackend(renderElement.first, renderElement.second);
+			const QPair<const Tagaro::GraphicsSource*, QString> renderElement = theme->mapSpriteKey(it1.key());
+			it1.value()->d->setSource(renderElement.first, renderElement.second);
 		}
 	}
 }
@@ -246,8 +246,8 @@ struct Tagaro::StandardThemeProvider::Private
 	Private(const QByteArray& configKey, Tagaro::StandardThemeProvider* parent) : m_parent(parent), m_configKey(configKey) {}
 };
 
-Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, const Tagaro::RenderBehavior& behavior, QObject* parent)
-	: Tagaro::ThemeProvider(true, behavior, parent)
+Tagaro::StandardThemeProvider::StandardThemeProvider(const QByteArray& configKey, const QByteArray& ksdResource, const QString& ksdDirectory_, QObject* parent, const Tagaro::GraphicsSourceConfig& gsConfig)
+	: Tagaro::ThemeProvider(true, parent, gsConfig)
 	, d(new Private(configKey, this))
 {
 	static const QString defaultTheme = QLatin1String("default.desktop");
@@ -308,8 +308,8 @@ struct Tagaro::SimpleThemeProvider::Private
 	QList<Tagaro::Theme*> m_themes;
 };
 
-Tagaro::SimpleThemeProvider::SimpleThemeProvider(const Tagaro::RenderBehavior& behavior, QObject* parent)
-	: Tagaro::ThemeProvider(true, behavior, parent)
+Tagaro::SimpleThemeProvider::SimpleThemeProvider(QObject* parent, const Tagaro::GraphicsSourceConfig& config)
+	: Tagaro::ThemeProvider(true, parent, config)
 	, d(new Private)
 {
 }

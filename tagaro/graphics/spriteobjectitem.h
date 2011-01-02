@@ -22,7 +22,7 @@
 #include <QtCore/QObject>
 #include <QtGui/QGraphicsItem>
 
-#include "rendererclient.h"
+#include "spriteclient.h"
 #include <libtagaro_export.h>
 
 namespace Tagaro {
@@ -47,7 +47,7 @@ namespace Tagaro {
  * To automatically adjust the render size to the physical coordinate system of
  * a QGraphicsView, insert the Tagaro::SpriteObjectItem into a Tagaro::Board.
  */
-class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::RendererClient
+class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::SpriteClient
 {
 	Q_OBJECT
 	Q_PROPERTY(int frame READ frame WRITE setFrame)

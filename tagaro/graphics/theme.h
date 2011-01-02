@@ -26,7 +26,7 @@
 
 namespace Tagaro {
 
-class RenderBackend;
+class GraphicsSource;
 class ThemeProvider;
 
 /**
@@ -84,35 +84,35 @@ class TAGARO_EXPORT Theme
 		///@see customData()
 		void setCustomData(const QMap<QString, QString>& customData);
 
-		///Adds a new @a backend to this theme. If @a identifier is empty, it
+		///Adds a new @a source to this theme. If @a identifier is empty, it
 		///is replaced by the default identifier "default".
-		void addBackend(const QByteArray& identifier, Tagaro::RenderBackend* backend);
-		///Adds a new backend to this theme by instantiating one with the given
+		void addSource(const QByteArray& identifier, Tagaro::GraphicsSource* source);
+		///Adds a new source to this theme by instantiating one with the given
 		///@a specification. Relative file paths are resolved against the
 		///reference directories in the @a refDirs parameter. If the
-		///specification is invalid, a null backend is created to indicate that
-		///the theme could not be loaded properly. The @a backendConfig is
-		///passed to Tagaro::RenderBackend::addConfiguration.
-		void addBackend(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& backendConfig);
-		///@return the backend with the given @a identifier, or 0 if no such
-		///backend exists
+		///specification is invalid, a null source is created to indicate that
+		///the theme could not be loaded properly. The @a sourceConfig is
+		///passed to Tagaro::GraphicsSource::addConfiguration.
+		void addSource(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& sourceConfig);
+		///@return the source with the given @a identifier, or 0 if no such
+		///source exists
 		///
 		///If @a identifier is empty, it is replaced by the default identifier
 		///"default".
-		const Tagaro::RenderBackend* backend(const QByteArray& identifier) const;
-		///Adds a new route to this theme's routing table.
+		const Tagaro::GraphicsSource* source(const QByteArray& identifier) const;
+		///Adds a new mapping to this theme's routing table.
 		///@param spriteKey  a regular expression matching the sprite keys
-		///                  affected by this route (the sprite key is what you
+		///                  affected by this mapping (the sprite key is what you
 		///                  give to Tagaro::Renderer::sprite())
 		///@param elementKey the element key for the graphics source (this is
-		///                  what you give to Tagaro::RenderBackend methods);
+		///                  what you give to Tagaro::GraphicsSource methods);
 		///                  the argument can contain "%0", "%1", "%2", ...
 		///                  which are replaced by the regexp's capturedTexts()
-		///@param backend    the backend which serves the matching elements
-		void addRoute(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::RenderBackend* backend);
-		///Resolve sprite keys to backends and element keys with the routing
+		///@param source    the source which serves the matching elements
+		void addMapping(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::GraphicsSource* source);
+		///Resolve sprite keys to sources and element keys with the routing
 		///table of this theme.
-		QPair<const Tagaro::RenderBackend*, QString> mapSpriteKey(const QString& spriteKey) const;
+		QPair<const Tagaro::GraphicsSource*, QString> mapSpriteKey(const QString& spriteKey) const;
 	private:
 		class Private;
 		Private* const d;

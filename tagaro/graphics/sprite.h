@@ -24,7 +24,7 @@
 
 namespace Tagaro {
 
-class RendererClient;
+class SpriteClient;
 class SpriteFetcher;
 class ThemeProvider;
 
@@ -87,7 +87,7 @@ class TAGARO_EXPORT Sprite
 		class Private;
 		Private* const d;
 
-		friend class Tagaro::RendererClient;
+		friend class Tagaro::SpriteClient;
 		friend class Tagaro::SpriteFetcher;
 		friend class Tagaro::ThemeProvider;
 		Sprite();

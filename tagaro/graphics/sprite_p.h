@@ -20,14 +20,14 @@
 #define TAGARO_SPRITE_P_H
 
 #include "sprite.h"
-#include "rendererclient.h"
+#include "spriteclient.h"
 
 #include <QtCore/QHash>
 
 namespace Tagaro {
 
-class RenderBackend;
-class RendererClient;
+class GraphicsSource;
+class SpriteClient;
 
 class SpriteFetcher : public QObject
 {
@@ -35,13 +35,13 @@ class SpriteFetcher : public QObject
 	public:
 		SpriteFetcher(const QSize& size, Tagaro::Sprite::Private* d) : d(d), m_size(size) {}
 
-		void addClient(Tagaro::RendererClient* client);
-		void removeClient(Tagaro::RendererClient* client);
-		void updateClient(Tagaro::RendererClient* client);
+		void addClient(Tagaro::SpriteClient* client);
+		void removeClient(Tagaro::SpriteClient* client);
+		void updateClient(Tagaro::SpriteClient* client);
 		void updateAllClients();
 	public Q_SLOTS:
 		//If called with a null @a image, looks in the cache for the given
-		//pixmap, or renders it synchronously on the given backend. This
+		//pixmap, or renders it synchronously on the given source. This
 		//interface is used for synchronous pixmap fetching.
 		//
 		//If @a image is not null, this image is converted and placed in the
@@ -55,37 +55,37 @@ class SpriteFetcher : public QObject
 		QSize m_size;
 
 		QHash<int, QPixmap> m_pixmapCache;
-		QList<Tagaro::RendererClient*> m_clients;
+		QList<Tagaro::SpriteClient*> m_clients;
 };
 
 struct Sprite::Private
 {
 	public:
-		void setBackend(const Tagaro::RenderBackend* backend, const QString& element);
+		void setSource(const Tagaro::GraphicsSource* source, const QString& element);
 
-		void addClient(Tagaro::RendererClient* client);
-		void removeClient(Tagaro::RendererClient* client);
+		void addClient(Tagaro::SpriteClient* client);
+		void removeClient(Tagaro::SpriteClient* client);
 		Tagaro::SpriteFetcher* fetcher(const QSize& size);
 	private:
 		friend class Tagaro::Sprite;
 		friend class Tagaro::SpriteFetcher;
 		Private();
 
-		const Tagaro::RenderBackend* m_backend;
+		const Tagaro::GraphicsSource* m_source;
 		QString m_element;
 	
 		QHash<QSize, SpriteFetcher*> m_fetchers;
-		QList<Tagaro::RendererClient*> m_clients;
+		QList<Tagaro::SpriteClient*> m_clients;
 };
 
-struct RendererClient::Private
+struct SpriteClient::Private
 {
 	public:
-		Private(Tagaro::Sprite* sprite, Tagaro::RendererClient* q);
+		Private(Tagaro::Sprite* sprite, Tagaro::SpriteClient* q);
 		void receivePixmap(const QPixmap& pixmap);
 	private:
-		friend class Tagaro::RendererClient;
-		Tagaro::RendererClient* q;
+		friend class Tagaro::SpriteClient;
+		Tagaro::SpriteClient* q;
 		Tagaro::Sprite* m_sprite;
 		QSize m_size;
 		Tagaro::SpriteFetcher* m_fetcher;

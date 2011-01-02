@@ -21,7 +21,7 @@
 
 #include <QtGui/QGraphicsPixmapItem>
 
-#include "rendererclient.h"
+#include "spriteclient.h"
 #include <libtagaro_export.h>
 
 namespace Tagaro {
@@ -36,7 +36,7 @@ class SpriteItemPrivate;
  * Tagaro::Sprite, and updates it automatically when the corresponding
  * Tagaro::ThemeProvider changes the theme.
  */
-class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::RendererClient
+class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::SpriteClient
 {
 	public:
 		///Creates a new Tagaro::SpriteItem which renders the given @a sprite.

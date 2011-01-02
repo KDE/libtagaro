@@ -16,10 +16,11 @@ set(tagaro_LIB_SRCS
 	audio/sound.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
-	graphics/renderbackend.cpp
-	graphics/renderbackends.cpp
-	graphics/rendererclient.cpp
+	graphics/graphicssource.cpp
+	graphics/graphicssources.cpp
+	graphics/graphicssourceconfig.cpp
 	graphics/sprite.cpp
+	graphics/spriteclient.cpp
 	graphics/spriteitem.cpp
 	graphics/spriteobjectitem.cpp
 	graphics/theme.cpp
@@ -57,9 +58,10 @@ DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
 
 install(FILES
 	graphics/graphicsconfigdialog.h
-	graphics/renderbackend.h
-	graphics/rendererclient.h
+	graphics/graphicssource.h
+	graphics/graphicssourceconfig.h
 	graphics/sprite.h
+	graphics/spriteclient.h
 	graphics/spriteitem.h
 	graphics/spriteobjectitem.h
 	graphics/theme.h

@@ -27,7 +27,7 @@
 #include <QtGui/QTextDocument>
 
 Tagaro::Scene::Private::Private(Tagaro::Sprite* backgroundSprite, Tagaro::Scene* parent)
-	: Tagaro::RendererClient(backgroundSprite)
+	: Tagaro::SpriteClient(backgroundSprite)
 	, m_parent(parent)
 	, m_mainView(0)
 	, m_renderSize() //constructed with invalid size (as documented)
@@ -119,7 +119,7 @@ void Tagaro::Scene::Private::_k_updateSceneRect(const QRectF& rect)
 //END scene rect stuff
 //BEGIN background brush stuff
 
-Tagaro::RendererClient* Tagaro::Scene::backgroundBrushClient() const
+Tagaro::SpriteClient* Tagaro::Scene::backgroundBrushClient() const
 {
 	return d;
 }

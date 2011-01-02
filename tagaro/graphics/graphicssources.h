@@ -16,20 +16,18 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_RENDERBACKENDS_H
-#define TAGARO_RENDERBACKENDS_H
+#ifndef TAGARO_GRAPHICSSOURCES_H
+#define TAGARO_GRAPHICSSOURCES_H
 
-#include "renderbackend.h"
-
-//TODO: document the available backends (where?)
+#include "graphicssource.h"
 
 namespace Tagaro {
 
-class QtSvgRenderBackend : public Tagaro::RenderBackend
+class QtSvgGraphicsSource : public Tagaro::GraphicsSource
 {
 	public:
-		QtSvgRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior);
-		virtual ~QtSvgRenderBackend();
+		QtSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		virtual ~QtSvgGraphicsSource();
 
 		virtual uint lastModified() const;
 		virtual QRectF elementBounds(const QString& element) const;
@@ -42,11 +40,11 @@ class QtSvgRenderBackend : public Tagaro::RenderBackend
 		Private* const d;
 };
 
-class ColorRenderBackend : public Tagaro::RenderBackend
+class ColorGraphicsSource : public Tagaro::GraphicsSource
 {
 	public:
-		ColorRenderBackend(const Tagaro::RenderBehavior& behavior);
-		virtual ~ColorRenderBackend();
+		ColorGraphicsSource(const Tagaro::GraphicsSourceConfig& config);
+		virtual ~ColorGraphicsSource();
 
 		virtual bool elementExists(const QString& element) const;
 		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
@@ -55,11 +53,11 @@ class ColorRenderBackend : public Tagaro::RenderBackend
 		Private* const d;
 };
 
-class ImageRenderBackend : public Tagaro::RenderBackend
+class ImageGraphicsSource : public Tagaro::GraphicsSource
 {
 	public:
-		ImageRenderBackend(const QString& path, const Tagaro::RenderBehavior& behavior);
-		virtual ~ImageRenderBackend();
+		ImageGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		virtual ~ImageGraphicsSource();
 
 		virtual void addConfiguration(const QMap<QString, QString>& configuration);
 		virtual bool load();
@@ -74,4 +72,4 @@ class ImageRenderBackend : public Tagaro::RenderBackend
 
 } //namespace Tagaro
 
-#endif // TAGARO_RENDERBACKENDS_H
+#endif // TAGARO_GRAPHICSSOURCES_H

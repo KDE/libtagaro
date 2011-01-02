@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_RENDERERCLIENT_H
-#define TAGARO_RENDERERCLIENT_H
+#ifndef TAGARO_SPRITECLIENT_H
+#define TAGARO_SPRITECLIENT_H
 
 #include <QtGui/QPixmap>
 
@@ -29,27 +29,25 @@ class Sprite;
 class SpriteFetcher;
 
 /**
- * @class Tagaro::RendererClient rendererclient.h <Tagaro/RendererClient>
- * @short An object that receives pixmaps from a Tagaro::Renderer.
+ * @class Tagaro::SpriteClient spriteclient.h <Tagaro/SpriteClient>
+ * @short An object that receives pixmaps from a Tagaro::Sprite.
  *
- * This class abstracts a sprite rendered by Tagaro::Renderer. Given a sprite
- * key, render size and possibly a frame index, it returns the QPixmap for this
- * sprite (frame) once it becomes available. See the Tagaro::Renderer class
- * documentation for details.
+ * This class is the asynchronous rendering interface for Tagaro::Sprite (in
+ * contrast to the synchronous Tagaro::Sprite::pixmap() method). Given a render
+ * size and possibly a frame index, it returns the QPixmap for this sprite
+ * (frame) once it becomes available. See @ref tagarographics for details.
  *
  * Subclasses have to reimplement the receivePixmap() method.
- *
- * TODO: Update documentation for Tagaro::Sprite
  */
-class TAGARO_EXPORT RendererClient
+class TAGARO_EXPORT SpriteClient
 {
 	public:
 		///Creates a new client which receives pixmaps for the given @a sprite.
 		///You may give a null pointer to @a sprite to disable pixmap fetching.
 		///The pixmap() will then be invalid.
-		RendererClient(Tagaro::Sprite* sprite);
-		///Destroys this Tagaro::RendererClient.
-		virtual ~RendererClient();
+		SpriteClient(Tagaro::Sprite* sprite);
+		///Destroys this Tagaro::SpriteClient.
+		virtual ~SpriteClient();
 
 		///@return the sprite rendered by this client
 		Tagaro::Sprite* sprite() const;
@@ -63,7 +61,7 @@ class TAGARO_EXPORT RendererClient
 		///normalized by taking the modulo of the frame count, so the following
 		///code works fine:
 		///@code
-		///    class MyClient : public Tagaro::RendererClient { ... }
+		///    class MyClient : public Tagaro::SpriteClient { ... }
 		///    MyClient client;
 		///    client.setFrame(client.frame() + 1); //cycle to next frame
 		///    client.setFrame(KRandom::random());  //choose a random frame
@@ -95,4 +93,4 @@ class TAGARO_EXPORT RendererClient
 
 } //namespace Tagaro
 
-#endif // TAGARO_RENDERERCLIENT_H
+#endif // TAGARO_SPRITECLIENT_H
