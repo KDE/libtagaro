@@ -21,6 +21,8 @@
 
 #include "graphicssource.h"
 
+//TODO: make these graphics sources available publicly
+
 namespace Tagaro {
 
 class QtSvgGraphicsSource : public Tagaro::GraphicsSource

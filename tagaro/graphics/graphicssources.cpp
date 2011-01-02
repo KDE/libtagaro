@@ -21,6 +21,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 #include <QtCore/QHash>
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtGui/QPainter>
@@ -205,7 +206,17 @@ Tagaro::ImageGraphicsSource::~ImageGraphicsSource()
 
 void Tagaro::ImageGraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
 {
-	//TODO: Tagaro::ImageGraphicsSource::addConfiguration
+	const QRegExp rx("(\\d+)x(\\d+)\\+(\\d+)\\+(\\d+)");
+	QMap<QString, QString>::const_iterator it1 = configuration.constBegin(), it2 = configuration.constEnd();
+	for (; it1 != it2; ++it1)
+	{
+		//parse location specification; format: WIDTHxHEIGHT+XOFF+YOFF
+		if (rx.exactMatch(it1.value()))
+		{
+			const QRect rect(rx.cap(3).toInt(), rx.cap(4).toInt(), rx.cap(1).toInt(), rx.cap(2).toInt());
+			d->m_elements.insert(it1.key(), rect);
+		}
+	}
 }
 
 bool Tagaro::ImageGraphicsSource::load()
@@ -232,11 +243,11 @@ QImage Tagaro::ImageGraphicsSource::elementImage(const QString& element, const Q
 {
 	Q_UNUSED(timeConstraint) //simple copying of images is not expensive (compared to setting up a renderer thread)
 	QImage image(size, QImage::Format_ARGB32_Premultiplied);
+	image.fill(QColor(Qt::transparent).rgba());
 	QHash<QString, QRect>::const_iterator it = d->m_elements.constFind(element);
 	if (it == d->m_elements.constEnd())
 	{
 		//unknown element -> return empty image
-		image.fill(QColor(Qt::transparent).rgba());
 		return image;
 	}
 	//copy the part of the image which is specified by this element

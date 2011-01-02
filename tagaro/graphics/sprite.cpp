@@ -197,7 +197,16 @@ namespace Tagaro {
 			}
 			virtual void run()
 			{
-				const QImage result = m_source->elementImage(m_element, m_size, false);
+				QImage result;
+				if (m_source)
+				{
+					result = m_source->elementImage(m_element, m_size, false);
+				}
+				else
+				{
+					result = QImage(m_size, QImage::Format_ARGB32_Premultiplied);
+					result.fill(QColor(Qt::transparent).rgba());
+				}
 				QMetaObject::invokeMethod(m_receiver, "cachePixmap",
 					Q_ARG(int, m_frame), Q_ARG(QImage, result)
 				);

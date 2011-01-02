@@ -1,0 +1,13 @@
+[Tagaro Theme]
+Name=Example theme
+Description=Example theme
+Author=John Doe
+AuthorEmail=john.doe@example.org
+
+[Sources][default]
+SourceType=image:example-imagesource.png
+item1=64x64+0+0
+item2=64x64+0+64
+item3=64x64+64+0
+item4=64x64+64+64
+background=128x128+128+0

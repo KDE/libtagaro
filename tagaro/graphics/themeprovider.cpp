@@ -210,25 +210,20 @@ void Tagaro::ThemeProvider::setThemes(const QList<Tagaro::Theme*>& themes)
 	{
 		d->m_cThemes << themes[i];
 	}
+	//announce change
+	emit themesChanged();
 	//update theme selection
-	const Tagaro::Theme* oldSelected = d->m_selectedTheme;
 	if (!d->m_selectedTheme)
 	{
 		if (d->m_themes.size() > 0)
 		{
-			d->m_selectedTheme = defaultTheme();
+			setSelectedTheme(defaultTheme());
 		}
 	}
 	else if (!d->m_cThemes.contains(d->m_selectedTheme))
 	{
 		//this also sets selection to null if d->m_themes.isEmpty()
-		d->m_selectedTheme = defaultTheme();
-	}
-	//announce changes
-	emit themesChanged();
-	if (d->m_selectedTheme != oldSelected)
-	{
-		emit selectedThemeChanged(d->m_selectedTheme);
+		setSelectedTheme(defaultTheme());
 	}
 	//cleanup
 	qDeleteAll(deleteableThemes);

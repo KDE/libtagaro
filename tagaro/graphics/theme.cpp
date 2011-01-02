@@ -306,11 +306,12 @@ struct Tagaro::StandardTheme::Private
 };
 
 Tagaro::StandardTheme::StandardTheme(const QString& filePath, const Tagaro::ThemeProvider* provider)
-	: Tagaro::Theme(QFileInfo(filePath).absolutePath().toUtf8(), provider)
+	: Tagaro::Theme(QFileInfo(filePath).absoluteFilePath().toUtf8(), provider)
 	, d(new Private)
 {
-	d->m_directories << QFileInfo(filePath).dir();
-	d->init(this, filePath);
+	QFileInfo file(filePath);
+	d->m_directories << file.dir();
+	d->init(this, file.absoluteFilePath());
 }
 
 static const QByteArray dftIdentifier(const QString& ksdDirectory, const QString& fileName)
