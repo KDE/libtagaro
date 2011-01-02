@@ -19,22 +19,21 @@
 #include "kcmtagaro.h"
 
 #include <KDE/KAboutData>
-#include <KDE/KConfigDialogManager>
-#include <KDE/KGenericFactory>
+#include <KDE/KPluginFactory>
 
 #include <Tagaro/Settings>
 #include "ui_visuals.h"
 
-typedef KGenericFactory<KCMTagaro, QWidget> KCMTagaroFactory;
-K_EXPORT_COMPONENT_FACTORY(kcmtagaro, KCMTagaroFactory("kcmtagaro"))
+K_PLUGIN_FACTORY(KCMTagaroFactory, registerPlugin<KCMTagaro>("tagaro");)
+K_EXPORT_PLUGIN(KCMTagaroFactory("kcmtagaro"))
 
 struct KCMTagaro::Private
 {
 	Ui_Visuals m_visualsUi;
 };
 
-KCMTagaro::KCMTagaro(QWidget* parent, const QStringList& args)
-	: KCModule(KCMTagaroFactory::componentData(), parent)
+KCMTagaro::KCMTagaro(QWidget* parent, const QVariantList& args)
+	: KCModule(KCMTagaroFactory::componentData(), parent, args)
 	, d(new Private)
 {
 	Q_UNUSED(args)

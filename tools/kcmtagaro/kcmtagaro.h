@@ -24,7 +24,7 @@
 class KCMTagaro : public KCModule
 {
 	public:
-		KCMTagaro(QWidget* parent, const QStringList& args);
+		KCMTagaro(QWidget* parent, const QVariantList& args);
 		virtual ~KCMTagaro();
 	private:
 		class Private;
