@@ -260,7 +260,7 @@ const Tagaro::GraphicsSource* Tagaro::Theme::source(const QByteArray& identifier
 
 void Tagaro::Theme::addMapping(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::GraphicsSource* source)
 {
-	Q_ASSERT(d->m_sources.containsValue(const_cast<Tagaro::GraphicsSource*>(source)));
+	Q_ASSERT(!d->m_sources.key(const_cast<Tagaro::GraphicsSource*>(source)).isEmpty());
 	ThemeMapping mapping = { spriteKey, elementKey, source };
 	d->m_mappings << mapping;
 }
