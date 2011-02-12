@@ -1,6 +1,7 @@
 [Tagaro Theme]
 Name=Example theme
 Name[es]=Tema de ejemplo
+Name[nl]=Voorbeeld thema
 Name[pt]=Tema de exemplo
 Name[pt_BR]=Tema de exemplo
 Name[sv]=Exempeltema
@@ -8,6 +9,7 @@ Name[uk]=Приклад теми
 Name[x-test]=xxExample themexx
 Description=Example theme
 Description[es]=Tema de ejemplo
+Description[nl]=Voorbeeld thema
 Description[pt]=Tema de exemplo
 Description[pt_BR]=Tema de exemplo
 Description[sv]=Exempeltema
