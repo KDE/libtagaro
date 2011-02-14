@@ -114,6 +114,16 @@ void Tagaro::MessageOverlay::setVisible(bool visible)
 	emit visibleChanged(visible);
 }
 
+void Tagaro::MessageOverlay::show()
+{
+	setVisible(true);
+}
+
+void Tagaro::MessageOverlay::hide()
+{
+	setVisible(false);
+}
+
 void Tagaro::MessageOverlay::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() != d->m_timer.timerId())

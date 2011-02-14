@@ -70,9 +70,9 @@ class TAGARO_EXPORT MessageOverlay : public QObject
 		///rendered
 		void setVisible(bool visible);
 		///A synonym for setVisible(true).
-		inline void show();
+		void show();
 		///A synonym for setVisible(false).
-		inline void hide();
+		void hide();
 	Q_SIGNALS:
 		void textChanged(const QString& text);
 		void visibleChanged(bool visible);
@@ -84,15 +84,5 @@ class TAGARO_EXPORT MessageOverlay : public QObject
 };
 
 } //namespace Tagaro
-
-void Tagaro::MessageOverlay::show()
-{
-	setVisible(true);
-}
-
-void Tagaro::MessageOverlay::hide()
-{
-	setVisible(false);
-}
 
 #endif // TAGARO_MESSAGEOVERLAY_H

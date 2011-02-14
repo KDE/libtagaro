@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2011 Stefan Majewsky <majewsky@gmx.net>                     *
+ *   Copyright 2010-2011 Stefan Majewsky <majewsky@gmx.net>                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -129,7 +129,7 @@ class TAGARO_EXPORT Application : public KApplication
  *          Tagaro::Application instance has been created (or after it has been
  *          destroyed).
  */
-class TAGARO_EXPORT ObjectPointer
+class TAGARO_EXPORT ObjectPointer //krazy:exclude=dpointer
 {
 	public:
 		///Creates a Tagaro::ObjectPointer instance by fetching the pointer to
@@ -137,7 +137,7 @@ class TAGARO_EXPORT ObjectPointer
 		///object with the right @a key exists in the pool, this pointer will
 		///be null.
 		///@see Tagaro::Application::object()
-		inline ObjectPointer(const QByteArray& key); //krazy:exclude=explicit
+		inline ObjectPointer(const QByteArray& key); //krazy:exclude=explicit,inline
 
 		///@return true if the pointer is not null
 		inline operator bool() const;

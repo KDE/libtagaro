@@ -75,7 +75,7 @@ class TAGARO_EXPORT Sound : public QObject
 		///expensive operation which you might want to do during application
 		///startup. However, you can reuse the same Sound instance for multiple
 		///playback events.
-		Sound(const QString& file, QObject* parent = 0);
+		explicit Sound(const QString& file, QObject* parent = 0);
 		///Destroys this Tagaro::Sound instance.
 		virtual ~Sound();
 

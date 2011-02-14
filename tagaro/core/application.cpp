@@ -64,7 +64,7 @@ void Tagaro::Application::addObject(const QByteArray& key, QObject* object)
 
 void Tagaro::Application::Private::_t_objectDestroyed(QObject* object)
 {
-	//remove all occurences of given object from object pool
+	//remove all occurrences of given object from object pool
 	QMutableHashIterator<QByteArray, QObject*> it(m_objects);
 	while (it.hasNext())
 	{
