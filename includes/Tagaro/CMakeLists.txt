@@ -1,5 +1,6 @@
 #NOTE: Use the autogen-includes.sh script to update this file.
 install(FILES
+	Application
 	AudioScene
 	Board
 	CachedProxyGraphicsSource
@@ -8,7 +9,6 @@ install(FILES
 	GraphicsSourceConfig
 	MessageOverlay
 	ObjectPointer
-	ObjectPool
 	Scene
 	Settings
 	SimpleThemeProvider

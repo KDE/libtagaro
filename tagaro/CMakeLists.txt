@@ -11,9 +11,9 @@ include_directories(
 )
 
 set(tagaro_LIB_SRCS
-	objectpool.cpp
 	audio/audioscene.cpp
 	audio/sound.cpp
+	core/application.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/graphicssource.cpp
@@ -47,7 +47,6 @@ set_target_properties(tagaro PROPERTIES
 install(TARGETS tagaro ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
-	objectpool.h
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
 
@@ -55,6 +54,10 @@ install(FILES
 	audio/audioscene.h
 	audio/sound.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
+
+install(FILES
+	core/application.h
+DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/core COMPONENT Devel)
 
 install(FILES
 	graphics/graphicsconfigdialog.h
