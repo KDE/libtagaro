@@ -24,8 +24,8 @@
 #include <Tagaro/Settings>
 #include "ui_visuals.h"
 
-K_PLUGIN_FACTORY(KCMTagaroFactory, registerPlugin<KCMTagaro>("tagaro");)
-K_EXPORT_PLUGIN(KCMTagaroFactory("kcmtagaro"))
+K_PLUGIN_FACTORY(KCMTagaroFactory, registerPlugin<KCMTagaro>();)
+K_EXPORT_PLUGIN(KCMTagaroFactory("kcmtagaro", "tagaro"))
 
 struct KCMTagaro::Private
 {
