@@ -19,6 +19,7 @@
 #ifndef TAGARO_APPLICATION_H
 #define TAGARO_APPLICATION_H
 
+class QDeclarativeEngine;
 #include <KDE/KApplication>
 
 #include <libtagaro_export.h>
@@ -52,10 +53,10 @@ class TAGARO_EXPORT Application : public KApplication
 
 		///Registers an @a object with the application under the name @a key.
 		///
-		///The application takes ownership of the @a object, though this is not
-		///reflected by setting the @a object's QObject::parent explicitly. When
-		///the application is destroyed, it cleans up all objects it knows
-		///about (in no particular order!).
+		///Empty keys are forbidden. The application takes ownership of the
+		///@a object, though this is not reflected by setting the @a object's
+		///QObject::parent explicitly. When the application is destroyed, it
+		///cleans up all objects it knows about (in no particular order!).
 		///
 		///However, it is also allowed to delete objects which are registered
 		///with the application. The latter will update is object storage
@@ -68,13 +69,31 @@ class TAGARO_EXPORT Application : public KApplication
 		///
 		///Empty keys are forbidden.
 		void addObject(const QByteArray& key, QObject* object);
+		///@overload
+		///
+		///This overload reads a QML @a file and instantiates the QObject from
+		///this declarative component. The object is instantiated in the
+		///qmlEngine() and therefore can access all
+		void addObject(const QByteArray& key, const QString& file);
 		///@return the object registered with the application under the given
 		///        @a key (or 0 if this key is not known)
 		///
-		///@see tObj() for a short-hand
+		///@see Tagaro::ObjectPointer for smart access
+		///
+		///This method also looks up objects in the root context of the
+		///application's qmlEngine(), so these objects are also visible to
+		///tObj() et. al.
 		QObject* object(const QByteArray& key) const;
 		///@return all objects registered with the application
 		QHash<QByteArray, QObject*> objects() const;
+
+		///@return the QML engine for this application
+		///
+		///The object pool of the Tagaro::Application is automatically bound
+		///to the root context of this engine. The use of this engine is
+		///recommended for the instantiation of Tagaro QML components (e.g.
+		///interface elements).
+		QDeclarativeEngine* qmlEngine() const;
 	private:
 		class Private;
 		Private* const d;
@@ -143,6 +162,10 @@ class TAGARO_EXPORT ObjectPointer //krazy:exclude=dpointer
 		inline operator bool() const;
 		///@return the pointer encapsulated by this object, qobject_casted to T*
 		template<typename T> inline operator T*() const;
+		///@return the pointer to this QObject without any casting
+		QObject* operator*() const;
+		///@return the pointer to this QObject without any casting
+		QObject* operator->() const;
 	private:
 		QObject* m_pointer;
 };
@@ -168,6 +191,16 @@ template <typename T>
 Tagaro::ObjectPointer::operator T*() const
 {
 	return qobject_cast<T*>(m_pointer);
+}
+
+QObject* Tagaro::ObjectPointer::operator*() const
+{
+	return m_pointer;
+}
+
+QObject* Tagaro::ObjectPointer::operator->() const
+{
+	return m_pointer;
 }
 
 //END implementation of Tagaro::ObjectPointer
