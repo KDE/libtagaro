@@ -19,6 +19,7 @@
 #include "instantiable.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QTimer>
 #include <KDE/KIcon>
 #include <KDE/KMessageBox>
 #include <KDE/KServiceTypeTrader>
@@ -55,7 +56,8 @@ bool TApp::Instantiable::open()
 	m_running = createInstance(m_widget);
 	if (!m_running)
 		m_widget = 0;
-	m_widget->setProperty("_t_instantiable", QVariant::fromValue(this));
+	if (m_widget)
+		m_widget->setProperty("_t_instantiable", QVariant::fromValue(this));
 	m_activated = false;
 	return m_running;
 }
@@ -144,7 +146,7 @@ bool TApp::TagaroGamePlugin::deactivateInstance(QWidget* widget)
 	return true;
 }
 
-bool TApp::TagaroGamePlugin::deleteInstance(QWidget* widget)
+bool TApp::TagaroGamePlugin::deleteInstance(QWidget*& widget)
 {
 	kDebug();
 	//TODO: when there is a Plugin class, forward call to plugin
@@ -201,7 +203,7 @@ bool TApp::XdgAppPlugin::deactivateInstance(QWidget* widget)
 	return true;
 }
 
-bool TApp::XdgAppPlugin::deleteInstance(QWidget* widget)
+bool TApp::XdgAppPlugin::deleteInstance(QWidget*& widget)
 {
 	//dummy implementation (see todo item in createInstance())
 	Q_UNUSED(widget)
@@ -245,7 +247,7 @@ TApp::GluonGameFile::GluonGameFile(const QString& projectFile)
 
 TApp::GluonGameFile::~GluonGameFile()
 {
-	delete m_project;
+	m_project->deleteLater();
 }
 
 TApp::InstantiatorFlags TApp::GluonGameFile::flags() const
@@ -288,13 +290,18 @@ bool TApp::GluonGameFile::deactivateInstance(QWidget* widget)
 	return true;
 }
 
-bool TApp::GluonGameFile::deleteInstance(QWidget* widget)
+bool TApp::GluonGameFile::deleteInstance(QWidget*& widget)
 {
-	Q_UNUSED(widget)
 	GluonEngine::Game* g = GluonEngine::Game::instance();
 	g->stopGame();
-	if (g->gameProject() == m_project)
-		g->setGameProject(0);
+	//problem: widget is rendered upon from a different thread
+	//detach it by hand from the parent and save it from deletion
+	//by the Instantiable superclass until the next few frames
+	//have been rendered
+	widget->setParent(0);
+	widget->hide();
+	QTimer::singleShot(100, widget, SLOT(deleteLater()));
+	widget = 0;
 	return true;
 }
 

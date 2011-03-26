@@ -79,7 +79,7 @@ namespace TApp
 			///Shuts down the game. Shall return true on success. For games
 			///that run in the same process, the top-level widget is given
 			///(which was returned from createInstance()).
-			virtual bool deleteInstance(QWidget* widget) = 0;
+			virtual bool deleteInstance(QWidget*& widget) = 0;
 		private:
 			bool m_running, m_activated;
 			QWidget* m_widget;
@@ -97,7 +97,7 @@ namespace TApp
 			virtual bool createInstance(QWidget*& widget);
 			virtual bool activateInstance(QWidget* widget);
 			virtual bool deactivateInstance(QWidget* widget);
-			virtual bool deleteInstance(QWidget* widget);
+			virtual bool deleteInstance(QWidget*& widget);
 		private:
 			KService::Ptr m_service;
 	};
@@ -114,7 +114,7 @@ namespace TApp
 			virtual bool createInstance(QWidget*& widget);
 			virtual bool activateInstance(QWidget* widget);
 			virtual bool deactivateInstance(QWidget* widget);
-			virtual bool deleteInstance(QWidget* widget);
+			virtual bool deleteInstance(QWidget*& widget);
 		private:
 			KService::Ptr m_service;
 	};
@@ -133,7 +133,7 @@ namespace TApp
 			virtual bool createInstance(QWidget*& widget);
 			virtual bool activateInstance(QWidget* widget);
 			virtual bool deactivateInstance(QWidget* widget);
-			virtual bool deleteInstance(QWidget* widget);
+			virtual bool deleteInstance(QWidget*& widget);
 		private:
 			GluonEngine::GameProject* m_project;
 	};
