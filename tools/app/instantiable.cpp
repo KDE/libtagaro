@@ -38,6 +38,16 @@ TApp::Instantiable::~Instantiable()
 	//NOTE: It's too late for close() because the vtable has been destroyed.
 }
 
+QWidget* TApp::Instantiable::widget() const
+{
+	return m_widget;
+}
+
+/*static*/ TApp::Instantiable* TApp::Instantiable::forWidget(QWidget* widget)
+{
+	return widget->property("_t_instantiable").value<TApp::Instantiable*>();
+}
+
 bool TApp::Instantiable::open()
 {
 	if (m_running)
@@ -45,6 +55,7 @@ bool TApp::Instantiable::open()
 	m_running = createInstance(m_widget);
 	if (!m_running)
 		m_widget = 0;
+	m_widget->setProperty("_t_instantiable", QVariant::fromValue(this));
 	m_activated = false;
 	return m_running;
 }
@@ -102,8 +113,10 @@ TApp::InstantiatorFlags TApp::TagaroGamePlugin::flags() const
 	return 0;
 }
 
+#include <KDebug>
 bool TApp::TagaroGamePlugin::createInstance(QWidget*& widget)
 {
+	kDebug();
 	QString error;
 	widget = m_service->createInstance<QWidget>(0, QVariantList(), &error);
 	if (!widget)
@@ -114,23 +127,26 @@ bool TApp::TagaroGamePlugin::createInstance(QWidget*& widget)
 
 bool TApp::TagaroGamePlugin::activateInstance(QWidget* widget)
 {
+	kDebug();
 	//TODO: when there is a manager for these widget, tell it to select the widget
 	//TODO: when there is a Plugin class, forward call to plugin
-	widget->show();
-	widget->activateWindow();
+//	widget->show();
+//	widget->activateWindow();
 	return true;
 }
 
 bool TApp::TagaroGamePlugin::deactivateInstance(QWidget* widget)
 {
+	kDebug();
 	//TODO: when there is a manager for these widget, tell it to select the widget
 	//TODO: when there is a Plugin class, forward call to plugin
-	widget->hide();
+//	widget->hide();
 	return true;
 }
 
 bool TApp::TagaroGamePlugin::deleteInstance(QWidget* widget)
 {
+	kDebug();
 	//TODO: when there is a Plugin class, forward call to plugin
 	delete widget;
 	return true;

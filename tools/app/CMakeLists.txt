@@ -2,6 +2,7 @@ set(tagaroapp_SRCS
 	applist.cpp
 	instantiable.cpp
 	main.cpp
+	mainwindow.cpp
 )
 set(tagaroapp_LIBS tagaro)
 
@@ -15,3 +16,4 @@ kde4_add_executable(tagaroapp ${tagaroapp_SRCS})
 target_link_libraries(tagaroapp ${tagaroapp_LIBS})
 
 install(TARGETS tagaroapp ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES tagaroappui.rc DESTINATION ${DATA_INSTALL_DIR}/tagaroapp)

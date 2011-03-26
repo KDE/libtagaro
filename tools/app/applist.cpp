@@ -19,17 +19,50 @@
 #include "applist.h"
 #include "instantiable.h"
 
+#include <KDE/KGlobal>
+
+//BEGIN TApp::AppListModel
+
+namespace TApp
+{
+	class AppListModel : public QStandardItemModel
+	{
+		public:
+			AppListModel();
+			virtual ~AppListModel();
+	};
+}
+
+TApp::AppListModel::AppListModel()
+{
+	TApp::TagaroGamePlugin::loadInto(this);
+#ifdef TAGAROAPP_USE_GLUON
+	TApp::GluonGameFile::loadInto(this);
+#endif
+	TApp::XdgAppPlugin::loadInto(this);
+}
+
+TApp::AppListModel::~AppListModel()
+{
+	const int count = rowCount();
+	for (int i = 0; i < count; ++i)
+	{
+		TApp::Instantiable* inst = dynamic_cast<TApp::Instantiable*>(item(i));
+		if (inst)
+			inst->close();
+	}
+}
+
+//END TApp::AppListModel
 //BEGIN TApp::AppListView
+
+K_GLOBAL_STATIC(TApp::AppListModel, g_model)
 
 TApp::AppListView::AppListView(QWidget* parent)
 	: QListView(parent)
 {
-	TApp::TagaroGamePlugin::loadInto(&m_model);
-#ifdef TAGAROAPP_USE_GLUON
-	TApp::GluonGameFile::loadInto(&m_model);
-#endif
-	TApp::XdgAppPlugin::loadInto(&m_model);
-	setModel(&m_model);
+	qRegisterMetaType<TApp::Instantiable*>();
+	setModel(g_model);
 	setViewMode(QListView::IconMode);
 	setMovement(QListView::Snap);
 	setResizeMode(QListView::Adjust);
@@ -37,23 +70,12 @@ TApp::AppListView::AppListView(QWidget* parent)
 	connect(this, SIGNAL(activated(QModelIndex)), SLOT(handleActivated(QModelIndex)));
 }
 
-TApp::AppListView::~AppListView()
-{
-	const int count = m_model.rowCount();
-	for (int i = 0; i < count; ++i)
-	{
-		TApp::Instantiable* inst = dynamic_cast<TApp::Instantiable*>(m_model.item(i));
-		if (inst)
-			inst->close();
-	}
-}
-
 void TApp::AppListView::handleActivated(const QModelIndex& index)
 {
-	QStandardItem* item = m_model.itemFromIndex(index);
+	QStandardItem* item = g_model->itemFromIndex(index);
 	TApp::Instantiable* inst = dynamic_cast<TApp::Instantiable*>(item);
 	if (inst)
-		inst->activate();
+		emit selected(inst);
 }
 
 //END TApp::AppListView

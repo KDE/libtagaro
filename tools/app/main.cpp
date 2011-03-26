@@ -16,7 +16,7 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ***************************************************************************/
 
-#include "applist.h"
+#include "mainwindow.h"
 
 #include <QtGui/QListView>
 #include <KDE/KAboutData>
@@ -26,7 +26,7 @@
 int main(int argc, char** argv)
 {
 	KAboutData about(
-		"tagaro", 0, ki18nc("App name", "Tagaro"), "0.1",
+		"tagaroapp", 0, ki18nc("App name", "Tagaro"), "0.1",
 		ki18n("KDE Games Center"),
 		KAboutData::License_GPL, ki18n("Copyright 2011 Stefan Majewsky")
 	);
@@ -35,8 +35,6 @@ int main(int argc, char** argv)
 
 	KApplication app; //TODO: KUniqueApplication (and redirect open requests to the running instance, like e.g. Konqueror can do)
 
-	TApp::AppListView view;
-	view.show();
-
+	(new TApp::MainWindow)->show();
 	return app.exec();
 }

@@ -16,26 +16,31 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ***************************************************************************/
 
-#ifndef TAPP_APPLIST_H
-#define TAPP_APPLIST_H
+#ifndef TAPP_MAINWINDOW_H
+#define TAPP_MAINWINDOW_H
 
-#include <QtGui/QListView>
-#include <QtGui/QStandardItemModel>
+class KTabWidget;
+#include <KDE/KXmlGuiWindow>
 
 namespace TApp
 {
 	class Instantiable;
 
-	class AppListView : public QListView
+	class MainWindow : public KXmlGuiWindow
 	{
 		Q_OBJECT
 		public:
-			AppListView(QWidget* parent = 0);
-		Q_SIGNALS:
-			void selected(TApp::Instantiable* game);
+			MainWindow();
+			virtual ~MainWindow();
 		private Q_SLOTS:
-			void handleActivated(const QModelIndex& index);
+			void actionNew();
+			void activate(TApp::Instantiable* game);
+			void closeTab(int index);
+		private:
+			void setupActions();
+
+			KTabWidget* m_tabWidget;
 	};
 }
 
-#endif // TAPP_APPLIST_H
+#endif // TAPP_MAINWINDOW_H
