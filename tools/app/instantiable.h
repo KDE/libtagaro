@@ -21,6 +21,10 @@
 
 #include <QtGui/QStandardItemModel>
 #include <KDE/KService>
+namespace GluonEngine
+{
+	class GameProject;
+}
 
 namespace TApp
 {
@@ -108,6 +112,26 @@ namespace TApp
 		private:
 			KService::Ptr m_service;
 	};
+
+#ifdef TAGAROAPP_USE_GLUON
+	class GluonGameFile : public TApp::Instantiable
+	{
+		public:
+			GluonGameFile(const QString& projectFile);
+			virtual ~GluonGameFile();
+			///Loads available Gluon games into the given @a model.
+			static void loadInto(QStandardItemModel* model);
+
+			virtual TApp::InstantiatorFlags flags() const;
+		protected:
+			virtual bool createInstance(QWidget*& widget);
+			virtual bool activateInstance(QWidget* widget);
+			virtual bool deactivateInstance(QWidget* widget);
+			virtual bool deleteInstance(QWidget* widget);
+		private:
+			GluonEngine::GameProject* m_project;
+	};
+#endif // TAGAROAPP_USE_GLUON
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TApp::InstantiatorFlags)

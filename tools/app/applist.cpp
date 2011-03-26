@@ -25,6 +25,9 @@ TApp::AppListView::AppListView(QWidget* parent)
 	: QListView(parent)
 {
 	TApp::TagaroGamePlugin::loadInto(&m_model);
+#ifdef TAGAROAPP_USE_GLUON
+	TApp::GluonGameFile::loadInto(&m_model);
+#endif
 	TApp::XdgAppPlugin::loadInto(&m_model);
 	setModel(&m_model);
 	setViewMode(QListView::IconMode);

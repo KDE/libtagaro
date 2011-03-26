@@ -18,6 +18,7 @@
 
 #include "instantiable.h"
 
+#include <QtCore/QDir>
 #include <KDE/KIcon>
 #include <KDE/KMessageBox>
 #include <KDE/KServiceTypeTrader>
@@ -192,3 +193,96 @@ bool TApp::XdgAppPlugin::deleteInstance(QWidget* widget)
 }
 
 //END TApp::XdgAppPlugin
+#ifdef TAGAROAPP_USE_GLUON
+//BEGIN TApp::GluonGameFile
+
+#include <gluon/core/gluon_global.h>
+#include <gluon/engine/game.h>
+#include <gluon/engine/gameproject.h>
+#include <gluon/graphics/renderwidget.h>
+
+/*static*/ void TApp::GluonGameFile::loadInto(QStandardItemModel* model)
+{
+	//find games
+	QDir dataDir(GluonCore::Global::dataDirectory() + "/gluon/games");
+	dataDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+	dataDir.setSorting(QDir::Name);
+	const QStringList gameDirs = dataDir.entryList(QStringList() << (QChar('*') + GluonEngine::projectSuffix));
+	//read project file for each game
+	foreach (const QString& gameDirName, gameDirs)
+	{
+		QDir gameDir(dataDir.absoluteFilePath(gameDirName));
+		if (!gameDir.exists(GluonEngine::projectFilename))
+			continue;
+		model->appendRow(new TApp::GluonGameFile(gameDir.absoluteFilePath(GluonEngine::projectFilename)));
+	}
+}
+
+TApp::GluonGameFile::GluonGameFile(const QString& projectFile)
+	: m_project(new GluonEngine::GameProject)
+{
+	m_project->loadFromFile(projectFile);
+	setData(m_project->name(), Qt::DisplayRole);
+	setData(m_project->description(), Qt::ToolTipRole);
+	setData(KIcon("gluon"), Qt::DecorationRole);
+}
+
+TApp::GluonGameFile::~GluonGameFile()
+{
+	delete m_project;
+}
+
+TApp::InstantiatorFlags TApp::GluonGameFile::flags() const
+{
+	return 0;
+}
+
+bool TApp::GluonGameFile::createInstance(QWidget*& widget)
+{
+	widget = new GluonGraphics::RenderWidget;
+	widget->setWindowTitle(m_project->name());
+	return true;
+}
+
+bool TApp::GluonGameFile::activateInstance(QWidget* widget)
+{
+	GluonEngine::Game* g = GluonEngine::Game::instance();
+	if (g->gameProject() == m_project)
+	{
+		g->setPause(false);
+		widget->show();
+	}
+	else
+	{
+		//changing from another game
+		g->stopGame();
+		g->setGameProject(m_project);
+		g->setCurrentScene(m_project->entryPoint());
+		widget->show();
+		//cannot call that directly because it blocks until g->stopGame()
+		QMetaObject::invokeMethod(g, "runGame", Qt::QueuedConnection);
+	}
+	return true;
+}
+
+bool TApp::GluonGameFile::deactivateInstance(QWidget* widget)
+{
+	GluonEngine::Game::instance()->setPause(true);
+	widget->hide();
+	return true;
+}
+
+bool TApp::GluonGameFile::deleteInstance(QWidget* widget)
+{
+	Q_UNUSED(widget)
+	GluonEngine::Game* g = GluonEngine::Game::instance();
+	g->stopGame();
+	if (g->gameProject() == m_project)
+		g->setGameProject(0);
+	return true;
+}
+
+//END TApp::GluonGameFile
+#endif // TAGAROAPP_USE_GLUON
+
+#include "instantiable.moc"
