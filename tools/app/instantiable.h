@@ -20,6 +20,7 @@
 #define TAPP_INSTANTIATOR_H
 
 #include <QtGui/QStandardItemModel>
+class KMainWindow;
 #include <KDE/KService>
 namespace GluonEngine
 {
@@ -33,6 +34,8 @@ namespace TApp
 		OutOfProcessInstance = 0x1
 	};
 	Q_DECLARE_FLAGS(InstantiatorFlags, InstantiatorFlag)
+
+	extern KMainWindow* mainWindow;
 
 	///Represents a game which can be launched.
 	class Instantiable : public QObject, public QStandardItem

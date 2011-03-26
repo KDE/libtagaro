@@ -17,6 +17,7 @@
 ***************************************************************************/
 
 #include "mainwindow.h"
+#include "instantiable.h"
 
 #include <QtGui/QListView>
 #include <KDE/KAboutData>
@@ -35,6 +36,7 @@ int main(int argc, char** argv)
 
 	KApplication app; //TODO: KUniqueApplication (and redirect open requests to the running instance, like e.g. Konqueror can do)
 
-	(new TApp::MainWindow)->show();
+	TApp::mainWindow = new TApp::MainWindow;
+	TApp::mainWindow->show();
 	return app.exec();
 }

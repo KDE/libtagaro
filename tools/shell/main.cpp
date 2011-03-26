@@ -17,12 +17,15 @@
 ***************************************************************************/
 
 #include <iostream>
-#include <QtGui/QMainWindow>
+#include <QtGui/QLayout>
+#include <QtGui/QStackedWidget>
 #include <KDE/KAboutData>
 #include <KDE/KApplication>
 #include <KDE/KCmdLineArgs>
 #include <KDE/KCmdLineOptions>
+#include <KDE/KMainWindow>
 #include <KDE/KServiceTypeTrader>
+#include <Tagaro/Game>
 
 int main(int argc, char** argv)
 {
@@ -44,12 +47,31 @@ int main(int argc, char** argv)
 	args->clear();
 
 	//find plugin with KServiceTypeTrader
-	QString error;
-	QWidget* game = KServiceTypeTrader::createInstanceFromQuery<QWidget>(
+	KService::Ptr service = KServiceTypeTrader::self()->query(
 		QString::fromLatin1("Tagaro/Game"),
-		QString::fromLatin1("'%1' == Library").arg(plugin),
-		0, QVariantList(), &error
-	);
+		QString::fromLatin1("'%1' == Library").arg(plugin)
+	).value(0);
+	if (!service)
+	{
+		std::cerr << "No such game available." << std::endl;
+		return 1;
+	}
+
+	//setup window (contains a QStackedWidget as a centralWidget() to avoid
+	//a double delete on the game widget)
+	KMainWindow* window = new KMainWindow;
+	QStackedWidget* stackedWidget = new QStackedWidget;
+	window->setCentralWidget(stackedWidget);
+	stackedWidget->layout()->setMargin(0);
+
+	//prepare plugin args for shell handshake
+	QVariantList gameArgs;
+	gameArgs << QVariant::fromValue<int>(1); //handshake protocol version
+	gameArgs << QVariant::fromValue<QObject*>(window);
+	gameArgs << QVariant::fromValue<QString>(service->icon());
+	//instantiate plugin
+	QString error;
+	Tagaro::Game* game = service->createInstance<Tagaro::Game>(window, gameArgs, &error);
 	if (!game)
 	{
 		std::cerr << "Could not load game. Error was: " << qPrintable(error) << std::endl;
@@ -57,9 +79,10 @@ int main(int argc, char** argv)
 	}
 
 	//show game in window
-	QMainWindow window;
-	window.setCentralWidget(game);
-	window.show();
+	stackedWidget->addWidget(game);
+	game->setActive(true);
+	game->setPaused(false);
+	window->show();
 
 	return app.exec();
 }

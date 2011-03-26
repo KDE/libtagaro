@@ -21,9 +21,13 @@
 #include <QtCore/QDir>
 #include <QtCore/QTimer>
 #include <KDE/KIcon>
+#include <KDE/KMainWindow>
 #include <KDE/KMessageBox>
 #include <KDE/KServiceTypeTrader>
 #include <KDE/KToolInvocation>
+#include <Tagaro/Game>
+
+KMainWindow* TApp::mainWindow;
 
 //BEGIN TApp::Instantiable
 
@@ -115,12 +119,16 @@ TApp::InstantiatorFlags TApp::TagaroGamePlugin::flags() const
 	return 0;
 }
 
-#include <KDebug>
 bool TApp::TagaroGamePlugin::createInstance(QWidget*& widget)
 {
-	kDebug();
+	//prepare plugin args for shell handshake
+	QVariantList gameArgs;
+	gameArgs << QVariant::fromValue<int>(1); //handshake protocol version
+	gameArgs << QVariant::fromValue<QObject*>(TApp::mainWindow);
+	gameArgs << QVariant::fromValue<QString>(m_service->icon());
+	//create instance from KService
 	QString error;
-	widget = m_service->createInstance<QWidget>(0, QVariantList(), &error);
+	widget = m_service->createInstance<Tagaro::Game>(TApp::mainWindow, gameArgs, &error);
 	if (!widget)
 		KMessageBox::detailedError(0, i18n("The game \"%1\" could not be launched.", m_service->name()), error);
 	//TODO: when there is a Plugin class, forward call to plugin (for late init)
@@ -129,26 +137,18 @@ bool TApp::TagaroGamePlugin::createInstance(QWidget*& widget)
 
 bool TApp::TagaroGamePlugin::activateInstance(QWidget* widget)
 {
-	kDebug();
-	//TODO: when there is a manager for these widget, tell it to select the widget
-	//TODO: when there is a Plugin class, forward call to plugin
-//	widget->show();
-//	widget->activateWindow();
+	qobject_cast<Tagaro::Game*>(widget)->setActive(true);
 	return true;
 }
 
 bool TApp::TagaroGamePlugin::deactivateInstance(QWidget* widget)
 {
-	kDebug();
-	//TODO: when there is a manager for these widget, tell it to select the widget
-	//TODO: when there is a Plugin class, forward call to plugin
-//	widget->hide();
+	qobject_cast<Tagaro::Game*>(widget)->setActive(false);
 	return true;
 }
 
 bool TApp::TagaroGamePlugin::deleteInstance(QWidget*& widget)
 {
-	kDebug();
 	//TODO: when there is a Plugin class, forward call to plugin
 	delete widget;
 	return true;
