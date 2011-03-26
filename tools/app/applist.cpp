@@ -25,8 +25,12 @@ TApp::AppListView::AppListView(QWidget* parent)
 	: QListView(parent)
 {
 	TApp::TagaroGamePlugin::loadInto(&m_model);
+	TApp::XdgAppPlugin::loadInto(&m_model);
 	setModel(&m_model);
 	setViewMode(QListView::IconMode);
+	setMovement(QListView::Snap);
+	setResizeMode(QListView::Adjust);
+	setGridSize(QSize(80, 80));
 	connect(this, SIGNAL(activated(QModelIndex)), SLOT(handleActivated(QModelIndex)));
 }
 

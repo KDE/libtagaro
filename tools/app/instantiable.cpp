@@ -21,6 +21,7 @@
 #include <KDE/KIcon>
 #include <KDE/KMessageBox>
 #include <KDE/KServiceTypeTrader>
+#include <KDE/KToolInvocation>
 
 //BEGIN TApp::Instantiable
 
@@ -110,3 +111,52 @@ bool TApp::TagaroGamePlugin::deleteInstance(QWidget* widget)
 }
 
 //END TApp::TagaroGamePlugin
+//BEGIN TApp::XdgAppPlugin
+
+/*static*/ void TApp::XdgAppPlugin::loadInto(QStandardItemModel* model)
+{
+	KService::List services = KServiceTypeTrader::self()->query(
+		QLatin1String("Application"),
+		QLatin1String("'Game' in Categories and exist Exec and not ('tagaroshell' ~ Exec)")
+	);
+	foreach (KService::Ptr service, services)
+		model->appendRow(new TApp::XdgAppPlugin(service));
+}
+
+TApp::XdgAppPlugin::XdgAppPlugin(KService::Ptr service)
+	: m_service(service)
+{
+	setData(service->name(), Qt::DisplayRole);
+	setData(service->genericName(), Qt::ToolTipRole);
+	setData(KIcon(service->icon()), Qt::DecorationRole);
+}
+
+TApp::InstantiatorFlags TApp::XdgAppPlugin::flags() const
+{
+	return TApp::OutOfProcessInstance;
+}
+
+bool TApp::XdgAppPlugin::createInstance(QWidget*& widget)
+{
+	//TODO: Is it possible to get a QProcess instance out of KToolInvocation
+	//      (or similar) to control the started application?
+	widget = 0;
+	KToolInvocation::startServiceByDesktopPath(m_service->entryPath());
+	return true;
+}
+
+bool TApp::XdgAppPlugin::activateInstance(QWidget* widget)
+{
+	//dummy implementation (see todo item in createInstance())
+	Q_UNUSED(widget)
+	return true;
+}
+
+bool TApp::XdgAppPlugin::deleteInstance(QWidget* widget)
+{
+	//dummy implementation (see todo item in createInstance())
+	Q_UNUSED(widget)
+	return true;
+}
+
+//END TApp::XdgAppPlugin

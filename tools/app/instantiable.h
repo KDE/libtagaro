@@ -76,6 +76,22 @@ namespace TApp
 		private:
 			KService::Ptr m_service;
 	};
+
+	class XdgAppPlugin : public TApp::Instantiable
+	{
+		public:
+			XdgAppPlugin(KService::Ptr service);
+			///Loads available XDG-compliant applications into the given @a model.
+			static void loadInto(QStandardItemModel* model);
+
+			virtual TApp::InstantiatorFlags flags() const;
+		protected:
+			virtual bool createInstance(QWidget*& widget);
+			virtual bool activateInstance(QWidget* widget);
+			virtual bool deleteInstance(QWidget* widget);
+		private:
+			KService::Ptr m_service;
+	};
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(TApp::InstantiatorFlags)
