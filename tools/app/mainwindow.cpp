@@ -32,6 +32,7 @@ TApp::MainWindow::MainWindow()
 	setupGUI(KXmlGuiWindow::StandardWindowOptions(KXmlGuiWindow::Default & ~KXmlGuiWindow::StatusBar));
 	setCentralWidget(m_tabWidget);
 	//setup tab widget
+	m_tabWidget->setDocumentMode(true);
 	m_tabWidget->setTabsClosable(true);
 	m_tabWidget->setMovable(true);
 	connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), SLOT(closeTab(int)));
@@ -65,18 +66,23 @@ void TApp::MainWindow::activate(TApp::Instantiable* game)
 		return;
 	//check if this game is already open
 	QWidget* widget = game->widget();
-	if (!widget)
-		return;
-	if (widget->parent() != m_tabWidget)
+	if (widget)
 	{
-		const QIcon icon = game->data(Qt::DecorationRole).value<QIcon>();
-		const QString title = game->data(Qt::DisplayRole).toString();
-		if (m_tabWidget->count() == 0)
-			m_tabWidget->addTab(widget, icon, title);
-		else
-			m_tabWidget->insertTab(m_tabWidget->currentIndex(), widget, icon, title);
+		//if "New game" tab is open, close it
+		if (!TApp::Instantiable::forWidget(m_tabWidget->currentWidget()))
+			delete m_tabWidget->currentWidget();
+		//display interface of game
+		if (widget->parent() != m_tabWidget)
+		{
+			const QIcon icon = game->data(Qt::DecorationRole).value<QIcon>();
+			const QString title = game->data(Qt::DisplayRole).toString();
+			if (m_tabWidget->count() == 0)
+				m_tabWidget->addTab(widget, icon, title);
+			else
+				m_tabWidget->insertTab(m_tabWidget->currentIndex() - 1, widget, icon, title);
+		}
+		m_tabWidget->setCurrentWidget(widget);
 	}
-	m_tabWidget->setCurrentWidget(widget);
 }
 
 void TApp::MainWindow::closeTab(int index)
@@ -91,7 +97,7 @@ void TApp::MainWindow::closeTab(int index)
 			actionNew();
 	}
 	//!inst -> must be a "New game" tab -> allow close unless it's the only open tab
-	else if (m_tabWidget->count() == 1)
+	else if (m_tabWidget->count() > 1)
 		delete widget;
 }
 
@@ -100,7 +106,6 @@ void TApp::MainWindow::actionNew()
 	//create new "New game" tab
 	TApp::AppListView* view = new TApp::AppListView;
 	connect(view, SIGNAL(selected(TApp::Instantiable*)), SLOT(activate(TApp::Instantiable*)));
-	connect(view, SIGNAL(selected(TApp::Instantiable*)), view, SLOT(deleteLater()));
 	m_tabWidget->addTab(view, KIcon("document-new"), i18n("Start new game"));
 	m_tabWidget->setCurrentWidget(view);
 }
