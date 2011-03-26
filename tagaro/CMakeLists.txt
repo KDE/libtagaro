@@ -76,3 +76,5 @@ install(FILES
 	interface/messageoverlay.h
 	interface/scene.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)
+
+install(FILES tagaro-game.desktop DESTINATION ${SERVICETYPES_INSTALL_DIR})
