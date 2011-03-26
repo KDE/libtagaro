@@ -41,7 +41,16 @@ namespace TApp
 			///Returns information how this Instantiable behaves.
 			virtual TApp::InstantiatorFlags flags() const = 0;
 		public Q_SLOTS:
+			///Launches the game without activating it, i.e. the game is
+			///created in a paused state.
+			bool open();
+			///Activates the game, i.e. launches it if necessary (cf. open())
+			///and unpauses it.
 			bool activate();
+			///Pauses a running game. If the game is not running, this does
+			///nothing.
+			bool deactivate();
+			///Closes the game
 			bool close();
 		protected:
 			///Launches the game. Shall return true on success. For games that
@@ -49,15 +58,20 @@ namespace TApp
 			///given.
 			virtual bool createInstance(QWidget*& widget) = 0;
 			///Activates the game. Shall return true on success. For games that
-			///run in the same process, a pointer to the created widget must be
-			///given.
+			///run in the same process, the top-level widget is given (as
+			///returned from createInstance()).
 			virtual bool activateInstance(QWidget* widget) = 0;
+			///Deactivates (pauses) the game. Shall return true on success. The
+			///game can be resumed by a consecutive activateInstance() call.
+			///For games that run in the same process, the top-level widget is
+			///given (as returned from createInstance()).
+			virtual bool deactivateInstance(QWidget* widget) = 0;
 			///Shuts down the game. Shall return true on success. For games
 			///that run in the same process, the top-level widget is given
 			///(which was returned from createInstance()).
 			virtual bool deleteInstance(QWidget* widget) = 0;
 		private:
-			bool m_running;
+			bool m_running, m_activated;
 			QWidget* m_widget;
 	};
 
@@ -72,6 +86,7 @@ namespace TApp
 		protected:
 			virtual bool createInstance(QWidget*& widget);
 			virtual bool activateInstance(QWidget* widget);
+			virtual bool deactivateInstance(QWidget* widget);
 			virtual bool deleteInstance(QWidget* widget);
 		private:
 			KService::Ptr m_service;
@@ -88,6 +103,7 @@ namespace TApp
 		protected:
 			virtual bool createInstance(QWidget*& widget);
 			virtual bool activateInstance(QWidget* widget);
+			virtual bool deactivateInstance(QWidget* widget);
 			virtual bool deleteInstance(QWidget* widget);
 		private:
 			KService::Ptr m_service;

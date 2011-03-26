@@ -27,6 +27,7 @@
 
 TApp::Instantiable::Instantiable()
 	: m_running(false)
+	, m_activated(false)
 	, m_widget(0)
 {
 }
@@ -36,21 +37,34 @@ TApp::Instantiable::~Instantiable()
 	//NOTE: It's too late for close() because the vtable has been destroyed.
 }
 
+bool TApp::Instantiable::open()
+{
+	if (m_running)
+		return true;
+	m_running = createInstance(m_widget);
+	if (!m_running)
+		m_widget = 0;
+	m_activated = false;
+	return m_running;
+}
+
 bool TApp::Instantiable::activate()
 {
 	if (!m_running)
-	{
-		m_running = createInstance(m_widget);
-		if (!m_running)
-			m_widget = 0;
-	}
-	if (m_running)
-	{
-		activateInstance(m_widget);
+		if (!open())
+			return false;
+	if (!m_activated)
+		m_activated = activateInstance(m_widget);
+	return m_activated;
+}
+
+bool TApp::Instantiable::deactivate()
+{
+	if (!m_running || !m_activated)
 		return true;
-	}
-	else
-		return false;
+	const bool success = deactivateInstance(m_widget);
+	m_activated = !success;
+	return success;
 }
 
 bool TApp::Instantiable::close()
@@ -93,19 +107,30 @@ bool TApp::TagaroGamePlugin::createInstance(QWidget*& widget)
 	widget = m_service->createInstance<QWidget>(0, QVariantList(), &error);
 	if (!widget)
 		KMessageBox::detailedError(0, i18n("The game \"%1\" could not be launched.", m_service->name()), error);
+	//TODO: when there is a Plugin class, forward call to plugin (for late init)
 	return (bool) widget;
 }
 
 bool TApp::TagaroGamePlugin::activateInstance(QWidget* widget)
 {
 	//TODO: when there is a manager for these widget, tell it to select the widget
+	//TODO: when there is a Plugin class, forward call to plugin
 	widget->show();
 	widget->activateWindow();
 	return true;
 }
 
+bool TApp::TagaroGamePlugin::deactivateInstance(QWidget* widget)
+{
+	//TODO: when there is a manager for these widget, tell it to select the widget
+	//TODO: when there is a Plugin class, forward call to plugin
+	widget->hide();
+	return true;
+}
+
 bool TApp::TagaroGamePlugin::deleteInstance(QWidget* widget)
 {
+	//TODO: when there is a Plugin class, forward call to plugin
 	delete widget;
 	return true;
 }
@@ -148,6 +173,13 @@ bool TApp::XdgAppPlugin::createInstance(QWidget*& widget)
 bool TApp::XdgAppPlugin::activateInstance(QWidget* widget)
 {
 	//dummy implementation (see todo item in createInstance())
+	Q_UNUSED(widget)
+	return true;
+}
+
+bool TApp::XdgAppPlugin::deactivateInstance(QWidget* widget)
+{
+	//does nothing by design (external processes cannot be paused)
 	Q_UNUSED(widget)
 	return true;
 }
