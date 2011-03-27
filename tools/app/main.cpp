@@ -17,6 +17,7 @@
 ***************************************************************************/
 
 #include "mainwindow.h"
+#include "mobilemainwindow.h"
 #include "instantiable.h"
 
 #include <QtGui/QListView>
@@ -34,9 +35,23 @@ int main(int argc, char** argv)
 	about.addAuthor(ki18n("Stefan Majewsky"), KLocalizedString(), "Majewsky@gmx.net", "http://majewsky.wordpress.com");
 	KCmdLineArgs::init(argc, argv, &about);
 
+	KCmdLineOptions options;
+	options.add("i").add("interface <name>", ki18n("Which interface to start; either desktop (default) or mobile"));
+	KCmdLineArgs::addCmdLineOptions(options);
+
 	KApplication app; //TODO: KUniqueApplication (and redirect open requests to the running instance, like e.g. Konqueror can do)
 
-	TApp::mainWindow = new TApp::MainWindow;
+	KCmdLineArgs* args = KCmdLineArgs::parsedArgs();
+	const QString interface = args->getOption("interface");
+	args->clear();
+
+	if (interface == QLatin1String("mobile"))
+		//mobile interface
+		TApp::mainWindow = new TApp::MobileMainWindow;
+	else
+		//default: desktop interface
+		TApp::mainWindow = new TApp::MainWindow;
+
 	TApp::mainWindow->show();
 	return app.exec();
 }

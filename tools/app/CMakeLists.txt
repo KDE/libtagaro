@@ -3,6 +3,7 @@ set(tagaroapp_SRCS
 	instantiable.cpp
 	main.cpp
 	mainwindow.cpp
+	mobilemainwindow.cpp
 )
 set(tagaroapp_LIBS tagaro)
 
