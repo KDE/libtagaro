@@ -220,6 +220,7 @@ bool TApp::XdgAppPlugin::deleteInstance(Tagaro::Game*& game)
 #include <gluon/core/gluon_global.h>
 #include <gluon/engine/game.h>
 #include <gluon/engine/gameproject.h>
+#include <gluon/input/inputmanager.h>
 #include <gluon/graphics/renderwidget.h>
 
 class GluonGame : public Tagaro::Game
@@ -248,7 +249,7 @@ GluonGame::GluonGame(GluonEngine::GameProject* project, QObject* parent, const Q
 	, m_renderer(new GluonGraphics::RenderWidget)
 {
 	connect(this, SIGNAL(pausedChanged(bool)), GluonEngine::Game::instance(), SLOT(setPause(bool)));
-	//setup widget
+	//setup game interface
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	layout->addWidget(m_renderer);
@@ -281,7 +282,13 @@ void GluonGame::activeEvent(bool active)
 			//cannot call that directly because it blocks until g->stopGame()
 			QMetaObject::invokeMethod(g, "runGame", Qt::QueuedConnection);
 		}
+		connect(g, SIGNAL(painted(int)), m_renderer, SLOT(updateGL()));
+		GluonInput::InputManager::instance()->setFilteredObject(m_renderer);
 		m_renderer->setFocus();
+	}
+	else
+	{
+		disconnect(g, 0, m_renderer, 0);
 	}
 }
 
