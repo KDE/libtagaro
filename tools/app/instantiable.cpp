@@ -221,6 +221,8 @@ bool TApp::XdgAppPlugin::deleteInstance(QWidget*& widget)
 
 /*static*/ void TApp::GluonGameFile::loadInto(QStandardItemModel* model)
 {
+	//The following needs to be done before loading game projects.
+	GluonCore::GluonObjectFactory::instance()->loadPlugins();
 	//find games
 	QDir dataDir(GluonCore::Global::dataDirectory() + "/gluon/games");
 	dataDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -268,7 +270,6 @@ bool TApp::GluonGameFile::activateInstance(QWidget* widget)
 	if (g->gameProject() == m_project)
 	{
 		g->setPause(false);
-		widget->show();
 	}
 	else
 	{
@@ -276,10 +277,10 @@ bool TApp::GluonGameFile::activateInstance(QWidget* widget)
 		g->stopGame();
 		g->setGameProject(m_project);
 		g->setCurrentScene(m_project->entryPoint());
-		widget->show();
 		//cannot call that directly because it blocks until g->stopGame()
 		QMetaObject::invokeMethod(g, "runGame", Qt::QueuedConnection);
 	}
+	widget->setFocus();
 	return true;
 }
 
