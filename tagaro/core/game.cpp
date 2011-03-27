@@ -30,12 +30,11 @@ struct Tagaro::Game::Private
 	bool m_active, m_paused;
 	//what gets passed through shell handshake
 	KMainWindow* m_mainWindow;
-	QIcon m_windowIcon;
 
-	Private(const KAboutData& aboutData, const QVariantList& args);
+	Private(Tagaro::Game* q, const KAboutData& aboutData, const QVariantList& args);
 };
 
-Tagaro::Game::Private::Private(const KAboutData& aboutData, const QVariantList& args)
+Tagaro::Game::Private::Private(Tagaro::Game* q, const KAboutData& aboutData, const QVariantList& args)
 	: m_cdata(aboutData)
 	, m_active(false)
 	, m_paused(true)
@@ -46,13 +45,14 @@ Tagaro::Game::Private::Private(const KAboutData& aboutData, const QVariantList& 
 	//read handshake message
 	m_mainWindow = qobject_cast<KMainWindow*>(args[1].value<QObject*>());
 	Q_ASSERT(m_mainWindow);
-	m_windowIcon = args[2].value<QIcon>();
+	q->setWindowIcon(args[2].value<QIcon>());
 }
 
 Tagaro::Game::Game(const KAboutData& aboutData, QObject* parent, const QVariantList& args)
-	: d(new Private(aboutData, args))
+	: d(new Private(this, aboutData, args))
 {
 	QObject::setParent(parent);
+	setCaption(QString());
 }
 
 Tagaro::Game::~Game()
@@ -89,7 +89,7 @@ void Tagaro::Game::setActive(bool active)
 	if (active)
 	{
 		KGlobal::setActiveComponent(d->m_cdata);
-		d->m_mainWindow->setWindowIcon(d->m_windowIcon);
+		d->m_mainWindow->setWindowIcon(windowIcon());
 		d->m_mainWindow->setWindowTitle(windowTitle());
 	}
 	activeEvent(active);

@@ -32,93 +32,26 @@ KMainWindow* TApp::mainWindow;
 
 //BEGIN TApp::Instantiable
 
-TApp::Instantiable::Instantiable()
-	: m_running(false)
-	, m_activated(false)
-	, m_game(0)
-{
-}
-
-TApp::Instantiable::~Instantiable()
-{
-	//NOTE: It's too late for close() because the vtable has been destroyed.
-}
-
-Tagaro::Game* TApp::Instantiable::game() const
-{
-	return m_game;
-}
-
 /*static*/ TApp::Instantiable* TApp::Instantiable::forWidget(QWidget* widget)
 {
 	return widget->property("_t_instantiable").value<TApp::Instantiable*>();
 }
 
-bool TApp::Instantiable::open()
+Tagaro::Game* TApp::Instantiable::createInstance()
 {
-	if (m_running)
-		return true;
 	//prepare plugin args for shell handshake
 	QVariantList gameArgs;
 	gameArgs << QVariant::fromValue<int>(1); //handshake protocol version
 	gameArgs << QVariant::fromValue<QObject*>(TApp::mainWindow);
 	gameArgs << QVariant::fromValue<QIcon>(data(Qt::DecorationRole).value<QIcon>());
 	//create instance
-	m_running = createInstance(m_game, TApp::mainWindow, gameArgs);
-	if (!m_running)
-		m_game = 0;
-	if (m_game)
-		m_game->setProperty("_t_instantiable", QVariant::fromValue(this));
-	m_activated = false;
-	return m_running;
-}
-
-bool TApp::Instantiable::activate()
-{
-	if (!m_running)
-		if (!open())
-			return false;
-	if (!m_activated)
-		m_activated = activateInstance(m_game);
-	return m_activated;
-}
-
-bool TApp::Instantiable::deactivate()
-{
-	if (!m_running || !m_activated)
-		return true;
-	const bool success = deactivateInstance(m_game);
-	m_activated = !success;
-	return success;
-}
-
-bool TApp::Instantiable::close()
-{
-	if (!m_running)
-		return true;
-	const bool success = deleteInstance(m_game);
-	m_running = !success;
-	if (success)
-		m_game = 0;
-	return success;
-}
-
-bool TApp::Instantiable::activateInstance(Tagaro::Game* game)
-{
-	game->setActive(true);
-	return true;
-}
-
-bool TApp::Instantiable::deactivateInstance(Tagaro::Game* game)
-{
-	game->setActive(false);
-	return true;
-}
-
-bool TApp::Instantiable::deleteInstance(Tagaro::Game*& game)
-{
-	delete game;
-	return true;
+	Tagaro::Game* game = createInstance(TApp::mainWindow, gameArgs);
+	if (game)
+	{
+		game->setProperty("_t_instantiable", QVariant::fromValue(this));
+		connect(this, SIGNAL(destroyed(QObject*)), game, SLOT(deleteLater()));
+	}
+	return game;
 }
 
 //END TApp::Instantiable
@@ -144,13 +77,13 @@ TApp::InstantiatorFlags TApp::TagaroGamePlugin::flags() const
 	return 0;
 }
 
-bool TApp::TagaroGamePlugin::createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args)
+Tagaro::Game* TApp::TagaroGamePlugin::createInstance(QObject* parent, const QVariantList& args)
 {
 	QString error;
-	game = m_service->createInstance<Tagaro::Game>(parent, args, &error);
+	Tagaro::Game* game = m_service->createInstance<Tagaro::Game>(parent, args, &error);
 	if (!game)
 		KMessageBox::detailedError(0, i18n("The game \"%1\" could not be launched.", m_service->name()), error);
-	return (bool) game;
+	return game;
 }
 
 //END TApp::TagaroGamePlugin
@@ -179,35 +112,14 @@ TApp::InstantiatorFlags TApp::XdgAppPlugin::flags() const
 	return TApp::OutOfProcessInstance;
 }
 
-bool TApp::XdgAppPlugin::createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args)
+Tagaro::Game* TApp::XdgAppPlugin::createInstance(QObject* parent, const QVariantList& args)
 {
 	Q_UNUSED(parent) Q_UNUSED(args)
 	//TODO: Is it possible to get a QProcess instance out of KToolInvocation
-	//      (or similar) to control the started application?
-	game = 0;
+	//TODO: (or similar) to control the started application? (The QProcess
+	//TODO: would then probably need to be wrapped in a custom Tagaro::Game.)
 	KToolInvocation::startServiceByDesktopPath(m_service->entryPath());
-	return true;
-}
-
-bool TApp::XdgAppPlugin::activateInstance(Tagaro::Game* game)
-{
-	//dummy implementation (see todo item in createInstance())
-	Q_UNUSED(game)
-	return true;
-}
-
-bool TApp::XdgAppPlugin::deactivateInstance(Tagaro::Game* game)
-{
-	//does nothing by design (external processes cannot be paused)
-	Q_UNUSED(game)
-	return true;
-}
-
-bool TApp::XdgAppPlugin::deleteInstance(Tagaro::Game*& game)
-{
-	//dummy implementation (see todo item in createInstance())
-	Q_UNUSED(game)
-	return true;
+	return 0;
 }
 
 //END TApp::XdgAppPlugin
@@ -322,16 +234,13 @@ TApp::InstantiatorFlags TApp::GluonGameFile::flags() const
 	return 0;
 }
 
-bool TApp::GluonGameFile::createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args)
+Tagaro::Game* TApp::GluonGameFile::createInstance(QObject* parent, const QVariantList& args)
 {
 	GluonCore::GluonObjectFactory::instance()->loadPlugins();
 	GluonEngine::GameProject* project = new GluonEngine::GameProject;
 	project->loadFromFile(m_projectFile);
-	game = new GluonGame(project, parent, args);
-	return true;
+	return new GluonGame(project, parent, args);
 }
 
 //END TApp::GluonGameFile
 #endif // TAGAROAPP_USE_GLUON
-
-#include "instantiable.moc"

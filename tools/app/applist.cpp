@@ -28,29 +28,15 @@ namespace TApp
 	class AppListModel : public QStandardItemModel
 	{
 		public:
-			AppListModel();
-			virtual ~AppListModel();
-	};
-}
-
-TApp::AppListModel::AppListModel()
-{
-	TApp::TagaroGamePlugin::loadInto(this);
+			AppListModel()
+			{
+				TApp::TagaroGamePlugin::loadInto(this);
 #ifdef TAGAROAPP_USE_GLUON
-	TApp::GluonGameFile::loadInto(this);
+				TApp::GluonGameFile::loadInto(this);
 #endif
-	TApp::XdgAppPlugin::loadInto(this);
-}
-
-TApp::AppListModel::~AppListModel()
-{
-	const int count = rowCount();
-	for (int i = 0; i < count; ++i)
-	{
-		TApp::Instantiable* inst = dynamic_cast<TApp::Instantiable*>(item(i));
-		if (inst)
-			inst->close();
-	}
+				TApp::XdgAppPlugin::loadInto(this);
+			}
+	};
 }
 
 //END TApp::AppListModel
@@ -62,6 +48,7 @@ TApp::AppListView::AppListView(QWidget* parent)
 	: QListView(parent)
 {
 	qRegisterMetaType<TApp::Instantiable*>();
+	setFrameStyle(QFrame::NoFrame);
 	setModel(g_model);
 	setViewMode(QListView::IconMode);
 	setMovement(QListView::Snap);

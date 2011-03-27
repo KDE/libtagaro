@@ -21,6 +21,10 @@
 
 class KTabWidget;
 #include <KDE/KXmlGuiWindow>
+namespace Tagaro
+{
+	class Game;
+}
 
 namespace TApp
 {
@@ -31,15 +35,18 @@ namespace TApp
 		Q_OBJECT
 		public:
 			MainWindow();
-			virtual ~MainWindow();
 		private Q_SLOTS:
 			void actionNew();
-			void activate(TApp::Instantiable* game);
+			void activate(TApp::Instantiable* inst);
 			void closeTab(int index);
+			void selectTab(int index);
 		private:
 			void setupActions();
 
 			KTabWidget* m_tabWidget;
+			Tagaro::Game* m_activeGame;
+			QString m_defaultWindowTitle;
+			QIcon m_defaultWindowIcon;
 	};
 }
 

@@ -28,6 +28,9 @@
 
 TApp::MainWindow::MainWindow()
 	: m_tabWidget(new KTabWidget)
+	, m_activeGame(0)
+	, m_defaultWindowTitle(windowTitle())
+	, m_defaultWindowIcon(windowIcon())
 {
 	setupActions();
 	setupGUI(KXmlGuiWindow::StandardWindowOptions(KXmlGuiWindow::Default & ~KXmlGuiWindow::StatusBar));
@@ -37,23 +40,9 @@ TApp::MainWindow::MainWindow()
 	m_tabWidget->setTabsClosable(true);
 	m_tabWidget->setMovable(true);
 	connect(m_tabWidget, SIGNAL(tabCloseRequested(int)), SLOT(closeTab(int)));
+	connect(m_tabWidget, SIGNAL(currentChanged(int)), SLOT(selectTab(int)));
 	//open first "New game" dialog
 	actionNew();
-}
-
-TApp::MainWindow::~MainWindow()
-{
-	//close() all loaded Instantiables properly
-	const int count = m_tabWidget->count();
-	QList<QWidget*> widgets;
-	for (int i = 0; i < count; ++i)
-		widgets << m_tabWidget->widget(i);
-	foreach (QWidget* widget, widgets)
-	{
-		TApp::Instantiable* inst = TApp::Instantiable::forWidget(widget);
-		if (inst)
-			inst->close();
-	}
 }
 
 void TApp::MainWindow::setupActions()
@@ -61,46 +50,73 @@ void TApp::MainWindow::setupActions()
 	KStandardAction::openNew(this, SLOT(actionNew()), actionCollection());
 }
 
-void TApp::MainWindow::activate(TApp::Instantiable* game)
+void TApp::MainWindow::activate(TApp::Instantiable* inst)
 {
-	if (!game->activate())
-		return;
-	//check if this game is already open
-	QWidget* widget = game->game();
-	if (widget)
+	Tagaro::Game* game = inst->createInstance();
+	if (game)
 	{
 		//if "New game" tab is open, close it
-		if (!TApp::Instantiable::forWidget(m_tabWidget->currentWidget()))
-			delete m_tabWidget->currentWidget();
-		//display interface of game
-		if (widget->parent() != m_tabWidget)
+		QWidget* currentWidget = m_tabWidget->currentWidget();
+		if (!qobject_cast<Tagaro::Game*>(currentWidget))
 		{
-			const QIcon icon = game->data(Qt::DecorationRole).value<QIcon>();
-			const QString title = game->data(Qt::DisplayRole).toString();
-			if (m_tabWidget->count() == 0)
-				m_tabWidget->addTab(widget, icon, title);
-			else
-				m_tabWidget->insertTab(m_tabWidget->currentIndex() - 1, widget, icon, title);
+			m_tabWidget->removeTab(m_tabWidget->currentIndex());
+			currentWidget->deleteLater();
 		}
-		m_tabWidget->setCurrentWidget(widget);
+		//display game interface
+		if (game->parent() != m_tabWidget)
+		{
+			const QIcon icon = game->windowIcon();
+			const QString title = game->windowTitle();
+			if (m_tabWidget->count() == 0)
+				m_tabWidget->addTab(game, icon, title);
+			else
+				m_tabWidget->insertTab(m_tabWidget->currentIndex() - 1, game, icon, title);
+			//TODO: Changes to icon/title won't propagate to the tab icon/title.
+		}
+		m_tabWidget->setCurrentWidget(game);
 	}
 }
 
 void TApp::MainWindow::closeTab(int index)
 {
 	QWidget* widget = m_tabWidget->widget(index);
-	TApp::Instantiable* inst = TApp::Instantiable::forWidget(widget);
-	if (inst)
+	if (qobject_cast<Tagaro::Game*>(widget))
 	{
-		inst->close();
+		m_tabWidget->removeTab(index);
+		widget->deleteLater();
 		//if this was the last open tab, open a "New game" tab
 		if (m_tabWidget->count() == 0)
 			actionNew();
 	}
-	//!inst -> must be a "New game" tab -> allow close unless it's the only open tab
+	//not a game -> must be a "New game" tab -> allow close unless it's the only open tab
 	else if (m_tabWidget->count() > 1)
-		delete widget;
+	{
+		m_tabWidget->removeTab(index);
+		widget->deleteLater();
+	}
 }
+
+void TApp::MainWindow::selectTab(int index)
+{
+	//determine active game
+	QWidget* widget = m_tabWidget->widget(index);
+	Tagaro::Game* game = qobject_cast<Tagaro::Game*>(widget);
+	if (m_activeGame != game)
+	{
+		if (m_activeGame)
+			m_activeGame->setActive(false);
+		m_activeGame = game;
+		if (m_activeGame)
+			m_activeGame->setActive(true);
+		else
+		{
+			//restore game-less state
+			setWindowTitle(m_defaultWindowTitle);
+			setWindowIcon(m_defaultWindowIcon);
+		}
+	}
+}
+
 
 void TApp::MainWindow::actionNew()
 {
