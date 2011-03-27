@@ -62,7 +62,7 @@ bool TApp::Instantiable::open()
 	QVariantList gameArgs;
 	gameArgs << QVariant::fromValue<int>(1); //handshake protocol version
 	gameArgs << QVariant::fromValue<QObject*>(TApp::mainWindow);
-	gameArgs << QVariant::fromValue<QString>(data(Qt::UserRole).toString());
+	gameArgs << QVariant::fromValue<QIcon>(data(Qt::DecorationRole).value<QIcon>());
 	//create instance
 	m_running = createInstance(m_game, TApp::mainWindow, gameArgs);
 	if (!m_running)
@@ -137,7 +137,6 @@ TApp::TagaroGamePlugin::TagaroGamePlugin(KService::Ptr service)
 	setData(service->name(), Qt::DisplayRole);
 	setData(service->genericName(), Qt::ToolTipRole);
 	setData(KIcon(service->icon()), Qt::DecorationRole);
-	setData(service->icon(), Qt::UserRole); //as string!
 }
 
 TApp::InstantiatorFlags TApp::TagaroGamePlugin::flags() const
@@ -173,7 +172,6 @@ TApp::XdgAppPlugin::XdgAppPlugin(KService::Ptr service)
 	setData(service->name(), Qt::DisplayRole);
 	setData(service->genericName(), Qt::ToolTipRole);
 	setData(KIcon(service->icon()), Qt::DecorationRole);
-	setData(service->icon(), Qt::UserRole); //as string!
 }
 
 TApp::InstantiatorFlags TApp::XdgAppPlugin::flags() const
@@ -317,7 +315,6 @@ TApp::GluonGameFile::GluonGameFile(const QString& projectFile)
 	setData(project.name(), Qt::DisplayRole);
 	setData(project.description(), Qt::ToolTipRole);
 	setData(KIcon("gluon"), Qt::DecorationRole);
-	setData(QLatin1String("gluon"), Qt::UserRole); //icon name as string
 }
 
 TApp::InstantiatorFlags TApp::GluonGameFile::flags() const

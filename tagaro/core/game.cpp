@@ -21,7 +21,6 @@
 #include <KDE/KAboutData>
 #include <KDE/KComponentData>
 #include <KDE/KGlobal>
-#include <KDE/KIcon>
 #include <KDE/KLocale>
 #include <KDE/KMainWindow>
 
@@ -29,10 +28,9 @@ struct Tagaro::Game::Private
 {
 	KComponentData m_cdata;
 	bool m_active, m_paused;
-	QString m_caption, m_windowTitle;
 	//what gets passed through shell handshake
 	KMainWindow* m_mainWindow;
-	KIcon m_windowIcon;
+	QIcon m_windowIcon;
 
 	Private(const KAboutData& aboutData, const QVariantList& args);
 };
@@ -48,7 +46,7 @@ Tagaro::Game::Private::Private(const KAboutData& aboutData, const QVariantList& 
 	//read handshake message
 	m_mainWindow = qobject_cast<KMainWindow*>(args[1].value<QObject*>());
 	Q_ASSERT(m_mainWindow);
-	m_windowIcon = KIcon(args[2].toString());
+	m_windowIcon = args[2].value<QIcon>();
 }
 
 Tagaro::Game::Game(const KAboutData& aboutData, QObject* parent, const QVariantList& args)
@@ -72,11 +70,6 @@ bool Tagaro::Game::isPaused() const
 	return d->m_paused;
 }
 
-QString Tagaro::Game::caption() const
-{
-	return d->m_windowTitle;
-}
-
 const KComponentData& Tagaro::Game::componentData() const
 {
 	return d->m_cdata;
@@ -97,11 +90,11 @@ void Tagaro::Game::setActive(bool active)
 	{
 		KGlobal::setActiveComponent(d->m_cdata);
 		d->m_mainWindow->setWindowIcon(d->m_windowIcon);
-		d->m_mainWindow->setWindowTitle(d->m_windowTitle);
+		d->m_mainWindow->setWindowTitle(windowTitle());
 	}
 	activeEvent(active);
 	emit activeChanged(active);
-	if (!active)
+	if (active)
 	{
 		setPaused(false);
 	}
@@ -124,16 +117,18 @@ void Tagaro::Game::setPaused(bool paused)
 
 void Tagaro::Game::setCaption(const QString& caption)
 {
-	if (d->m_caption == caption)
-	{
-		return;
-	}
-	d->m_caption = caption;
-	const QString appName = d->m_cdata.aboutData()->programName();
-	d->m_windowTitle = caption + i18nc("Document/application separator in titlebar", " – ") + appName;
+	QString s = d->m_cdata.aboutData()->programName();
+	if (!caption.isEmpty())
+		s = caption + i18nc("Document/application separator in titlebar", " – ") + s;
+	setWindowTitle(s);
+}
+
+void Tagaro::Game::setWindowTitle(const QString& windowTitle)
+{
+	QWidget::setWindowTitle(windowTitle);
 	if (d->m_active)
 	{
-		d->m_mainWindow->setWindowTitle(d->m_windowTitle);
+		d->m_mainWindow->setWindowTitle(windowTitle);
 	}
 }
 

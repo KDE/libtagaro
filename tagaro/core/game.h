@@ -50,9 +50,6 @@ namespace Tagaro
 			///@return whether this Game instance is paused
 			///@see setPaused()
 			bool isPaused() const;
-			///@return the current window title
-			///@see setCaption()
-			QString caption() const;
 			///@return the component data for this game instance
 			///
 			///Like for KParts, the componentData is guaranteed to be set as
@@ -76,6 +73,8 @@ namespace Tagaro
 			///Sets the window title. (The game's name, according to aboutData,
 			///is appended automatically.)
 			void setCaption(const QString& caption);
+			///Sets the window title.
+			void setWindowTitle(const QString& windowTitle);
 		Q_SIGNALS:
 			///@see setActive(), activeEvent()
 			void activeChanged(bool active);
