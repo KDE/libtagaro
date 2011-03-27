@@ -26,6 +26,10 @@ namespace GluonEngine
 {
 	class GameProject;
 }
+namespace Tagaro
+{
+	class Game;
+}
 
 namespace TApp
 {
@@ -52,7 +56,7 @@ namespace TApp
 
 			///Returns information how this Instantiable behaves.
 			virtual TApp::InstantiatorFlags flags() const = 0;
-			QWidget* widget() const;
+			Tagaro::Game* game() const;
 		public Q_SLOTS:
 			///Launches the game without activating it, i.e. the game is
 			///created in a paused state.
@@ -69,23 +73,23 @@ namespace TApp
 			///Launches the game. Shall return true on success. For games that
 			///run in the same process, a pointer to the created widget must be
 			///given.
-			virtual bool createInstance(QWidget*& widget) = 0;
+			virtual bool createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args) = 0;
 			///Activates the game. Shall return true on success. For games that
 			///run in the same process, the top-level widget is given (as
 			///returned from createInstance()).
-			virtual bool activateInstance(QWidget* widget) = 0;
+			virtual bool activateInstance(Tagaro::Game* game);
 			///Deactivates (pauses) the game. Shall return true on success. The
 			///game can be resumed by a consecutive activateInstance() call.
 			///For games that run in the same process, the top-level widget is
 			///given (as returned from createInstance()).
-			virtual bool deactivateInstance(QWidget* widget) = 0;
+			virtual bool deactivateInstance(Tagaro::Game* game);
 			///Shuts down the game. Shall return true on success. For games
 			///that run in the same process, the top-level widget is given
 			///(which was returned from createInstance()).
-			virtual bool deleteInstance(QWidget*& widget) = 0;
+			virtual bool deleteInstance(Tagaro::Game*& game);
 		private:
 			bool m_running, m_activated;
-			QWidget* m_widget;
+			Tagaro::Game* m_game;
 	};
 
 	class TagaroGamePlugin : public TApp::Instantiable
@@ -97,10 +101,7 @@ namespace TApp
 
 			virtual TApp::InstantiatorFlags flags() const;
 		protected:
-			virtual bool createInstance(QWidget*& widget);
-			virtual bool activateInstance(QWidget* widget);
-			virtual bool deactivateInstance(QWidget* widget);
-			virtual bool deleteInstance(QWidget*& widget);
+			virtual bool createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args);
 		private:
 			KService::Ptr m_service;
 	};
@@ -114,10 +115,10 @@ namespace TApp
 
 			virtual TApp::InstantiatorFlags flags() const;
 		protected:
-			virtual bool createInstance(QWidget*& widget);
-			virtual bool activateInstance(QWidget* widget);
-			virtual bool deactivateInstance(QWidget* widget);
-			virtual bool deleteInstance(QWidget*& widget);
+			virtual bool createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args);
+			virtual bool activateInstance(Tagaro::Game* game);
+			virtual bool deactivateInstance(Tagaro::Game* game);
+			virtual bool deleteInstance(Tagaro::Game*& game);
 		private:
 			KService::Ptr m_service;
 	};
@@ -127,18 +128,14 @@ namespace TApp
 	{
 		public:
 			GluonGameFile(const QString& projectFile);
-			virtual ~GluonGameFile();
 			///Loads available Gluon games into the given @a model.
 			static void loadInto(QStandardItemModel* model);
 
 			virtual TApp::InstantiatorFlags flags() const;
 		protected:
-			virtual bool createInstance(QWidget*& widget);
-			virtual bool activateInstance(QWidget* widget);
-			virtual bool deactivateInstance(QWidget* widget);
-			virtual bool deleteInstance(QWidget*& widget);
+			virtual bool createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args);
 		private:
-			GluonEngine::GameProject* m_project;
+			QString m_projectFile;
 	};
 #endif // TAGAROAPP_USE_GLUON
 }

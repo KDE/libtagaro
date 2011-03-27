@@ -88,12 +88,22 @@ void Tagaro::Game::setActive(bool active)
 	{
 		return;
 	}
+	if (!active)
+	{
+		setPaused(true);
+	}
 	d->m_active = active;
 	if (active)
 	{
 		KGlobal::setActiveComponent(d->m_cdata);
 		d->m_mainWindow->setWindowIcon(d->m_windowIcon);
 		d->m_mainWindow->setWindowTitle(d->m_windowTitle);
+	}
+	activeEvent(active);
+	emit activeChanged(active);
+	if (!active)
+	{
+		setPaused(false);
 	}
 }
 
@@ -125,6 +135,11 @@ void Tagaro::Game::setCaption(const QString& caption)
 	{
 		d->m_mainWindow->setWindowTitle(d->m_windowTitle);
 	}
+}
+
+void Tagaro::Game::activeEvent(bool active)
+{
+	Q_UNUSED(active) //virtual hook
 }
 
 void Tagaro::Game::pauseEvent(bool paused)

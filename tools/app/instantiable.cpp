@@ -20,6 +20,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QTimer>
+#include <KDE/KAboutData>
 #include <KDE/KIcon>
 #include <KDE/KMainWindow>
 #include <KDE/KMessageBox>
@@ -34,7 +35,7 @@ KMainWindow* TApp::mainWindow;
 TApp::Instantiable::Instantiable()
 	: m_running(false)
 	, m_activated(false)
-	, m_widget(0)
+	, m_game(0)
 {
 }
 
@@ -43,9 +44,9 @@ TApp::Instantiable::~Instantiable()
 	//NOTE: It's too late for close() because the vtable has been destroyed.
 }
 
-QWidget* TApp::Instantiable::widget() const
+Tagaro::Game* TApp::Instantiable::game() const
 {
-	return m_widget;
+	return m_game;
 }
 
 /*static*/ TApp::Instantiable* TApp::Instantiable::forWidget(QWidget* widget)
@@ -57,11 +58,17 @@ bool TApp::Instantiable::open()
 {
 	if (m_running)
 		return true;
-	m_running = createInstance(m_widget);
+	//prepare plugin args for shell handshake
+	QVariantList gameArgs;
+	gameArgs << QVariant::fromValue<int>(1); //handshake protocol version
+	gameArgs << QVariant::fromValue<QObject*>(TApp::mainWindow);
+	gameArgs << QVariant::fromValue<QString>(data(Qt::UserRole).toString());
+	//create instance
+	m_running = createInstance(m_game, TApp::mainWindow, gameArgs);
 	if (!m_running)
-		m_widget = 0;
-	if (m_widget)
-		m_widget->setProperty("_t_instantiable", QVariant::fromValue(this));
+		m_game = 0;
+	if (m_game)
+		m_game->setProperty("_t_instantiable", QVariant::fromValue(this));
 	m_activated = false;
 	return m_running;
 }
@@ -72,7 +79,7 @@ bool TApp::Instantiable::activate()
 		if (!open())
 			return false;
 	if (!m_activated)
-		m_activated = activateInstance(m_widget);
+		m_activated = activateInstance(m_game);
 	return m_activated;
 }
 
@@ -80,7 +87,7 @@ bool TApp::Instantiable::deactivate()
 {
 	if (!m_running || !m_activated)
 		return true;
-	const bool success = deactivateInstance(m_widget);
+	const bool success = deactivateInstance(m_game);
 	m_activated = !success;
 	return success;
 }
@@ -89,11 +96,29 @@ bool TApp::Instantiable::close()
 {
 	if (!m_running)
 		return true;
-	const bool success = deleteInstance(m_widget);
+	const bool success = deleteInstance(m_game);
 	m_running = !success;
 	if (success)
-		m_widget = 0;
+		m_game = 0;
 	return success;
+}
+
+bool TApp::Instantiable::activateInstance(Tagaro::Game* game)
+{
+	game->setActive(true);
+	return true;
+}
+
+bool TApp::Instantiable::deactivateInstance(Tagaro::Game* game)
+{
+	game->setActive(false);
+	return true;
+}
+
+bool TApp::Instantiable::deleteInstance(Tagaro::Game*& game)
+{
+	delete game;
+	return true;
 }
 
 //END TApp::Instantiable
@@ -112,6 +137,7 @@ TApp::TagaroGamePlugin::TagaroGamePlugin(KService::Ptr service)
 	setData(service->name(), Qt::DisplayRole);
 	setData(service->genericName(), Qt::ToolTipRole);
 	setData(KIcon(service->icon()), Qt::DecorationRole);
+	setData(service->icon(), Qt::UserRole); //as string!
 }
 
 TApp::InstantiatorFlags TApp::TagaroGamePlugin::flags() const
@@ -119,39 +145,13 @@ TApp::InstantiatorFlags TApp::TagaroGamePlugin::flags() const
 	return 0;
 }
 
-bool TApp::TagaroGamePlugin::createInstance(QWidget*& widget)
+bool TApp::TagaroGamePlugin::createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args)
 {
-	//prepare plugin args for shell handshake
-	QVariantList gameArgs;
-	gameArgs << QVariant::fromValue<int>(1); //handshake protocol version
-	gameArgs << QVariant::fromValue<QObject*>(TApp::mainWindow);
-	gameArgs << QVariant::fromValue<QString>(m_service->icon());
-	//create instance from KService
 	QString error;
-	widget = m_service->createInstance<Tagaro::Game>(TApp::mainWindow, gameArgs, &error);
-	if (!widget)
+	game = m_service->createInstance<Tagaro::Game>(parent, args, &error);
+	if (!game)
 		KMessageBox::detailedError(0, i18n("The game \"%1\" could not be launched.", m_service->name()), error);
-	//TODO: when there is a Plugin class, forward call to plugin (for late init)
-	return (bool) widget;
-}
-
-bool TApp::TagaroGamePlugin::activateInstance(QWidget* widget)
-{
-	qobject_cast<Tagaro::Game*>(widget)->setActive(true);
-	return true;
-}
-
-bool TApp::TagaroGamePlugin::deactivateInstance(QWidget* widget)
-{
-	qobject_cast<Tagaro::Game*>(widget)->setActive(false);
-	return true;
-}
-
-bool TApp::TagaroGamePlugin::deleteInstance(QWidget*& widget)
-{
-	//TODO: when there is a Plugin class, forward call to plugin
-	delete widget;
-	return true;
+	return (bool) game;
 }
 
 //END TApp::TagaroGamePlugin
@@ -173,6 +173,7 @@ TApp::XdgAppPlugin::XdgAppPlugin(KService::Ptr service)
 	setData(service->name(), Qt::DisplayRole);
 	setData(service->genericName(), Qt::ToolTipRole);
 	setData(KIcon(service->icon()), Qt::DecorationRole);
+	setData(service->icon(), Qt::UserRole); //as string!
 }
 
 TApp::InstantiatorFlags TApp::XdgAppPlugin::flags() const
@@ -180,33 +181,34 @@ TApp::InstantiatorFlags TApp::XdgAppPlugin::flags() const
 	return TApp::OutOfProcessInstance;
 }
 
-bool TApp::XdgAppPlugin::createInstance(QWidget*& widget)
+bool TApp::XdgAppPlugin::createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args)
 {
+	Q_UNUSED(parent) Q_UNUSED(args)
 	//TODO: Is it possible to get a QProcess instance out of KToolInvocation
 	//      (or similar) to control the started application?
-	widget = 0;
+	game = 0;
 	KToolInvocation::startServiceByDesktopPath(m_service->entryPath());
 	return true;
 }
 
-bool TApp::XdgAppPlugin::activateInstance(QWidget* widget)
+bool TApp::XdgAppPlugin::activateInstance(Tagaro::Game* game)
 {
 	//dummy implementation (see todo item in createInstance())
-	Q_UNUSED(widget)
+	Q_UNUSED(game)
 	return true;
 }
 
-bool TApp::XdgAppPlugin::deactivateInstance(QWidget* widget)
+bool TApp::XdgAppPlugin::deactivateInstance(Tagaro::Game* game)
 {
 	//does nothing by design (external processes cannot be paused)
-	Q_UNUSED(widget)
+	Q_UNUSED(game)
 	return true;
 }
 
-bool TApp::XdgAppPlugin::deleteInstance(QWidget*& widget)
+bool TApp::XdgAppPlugin::deleteInstance(Tagaro::Game*& game)
 {
 	//dummy implementation (see todo item in createInstance())
-	Q_UNUSED(widget)
+	Q_UNUSED(game)
 	return true;
 }
 
@@ -214,15 +216,77 @@ bool TApp::XdgAppPlugin::deleteInstance(QWidget*& widget)
 #ifdef TAGAROAPP_USE_GLUON
 //BEGIN TApp::GluonGameFile
 
+#include <QtGui/QVBoxLayout>
 #include <gluon/core/gluon_global.h>
 #include <gluon/engine/game.h>
 #include <gluon/engine/gameproject.h>
 #include <gluon/graphics/renderwidget.h>
 
+class GluonGame : public Tagaro::Game
+{
+	public:
+		GluonGame(GluonEngine::GameProject* project, QObject* parent, const QVariantList& args);
+		virtual ~GluonGame();
+	protected:
+		virtual void activeEvent(bool active);
+	private:
+		GluonEngine::GameProject* m_project;
+		GluonGraphics::RenderWidget* m_renderer;
+};
+
+static KAboutData gluonAbout(GluonEngine::GameProject* project)
+{
+	return KAboutData(
+		"gluon", 0, ki18n(qPrintable(project->name())),
+		"0.0", ki18n(qPrintable(project->description()))
+	);
+}
+
+GluonGame::GluonGame(GluonEngine::GameProject* project, QObject* parent, const QVariantList& args)
+	: Tagaro::Game(gluonAbout(project), parent, args)
+	, m_project(project)
+	, m_renderer(new GluonGraphics::RenderWidget)
+{
+	connect(this, SIGNAL(pausedChanged(bool)), GluonEngine::Game::instance(), SLOT(setPause(bool)));
+	//setup widget
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	layout->addWidget(m_renderer);
+}
+
+GluonGame::~GluonGame()
+{
+	GluonEngine::Game::instance()->stopGame();
+	//problem: m_renderer is rendered upon from a different thread
+	//detach it by hand from the parent and save it from deletion
+	//by the Instantiable superclass until the next few frames
+	//have been rendered
+	m_renderer->setParent(0);
+	m_renderer->hide();
+	QTimer::singleShot(100, m_renderer, SLOT(deleteLater()));
+	m_project->deleteLater();
+}
+
+void GluonGame::activeEvent(bool active)
+{
+	GluonEngine::Game* g = GluonEngine::Game::instance();
+	if (active)
+	{
+		if (g->gameProject() != m_project)
+		{
+			//changing from another game
+			g->stopGame();
+			g->setGameProject(m_project);
+			g->setCurrentScene(m_project->entryPoint());
+			//cannot call that directly because it blocks until g->stopGame()
+			QMetaObject::invokeMethod(g, "runGame", Qt::QueuedConnection);
+		}
+		m_renderer->setFocus();
+	}
+}
+
 /*static*/ void TApp::GluonGameFile::loadInto(QStandardItemModel* model)
 {
-	//The following needs to be done before loading game projects.
-	GluonCore::GluonObjectFactory::instance()->loadPlugins();
 	//find games
 	QDir dataDir(GluonCore::Global::dataDirectory() + "/gluon/games");
 	dataDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -239,17 +303,14 @@ bool TApp::XdgAppPlugin::deleteInstance(QWidget*& widget)
 }
 
 TApp::GluonGameFile::GluonGameFile(const QString& projectFile)
-	: m_project(new GluonEngine::GameProject)
+	: m_projectFile(projectFile)
 {
-	m_project->loadFromFile(projectFile);
-	setData(m_project->name(), Qt::DisplayRole);
-	setData(m_project->description(), Qt::ToolTipRole);
+	GluonEngine::GameProject project;
+	project.loadFromFile(projectFile);
+	setData(project.name(), Qt::DisplayRole);
+	setData(project.description(), Qt::ToolTipRole);
 	setData(KIcon("gluon"), Qt::DecorationRole);
-}
-
-TApp::GluonGameFile::~GluonGameFile()
-{
-	m_project->deleteLater();
+	setData(QLatin1String("gluon"), Qt::UserRole); //icon name as string
 }
 
 TApp::InstantiatorFlags TApp::GluonGameFile::flags() const
@@ -257,52 +318,12 @@ TApp::InstantiatorFlags TApp::GluonGameFile::flags() const
 	return 0;
 }
 
-bool TApp::GluonGameFile::createInstance(QWidget*& widget)
+bool TApp::GluonGameFile::createInstance(Tagaro::Game*& game, QObject* parent, const QVariantList& args)
 {
-	widget = new GluonGraphics::RenderWidget;
-	widget->setWindowTitle(m_project->name());
-	return true;
-}
-
-bool TApp::GluonGameFile::activateInstance(QWidget* widget)
-{
-	GluonEngine::Game* g = GluonEngine::Game::instance();
-	if (g->gameProject() == m_project)
-	{
-		g->setPause(false);
-	}
-	else
-	{
-		//changing from another game
-		g->stopGame();
-		g->setGameProject(m_project);
-		g->setCurrentScene(m_project->entryPoint());
-		//cannot call that directly because it blocks until g->stopGame()
-		QMetaObject::invokeMethod(g, "runGame", Qt::QueuedConnection);
-	}
-	widget->setFocus();
-	return true;
-}
-
-bool TApp::GluonGameFile::deactivateInstance(QWidget* widget)
-{
-	GluonEngine::Game::instance()->setPause(true);
-	widget->hide();
-	return true;
-}
-
-bool TApp::GluonGameFile::deleteInstance(QWidget*& widget)
-{
-	GluonEngine::Game* g = GluonEngine::Game::instance();
-	g->stopGame();
-	//problem: widget is rendered upon from a different thread
-	//detach it by hand from the parent and save it from deletion
-	//by the Instantiable superclass until the next few frames
-	//have been rendered
-	widget->setParent(0);
-	widget->hide();
-	QTimer::singleShot(100, widget, SLOT(deleteLater()));
-	widget = 0;
+	GluonCore::GluonObjectFactory::instance()->loadPlugins();
+	GluonEngine::GameProject* project = new GluonEngine::GameProject;
+	project->loadFromFile(m_projectFile);
+	game = new GluonGame(project, parent, args);
 	return true;
 }
 

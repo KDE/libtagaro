@@ -65,6 +65,9 @@ namespace Tagaro
 			///A Game instance is guaranteed to be active while its interface is
 			///visible to the user. While a Game is active, its componentData()
 			///is set as KGlobal::activeComponent().
+			///
+			///Implement activeEvent() or listen to activeChanged() to actually
+			///do something.
 			void setActive(bool active);
 			///Sets whether this Game instance is paused. This actually does
 			///nothing. Implement pauseEvent() or listen to pausedChanged() to
@@ -74,9 +77,15 @@ namespace Tagaro
 			///is appended automatically.)
 			void setCaption(const QString& caption);
 		Q_SIGNALS:
+			///@see setActive(), activeEvent()
+			void activeChanged(bool active);
 			///@see setPaused(), pauseEvent()
 			void pausedChanged(bool paused);
 		protected:
+			///Reimplement this to handle changes to isActive(). Alternatively,
+			///use the activeChanged() signal. The default implementation does
+			///nothing.
+			virtual void activeEvent(bool active);
 			///Reimplement this to handle changes to isPaused(). Alternatively,
 			///use the pausedChanged() signal. The default implementation does
 			///nothing.

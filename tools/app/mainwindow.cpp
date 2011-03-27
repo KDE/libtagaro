@@ -24,6 +24,7 @@
 #include <KDE/KIcon>
 #include <KDE/KStandardAction>
 #include <KDE/KTabWidget>
+#include <Tagaro/Game>
 
 TApp::MainWindow::MainWindow()
 	: m_tabWidget(new KTabWidget)
@@ -65,7 +66,7 @@ void TApp::MainWindow::activate(TApp::Instantiable* game)
 	if (!game->activate())
 		return;
 	//check if this game is already open
-	QWidget* widget = game->widget();
+	QWidget* widget = game->game();
 	if (widget)
 	{
 		//if "New game" tab is open, close it
