@@ -3,6 +3,7 @@ Type=ServiceType
 X-KDE-ServiceType=Tagaro/Game
 X-KDE-Derived=
 Comment=Game plugin for Tagaro
+Comment[es]=Complemento de juegos para Tagaro
 Comment[et]=Tagaro mänguplugin
 Comment[pt]='Plugin' de jogo para o Tagaro
 Comment[uk]=Додаток гри для Tagaro
