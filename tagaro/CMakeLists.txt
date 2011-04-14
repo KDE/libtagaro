@@ -27,11 +27,11 @@ set(tagaro_LIB_SRCS
 )
 kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
 
-kde4_add_library(tagaro SHARED ${tagaro_LIB_SRCS})
-target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QCA2_LIBRARIES} ${TAGAROAUDIO_LINKLIBS})
-target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
+kde4_add_library(tagaroprivate SHARED ${tagaro_LIB_SRCS})
+target_link_libraries(tagaroprivate ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QCA2_LIBRARIES} ${TAGAROAUDIO_LINKLIBS})
+target_link_libraries(tagaroprivate LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
 
-set_target_properties(tagaro PROPERTIES
+set_target_properties(tagaroprivate PROPERTIES
 	VERSION 0.1.0
 	SOVERSION 0
 	DEFINE_SYMBOL MAKE_TAGARO_LIB
@@ -39,35 +39,37 @@ set_target_properties(tagaro PROPERTIES
 
 #################### install ####################
 
-install(TARGETS tagaro ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS tagaroprivate ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-install(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/settings.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
+if (INSTALL_HIGHLY_UNSTABLE_TAGARO_INCLUDES)
+	install(FILES
+		${CMAKE_CURRENT_BINARY_DIR}/settings.h
+	DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
 
-install(FILES
-	audio/audioscene.h
-	audio/sound.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
+	install(FILES
+		audio/audioscene.h
+		audio/sound.h
+	DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
 
-install(FILES
-	core/application.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/core COMPONENT Devel)
+	install(FILES
+		core/application.h
+	DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/core COMPONENT Devel)
 
-install(FILES
-	graphics/graphicsconfigdialog.h
-	graphics/graphicssource.h
-	graphics/graphicssourceconfig.h
-	graphics/sprite.h
-	graphics/spriteclient.h
-	graphics/spriteitem.h
-	graphics/spriteobjectitem.h
-	graphics/theme.h
-	graphics/themeprovider.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/graphics COMPONENT Devel)
+	install(FILES
+		graphics/graphicsconfigdialog.h
+		graphics/graphicssource.h
+		graphics/graphicssourceconfig.h
+		graphics/sprite.h
+		graphics/spriteclient.h
+		graphics/spriteitem.h
+		graphics/spriteobjectitem.h
+		graphics/theme.h
+		graphics/themeprovider.h
+	DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/graphics COMPONENT Devel)
 
-install(FILES
-	interface/board.h
-	interface/messageoverlay.h
-	interface/scene.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)
+	install(FILES
+		interface/board.h
+		interface/messageoverlay.h
+		interface/scene.h
+	DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)
+endif (INSTALL_HIGHLY_UNSTABLE_TAGARO_INCLUDES)

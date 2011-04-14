@@ -35,12 +35,13 @@ include_directories(
 )
 
 add_subdirectory(tagaro)
-add_subdirectory(includes)
 
 add_subdirectory(tools)
 
-macro_optional_add_subdirectory(examples)
-
-install(FILES libtagaro_export.h DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
+if (INSTALL_HIGHLY_UNSTABLE_TAGARO_INCLUDES)
+	macro_optional_add_subdirectory(examples)
+	add_subdirectory(includes)
+	install(FILES libtagaro_export.h DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
+endif (INSTALL_HIGHLY_UNSTABLE_TAGARO_INCLUDES)
 
 macro_display_feature_log()
