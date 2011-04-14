@@ -8,23 +8,21 @@ find_package(OpenAL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SNDFILE REQUIRED sndfile)
 
-if(TAGARO_DANGEROUS_COMPAT_IFDEFS)
-	add_definitions(-DTAGARO_DANGEROUS_COMPAT_IFDEFS)
-endif(TAGARO_DANGEROUS_COMPAT_IFDEFS)
-
 add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS} ${QCA2_DEFINITIONS})
-include_directories(${QDBUS_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES} ${QCA2_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${SNDFILE_INCLUDE_DIRS})
+include_directories(${QDBUS_INCLUDE_DIRS} ${KDE4_INCLUDES} ${QCA2_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR} ${SNDFILE_INCLUDE_DIRS})
 
-# allow libtagaro-based apps in this source tree to use the uninstalled includes correctly
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/includes)
-# this one is for <tagaro/settings.h>
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+# find uninstalled Tagaro includes correctly
+include_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}          # e.g. <tagaro/graphics/themeprovider.h>
+	                                     # also <libtagaro_export.h>
+	${CMAKE_CURRENT_SOURCE_DIR}/includes # e.g. <Tagaro/ThemeProvider>
+	${CMAKE_CURRENT_BINARY_DIR}          # only <tagaro/settings.h>
+)
 
 add_subdirectory(tagaro)
 add_subdirectory(includes)
 
 add_subdirectory(tools)
-add_subdirectory(cmake)
 
 macro_optional_add_subdirectory(examples)
 

@@ -1,5 +1,5 @@
 /**
- * @mainpage libtagaro reference
+ * @mainpage libtagaroprivate reference
  *
- * @warning This library is in active development, and its API is not yet stable!
+ * @warning This is a private library which is only available inside kdegames.
  */

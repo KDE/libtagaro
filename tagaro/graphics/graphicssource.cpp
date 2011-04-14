@@ -232,9 +232,7 @@ bool Tagaro::CachedProxyGraphicsSource::load()
 	//(shift by 20 converts megabytes to bytes)
 	d->m_cache = new KImageCache(cacheName, config().cacheSize() << 20);
 	d->m_cache->setPixmapCaching(false); //see comment below this method
-#if KDE_IS_VERSION(4, 5, 80) || !defined(TAGARO_DANGEROUS_COMPAT_IFDEFS)
 	if (d->m_cache->timestamp() < d->m_source->lastModified())
-#endif //This line is disabled on 4.5 if the above definition is given to "cmake -D". KImageCache::timestamp is not available on 4.5, but some need to build Tagaro (in order to get other parts). Adding the definition is considered dangerous because cache reuse will not work, but it's better than not building libtagaro at all. TODO: remove when not needed anymore (see also toplevel CMakeLists.txt)
 	{
 		d->m_cache->clear();
 		kDebug() << "Theme newer than cache, checking graphics file immediately";
