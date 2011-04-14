@@ -14,7 +14,6 @@ set(tagaro_LIB_SRCS
 	audio/audioscene.cpp
 	audio/sound.cpp
 	core/application.cpp
-	core/game.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/graphicssource.cpp
@@ -58,7 +57,6 @@ DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
 
 install(FILES
 	core/application.h
-	core/game.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/core COMPONENT Devel)
 
 install(FILES
@@ -78,5 +76,3 @@ install(FILES
 	interface/messageoverlay.h
 	interface/scene.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)
-
-install(FILES tagaro-game.desktop DESTINATION ${SERVICETYPES_INSTALL_DIR})

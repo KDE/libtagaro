@@ -4,7 +4,6 @@ install(FILES
 	AudioScene
 	Board
 	CachedProxyGraphicsSource
-	Game
 	GraphicsConfigDialog
 	GraphicsSource
 	GraphicsSourceConfig

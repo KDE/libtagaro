@@ -8,9 +8,6 @@ find_package(OpenAL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SNDFILE REQUIRED sndfile)
 
-macro_optional_find_package(Gluon)
-macro_log_feature(GLUON_FOUND "Gluon" "KDE Game Development Framework" "http://gluon.gamingfreedom.org/" FALSE "" "Needed to run Gluon games in Tagaro.")
-
 if(TAGARO_DANGEROUS_COMPAT_IFDEFS)
 	add_definitions(-DTAGARO_DANGEROUS_COMPAT_IFDEFS)
 endif(TAGARO_DANGEROUS_COMPAT_IFDEFS)
