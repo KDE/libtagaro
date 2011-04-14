@@ -17,7 +17,7 @@
  ***************************************************************************/
 
 #include "board.h"
-#include "spriteobjectitem.h"
+#include "../graphics/spriteobjectitem.h"
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimerEvent>

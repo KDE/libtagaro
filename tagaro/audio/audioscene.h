@@ -37,6 +37,11 @@ namespace Tagaro {
  * direction.
  *
  * Because there can only be one listener, all methods in this class are static.
+ *
+ * @warning Not all functionally exposed by the API of this class is guaranteed
+ *          to be available on the compiled TagaroAudio backend. If a property
+ *          is not supported, the getter will return a sensible default value
+ *          and the setter will do nothing except for warning via kDebug().
  */
 class TAGARO_EXPORT AudioScene
 {

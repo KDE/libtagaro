@@ -5,14 +5,9 @@ kde4_no_enable_final(libtagaro)
 
 #################### compile ####################
 
-include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/graphics
-)
-
 set(tagaro_LIB_SRCS
-	audio/audioscene.cpp
-	audio/sound.cpp
+	audio/audioscene-${TAGAROAUDIO_BACKEND}.cpp
+	audio/sound-${TAGAROAUDIO_BACKEND}.cpp
 	core/application.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
@@ -33,7 +28,7 @@ set(tagaro_LIB_SRCS
 kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
 
 kde4_add_library(tagaro SHARED ${tagaro_LIB_SRCS})
-target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QCA2_LIBRARIES} ${OPENAL_LIBRARY} ${SNDFILE_LIBRARIES})
+target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QCA2_LIBRARIES} ${TAGAROAUDIO_LINKLIBS})
 target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
 
 set_target_properties(tagaro PROPERTIES
