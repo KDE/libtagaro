@@ -24,12 +24,12 @@ fi
 		find $HEADER_DIR/ -name \*.h -a \! -name \*_p.h | xargs grep "namespace $NAMESPACE" -l | while read HEADERFILE; do
 			grep "class $EXPORT_MACRO" $HEADERFILE | sed "s/^.*$EXPORT_MACRO \\([^ ]*\\).*$/\\1/" | while read CLASSNAME; do
 				echo '#include <'$HEADERFILE'>' > $INCLUDE_DIR/$CLASSNAME
-				echo -en "\t"; echo "$CLASSNAME"
+                                echo -e "\t${CLASSNAME}"
 			done
 		done
 		for MANUAL_HEADER in $MANUAL_HEADERS; do
 			if [ -n $MANUAL_HEADER ]; then
-				echo -en "\t"; echo $MANUAL_HEADER
+                                echo -e "\t${MANUAL_HEADER}"
 			fi
 		done
 	) | sort
