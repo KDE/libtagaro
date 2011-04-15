@@ -21,8 +21,8 @@ fi
 	echo "#NOTE: Use the $(basename $0) script to update this file."
 	echo 'install(FILES'
 	(
-		find $HEADER_DIR/ -name \*.h -a \! -name \*_p.h | xargs grep "namespace $NAMESPACE" -l | while read HEADERFILE; do
-			grep "class $EXPORT_MACRO" $HEADERFILE | sed "s/^.*$EXPORT_MACRO \\([^ ]*\\).*$/\\1/" | while read CLASSNAME; do
+		find $HEADER_DIR/ -name \*.h -a \! -name \*_p.h | xargs grep "namespace ${NAMESPACE}" -l | while read HEADERFILE; do
+			grep "class ${EXPORT_MACRO}" $HEADERFILE | sed "s/^.*${EXPORT_MACRO} \\([^ ]*\\).*$/\\1/" | while read CLASSNAME; do
 				echo '#include <'$HEADERFILE'>' > $INCLUDE_DIR/$CLASSNAME
                                 echo -e "\t${CLASSNAME}"
 			done
@@ -33,5 +33,5 @@ fi
 			fi
 		done
 	) | sort
-	echo "DESTINATION $INCLUDE_INSTALL_DIR COMPONENT Devel)"
+	echo "DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)"
 ) > $INCLUDE_DIR/CMakeLists.txt
