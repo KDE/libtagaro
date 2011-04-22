@@ -1,24 +1,6 @@
 [Tagaro Theme]
 Name=Example theme
-Name[es]=Tema de ejemplo
-Name[et]=Näidisteema
-Name[fr]=Thème d'exemple
-Name[nl]=Voorbeeld thema
-Name[pt]=Tema de exemplo
-Name[pt_BR]=Tema de exemplo
-Name[sv]=Exempeltema
-Name[uk]=Приклад теми
-Name[x-test]=xxExample themexx
 Description=Example theme
-Description[es]=Tema de ejemplo
-Description[et]=Näidisteema
-Description[fr]=Thème d'exemple
-Description[nl]=Voorbeeld thema
-Description[pt]=Tema de exemplo
-Description[pt_BR]=Tema de exemplo
-Description[sv]=Exempeltema
-Description[uk]=Приклад теми
-Description[x-test]=xxExample themexx
 Author=John Doe
 AuthorEmail=john.doe@example.org
 
