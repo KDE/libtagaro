@@ -10,6 +10,7 @@ Name[pt_BR]=Tema de exemplo
 Name[sv]=Exempeltema
 Name[uk]=Приклад теми
 Name[x-test]=xxExample themexx
+Name[zh_TW]=範例主題
 Description=Example theme
 Description[de]=Beispieldesign
 Description[es]=Tema de ejemplo
@@ -21,6 +22,7 @@ Description[pt_BR]=Tema de exemplo
 Description[sv]=Exempeltema
 Description[uk]=Приклад теми
 Description[x-test]=xxExample themexx
+Description[zh_TW]=範例主題
 Author=John Doe
 AuthorEmail=john.doe@example.org
 
