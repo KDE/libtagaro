@@ -67,6 +67,7 @@ struct Sprite::Private
 		void removeClient(Tagaro::SpriteClient* client);
 		Tagaro::SpriteFetcher* fetcher(const QSize& size);
 	private:
+		friend class Tagaro::DeclarativeThemeProvider;
 		friend class Tagaro::Sprite;
 		friend class Tagaro::SpriteFetcher;
 		Private();

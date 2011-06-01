@@ -4,6 +4,7 @@ install(FILES
 	AudioScene
 	Board
 	CachedProxyGraphicsSource
+	DeclarativeThemeProvider
 	GraphicsConfigDialog
 	GraphicsSource
 	GraphicsSourceConfig

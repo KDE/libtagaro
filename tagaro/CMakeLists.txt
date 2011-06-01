@@ -9,6 +9,7 @@ set(tagaro_LIB_SRCS
 	audio/audioscene-${TAGAROAUDIO_BACKEND}.cpp
 	audio/sound-${TAGAROAUDIO_BACKEND}.cpp
 	core/application.cpp
+	graphics/declthemeprovider.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
 	graphics/graphicssource.cpp
@@ -29,7 +30,7 @@ kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
 
 kde4_add_library(tagaro SHARED ${tagaro_LIB_SRCS})
 target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QCA2_LIBRARIES} ${TAGAROAUDIO_LINKLIBS})
-target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS})
+target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS} ${QT_QTDECLARATIVE_LIBRARY})
 
 set_target_properties(tagaro PROPERTIES
 	VERSION 0.1.0
@@ -55,6 +56,7 @@ install(FILES
 DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/core COMPONENT Devel)
 
 install(FILES
+	graphics/declthemeprovider.h
 	graphics/graphicsconfigdialog.h
 	graphics/graphicssource.h
 	graphics/graphicssourceconfig.h

@@ -18,26 +18,18 @@
 
 #include "application.h"
 
-#include <QtDeclarative/QDeclarativeComponent>
-#include <QtDeclarative/QDeclarativeContext>
-#include <QtDeclarative/QDeclarativeEngine>
-#include <KDE/KDebug>
-
 static Tagaro::Application* g_tapp = 0;
 
 struct Tagaro::Application::Private
 {
 	QHash<QByteArray, QObject*> m_objects;
-	QDeclarativeEngine m_qmlEngine;
 
 	void _t_objectDestroyed(QObject* object);
-
-	Private(Tagaro::Application* parent) : m_qmlEngine(parent) {}
 };
 
 Tagaro::Application::Application(bool GUIenabled)
 	: KApplication(GUIenabled)
-	, d(new Private(this))
+	, d(new Private)
 {
 	g_tapp = this;
 }
@@ -68,28 +60,6 @@ void Tagaro::Application::addObject(const QByteArray& key, QObject* object)
 	//store object
 	d->m_objects.insertMulti(key, object);
 	connect(object, SIGNAL(destroyed(QObject*)), SLOT(_t_objectDestroyed(QObject*)));
-	//make QML aware of the new object
-	d->m_qmlEngine.rootContext()->setContextProperty(QString::fromUtf8(key), object);
-}
-
-void Tagaro::Application::addObject(const QByteArray& key, const QString& file)
-{
-	QDeclarativeComponent component(&d->m_qmlEngine, QUrl::fromLocalFile(file));
-	QObject* object = component.create();
-	if (!component.isError())
-	{
-		addObject(key, object);
-	}
-	else
-	{
-		const QList<QDeclarativeError> errors = component.errors();
-		kDebug() << errors.count() << "errors while instantiating object" << key << "from QML";
-		//not just kDebug() << errors -> every error should be on its own line
-		foreach (const QDeclarativeError& error, errors)
-		{
-			kDebug() << error;
-		}
-	}
 }
 
 void Tagaro::Application::Private::_t_objectDestroyed(QObject* object)
@@ -105,15 +75,6 @@ void Tagaro::Application::Private::_t_objectDestroyed(QObject* object)
 			it.remove();
 		}
 	}
-	//make QML aware of changes
-	if (!affectedKeys.isEmpty())
-	{
-		QDeclarativeContext* c = m_qmlEngine.rootContext();
-		foreach (const QByteArray& key, affectedKeys)
-		{
-			c->setContextProperty(QString::fromUtf8(key), m_objects.value(key, 0));
-		}
-	}
 }
 
 QObject* Tagaro::Application::object(const QByteArray& key) const
@@ -124,11 +85,6 @@ QObject* Tagaro::Application::object(const QByteArray& key) const
 QHash<QByteArray, QObject*> Tagaro::Application::objects() const
 {
 	return d->m_objects;
-}
-
-QDeclarativeEngine* Tagaro::Application::qmlEngine() const
-{
-	return &d->m_qmlEngine;
 }
 
 #include "application.moc"
