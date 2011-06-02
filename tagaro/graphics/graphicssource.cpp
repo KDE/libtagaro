@@ -184,10 +184,10 @@ Tagaro::CachedProxyGraphicsSource::~CachedProxyGraphicsSource()
 
 struct Tagaro_QCAStuff : public QCA::Initializer
 {
-	QCA::Hash hash;
+	QCA::Hash* hash;
 
 	Tagaro_QCAStuff()
-		: hash("sha1")
+		: hash(new QCA::Hash("sha1"))
 	{
 		Q_ASSERT(QCA::isSupported("sha1"));
 	}
@@ -208,7 +208,7 @@ bool Tagaro::CachedProxyGraphicsSource::load()
 		return d->m_valid = d->m_source->isValid();
 	}
 	//hash identifier to find name for cache
-	const QString cacheHash = g_qcaStuff->hash.hashToString(identifier().toUtf8());
+	const QString cacheHash = g_qcaStuff->hash->hashToString(identifier().toUtf8());
 	const QString appName = QCoreApplication::instance()->applicationName();
 	const QString cacheName = QString::fromLatin1("tagarorenderer/") % appName % QChar('/') % cacheHash;
 	kDebug() << "Opening cache:" << cacheName;
