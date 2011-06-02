@@ -171,7 +171,6 @@ void Tagaro::ThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
 		}
 		//do theme change
 		d->m_selectedTheme = theme;
-		emit selectedThemeChanged(theme);
 		//announce change to sprites
 		QHash<QString, Tagaro::Sprite*>::const_iterator it1 = d->m_sprites.constBegin(), it2 = d->m_sprites.constEnd();
 		for (; it1 != it2; ++it1)
@@ -179,6 +178,9 @@ void Tagaro::ThemeProvider::setSelectedTheme(const Tagaro::Theme* theme)
 			const QPair<const Tagaro::GraphicsSource*, QString> renderElement = theme->mapSpriteKey(it1.key());
 			it1.value()->d->setSource(renderElement.first, renderElement.second);
 		}
+		//announce change publicly (AFTER announce to sprites, because slots
+		//connected to this signal may want to refetch synchronous pixmaps)
+		emit selectedThemeChanged(theme);
 	}
 }
 
