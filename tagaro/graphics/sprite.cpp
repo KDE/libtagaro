@@ -251,7 +251,7 @@ QPixmap Tagaro::SpriteFetcher::cachePixmap(int frame, const QImage& image)
 			useImage.fill(QColor(Qt::transparent).rgba());
 		}
 	}
-	const QPixmap result = QPixmap::fromImage(image);
+	const QPixmap result = QPixmap::fromImage(useImage);
 	m_pixmapCache.insert(frame, result);
 	//if this frame has been requested by some clients, send it out
 	const int clientCount = m_clients.count();
