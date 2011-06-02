@@ -144,9 +144,9 @@ class TAGARO_EXPORT ObjectPointer //krazy:exclude=dpointer
 		///@return the pointer encapsulated by this object, qobject_casted to T*
 		template<typename T> inline operator T*() const;
 		///@return the pointer to this QObject without any casting
-		QObject* operator*() const;
+		inline QObject* operator*() const;
 		///@return the pointer to this QObject without any casting
-		QObject* operator->() const;
+		inline QObject* operator->() const;
 	private:
 		QObject* m_pointer;
 };
