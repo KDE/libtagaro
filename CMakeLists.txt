@@ -3,7 +3,6 @@ project(libtagaro)
 find_package(KDE4 4.4.80 REQUIRED)
 include(KDE4Defaults)
 include(MacroLibrary)
-find_package(QCA2 REQUIRED)
 
 macro_optional_find_package(OpenAL QUIET)
 macro_log_feature(OPENAL_FOUND "OpenAL" "OpenAL (Open Audio Library) is a free software cross-platform audio API." "http://connect.creativelabs.com/openal" FALSE "" "Tagaro will use OpenAL for sound effects. If not found, Phonon is used.")
@@ -13,8 +12,8 @@ pkg_check_modules(SNDFILE sndfile)
 #macro_optional_find_package(SndFile)
 macro_log_feature(SNDFILE_FOUND "SndFile" "libsndfile is a C library written by Erik de Castro Lopo for reading and writing audio files." "http://www.mega-nerd.com/libsndfile/" FALSE "" "SndFile is needed for the OpenAL support of Tagaro.")
 
-add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS} ${QCA2_DEFINITIONS})
-include_directories(${KDE4_INCLUDES} ${QCA2_INCLUDE_DIR})
+add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
+include_directories(${KDE4_INCLUDES})
 
 if (OPENAL_FOUND AND SNDFILE_FOUND)
 	include_directories(${OPENAL_INCLUDE_DIR} ${SNDFILE_INCLUDE_DIRS})

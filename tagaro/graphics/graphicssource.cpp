@@ -21,6 +21,7 @@
 #include "settings.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QCryptographicHash>
 #include <QtCore/QStringBuilder>
 #include <QtCrypto/QtCrypto>
 #include <KDE/KGlobal>
@@ -182,18 +183,6 @@ Tagaro::CachedProxyGraphicsSource::~CachedProxyGraphicsSource()
 	delete d;
 }
 
-struct Tagaro_QCAStuff : public QCA::Initializer
-{
-	QCA::Hash* hash;
-
-	Tagaro_QCAStuff()
-		: hash(new QCA::Hash("sha1"))
-	{
-		Q_ASSERT(QCA::isSupported("sha1"));
-	}
-};
-K_GLOBAL_STATIC(Tagaro_QCAStuff, g_qcaStuff)
-
 bool Tagaro::CachedProxyGraphicsSource::load()
 {
 	if (d->m_loaded)
@@ -208,7 +197,7 @@ bool Tagaro::CachedProxyGraphicsSource::load()
 		return d->m_valid = d->m_source->isValid();
 	}
 	//hash identifier to find name for cache
-	const QString cacheHash = g_qcaStuff->hash->hashToString(identifier().toUtf8());
+	const QString cacheHash = QString::fromUtf8(QCryptographicHash::hash(identifier().toUtf8(), QCryptographicHash::Sha1));
 	const QString appName = QCoreApplication::instance()->applicationName();
 	const QString cacheName = QString::fromLatin1("tagarorenderer/") % appName % QChar('/') % cacheHash;
 	kDebug() << "Opening cache:" << cacheName;
