@@ -79,11 +79,15 @@ class TAGARO_EXPORT Sprite
 		///@param size the size of the resulting pixmap
 		///@param frame the number of the frame which you want (set to -1 or
 		///             omit for non-animated frames)
+		///@param processingInstruction additional information for graphics source
 		///@warning Call only from GUI thread!
 		///
 		///The pixmap will always be rendered synchronously, i.e. in the same
 		///thread.
-		QPixmap pixmap(const QSize& size, int frame = -1) const;
+		///
+		///The format of @a processingInstruction is defined by the graphics
+		///source implementation. It may not contain "@" characters.
+		QPixmap pixmap(const QSize& size, int frame = -1, const QString& processingInstruction = QString()) const;
 	private:
 		class Private;
 		Private* const d;

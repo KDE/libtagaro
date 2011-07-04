@@ -97,27 +97,27 @@ QString Tagaro::Sprite::key() const
 	return d->m_element;
 }
 
-Tagaro::SpriteFetcher* Tagaro::Sprite::Private::fetcher(const QSize& size)
+Tagaro::SpriteFetcher* Tagaro::Sprite::Private::fetcher(const QSize& size, const QString& processingInstruction)
 {
 	if (size.isEmpty())
 	{
 		return 0;
 	}
-	Tagaro::SpriteFetcher*& fetcher = m_fetchers[size];
+	Tagaro::SpriteFetcher*& fetcher = m_fetchers[qMakePair(size, processingInstruction)];
 	if (!fetcher)
 	{
-		fetcher = new Tagaro::SpriteFetcher(size, this);
+		fetcher = new Tagaro::SpriteFetcher(size, processingInstruction, this);
 	}
 	return fetcher;
 }
 
-QPixmap Tagaro::Sprite::pixmap(const QSize& size, int frame) const
+QPixmap Tagaro::Sprite::pixmap(const QSize& size, int frame, const QString& processingInstruction) const
 {
 	if (!d->m_source || size.isEmpty())
 	{
 		return QPixmap();
 	}
-	return d->fetcher(size)->cachePixmap(frame, QImage());
+	return d->fetcher(size, processingInstruction)->cachePixmap(frame, QImage());
 }
 
 //BEGIN asynchronous pixmap serving
@@ -147,7 +147,7 @@ void Tagaro::SpriteFetcher::updateClient(Tagaro::SpriteClient* client)
 	if (d->m_source)
 	{
 		const QString frameElement = d->m_source->frameElementKey(d->m_element, frame);
-		const QImage image = d->m_source->elementImage(frameElement, m_size, true);
+		const QImage image = d->m_source->elementImage(frameElement, m_size, m_processingInstruction, true);
 		if (!image.isNull())
 		{
 			//This also sends the pixmap to the client in question.
@@ -184,14 +184,16 @@ namespace Tagaro {
 			QString m_element;
 			int m_frame;
 			QSize m_size;
+			QString m_processingInstruction;
 			Tagaro::SpriteFetcher* m_receiver;
 		public:
-			SpriteFetcherWorker(const Tagaro::GraphicsSource* source, const QString& element, int frame, const QSize& size, Tagaro::SpriteFetcher* receiver)
+			SpriteFetcherWorker(const Tagaro::GraphicsSource* source, const QString& element, int frame, const QSize& size, const QString& processingInstruction, Tagaro::SpriteFetcher* receiver)
 				: m_source(source)
 				  //DO NOT do the following in the worker thread. frameElementKey() is not guaranteed to be thread-safe!
 				, m_element(m_source->frameElementKey(element, frame))
 				, m_frame(frame)
 				, m_size(size)
+				, m_processingInstruction(processingInstruction)
 				, m_receiver(receiver)
 			{
 			}
@@ -200,7 +202,7 @@ namespace Tagaro {
 				QImage result;
 				if (m_source)
 				{
-					result = m_source->elementImage(m_element, m_size, false);
+					result = m_source->elementImage(m_element, m_size, m_processingInstruction, false);
 				}
 				else
 				{
@@ -218,12 +220,12 @@ void Tagaro::SpriteFetcher::startJob(int frame)
 {
 	if (Tagaro::Settings::useRenderingThreads())
 	{
-		QThreadPool::globalInstance()->start(new Tagaro::SpriteFetcherWorker(d->m_source, d->m_element, frame, m_size, this));
+		QThreadPool::globalInstance()->start(new Tagaro::SpriteFetcherWorker(d->m_source, d->m_element, frame, m_size, m_processingInstruction, this));
 	}
 	else
 	{
 		const QString element = d->m_source->frameElementKey(d->m_element, frame);
-		const QImage result = d->m_source->elementImage(element, m_size, false);
+		const QImage result = d->m_source->elementImage(element, m_size, m_processingInstruction, false);
 		cachePixmap(frame, result);
 	}
 }
@@ -243,7 +245,7 @@ QPixmap Tagaro::SpriteFetcher::cachePixmap(int frame, const QImage& image)
 		if (d->m_source)
 		{
 			const QString frameElement = d->m_source->frameElementKey(d->m_element, frame);
-			useImage = d->m_source->elementImage(frameElement, m_size, false);
+			useImage = d->m_source->elementImage(frameElement, m_size, m_processingInstruction, false);
 		}
 		else
 		{

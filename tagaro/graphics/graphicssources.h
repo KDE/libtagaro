@@ -34,7 +34,7 @@ class QtSvgGraphicsSource : public Tagaro::GraphicsSource
 		virtual uint lastModified() const;
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
-		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 	protected:
 		virtual bool load();
 	private:
@@ -49,7 +49,7 @@ class ColorGraphicsSource : public Tagaro::GraphicsSource
 		virtual ~ColorGraphicsSource();
 
 		virtual bool elementExists(const QString& element) const;
-		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 	private:
 		class Private;
 		Private* const d;
@@ -66,7 +66,7 @@ class ImageGraphicsSource : public Tagaro::GraphicsSource
 
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
-		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 	private:
 		class Private;
 		Private* const d;

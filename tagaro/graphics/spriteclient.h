@@ -68,6 +68,13 @@ class TAGARO_EXPORT SpriteClient
 		///@endcode
 		void setFrame(int frame);
 
+		///@return additional information for the graphics source
+		QString processingInstruction() const;
+		///This can be used to give additional information to the graphics
+		///source. THe format is defined by the graphics source implementation.
+		///It may not contain "@" characters.
+		void setProcessingInstruction(const QString& processingInstruction);
+
 		///@return the size of the pixmap requested from Tagaro::Renderer
 		QSize renderSize() const;
 		///Defines the size of the pixmap that will be requested from

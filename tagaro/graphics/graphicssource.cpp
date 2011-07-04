@@ -156,7 +156,7 @@ struct Tagaro::CachedProxyGraphicsSource::Private
 	Private(Tagaro::GraphicsSource* source);
 
 	QRectF elementBounds(const QString& element);
-	QImage elementImage(const QString& element, const QSize& size, bool timeConstraint);
+	QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint);
 };
 
 Tagaro::CachedProxyGraphicsSource::Private::Private(Tagaro::GraphicsSource* source)
@@ -320,17 +320,17 @@ bool Tagaro::CachedProxyGraphicsSource::elementExists(const QString& element) co
 	return d->m_valid ? d->m_source->elementExists(element) : false;
 }
 
-QImage Tagaro::CachedProxyGraphicsSource::Private::elementImage(const QString& element, const QSize& size, bool timeConstraint)
+QImage Tagaro::CachedProxyGraphicsSource::Private::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint)
 {
 	if (!m_sourceLoaded)
 	{
 		m_sourceLoaded = true;
 		m_valid = m_source->isValid();
 	}
-	return m_valid ? m_source->elementImage(element, size, timeConstraint) : QImage();
+	return m_valid ? m_source->elementImage(element, size, processingInstruction, timeConstraint) : QImage();
 }
 
-QImage Tagaro::CachedProxyGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::CachedProxyGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -340,18 +340,21 @@ QImage Tagaro::CachedProxyGraphicsSource::elementImage(const QString& element, c
 	//the no-cache case
 	if (!d->m_cache)
 	{
-		return d->elementImage(element, size, timeConstraint);
+		return d->elementImage(element, size, processingInstruction, timeConstraint);
 	}
-	//check cache
+	//construct cache key
 	static const QString prefix = QLatin1String("%1-%2-");
-	const QString key = prefix.arg(size.width()).arg(size.height()) + element;
+	QString key = prefix.arg(size.width()).arg(size.height()) + element;
+	if (!processingInstruction.isEmpty())
+		key += QChar('@') + processingInstruction;
+	//check cache
 	QImage result;
 	if (d->m_cache->findImage(key, &result))
 	{
 		return result;
 	}
 	//render image and cache for the following requests
-	result = d->elementImage(element, size, timeConstraint);
+	result = d->elementImage(element, size, processingInstruction, timeConstraint);
 	if (d->m_cache && !result.isNull())
 	{
 		d->m_cache->insertImage(key, result);

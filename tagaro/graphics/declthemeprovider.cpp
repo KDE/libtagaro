@@ -84,5 +84,5 @@ QImage Tagaro::DeclarativeThemeProvider::requestImage(const QString& id, QSize* 
 	//at all, so the advantage of populating the other cache too is nil)
 	const Tagaro::GraphicsSource* source = sprite->d->m_source;
 	const QString element = source->frameElementKey(sprite->d->m_element, frame);
-	return source->elementImage(element, renderSize, false);
+	return source->elementImage(element, renderSize, QString(), false);
 }

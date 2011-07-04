@@ -131,8 +131,9 @@ bool Tagaro::QtSvgGraphicsSource::elementExists(const QString& element) const
 	return result;
 }
 
-QImage Tagaro::QtSvgGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::QtSvgGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
+	Q_UNUSED(processingInstruction) //does not define any processing instructions
 	if (timeConstraint)
 	{
 		return QImage();
@@ -172,8 +173,9 @@ bool Tagaro::ColorGraphicsSource::elementExists(const QString& element) const
 	return QColor::isValidColor(element);
 }
 
-QImage Tagaro::ColorGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::ColorGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
+	Q_UNUSED(processingInstruction) //does not define any processing instructions
 	Q_UNUSED(timeConstraint) //constructing plain color images is not expensive (compared to setting up a renderer thread)
 	QColor color = QColor::isValidColor(element) ? QColor(element) : QColor(Qt::transparent);
 	QImage image(size, QImage::Format_ARGB32_Premultiplied);
@@ -239,8 +241,9 @@ bool Tagaro::ImageGraphicsSource::elementExists(const QString& element) const
 	return d->m_elements.contains(element);
 }
 
-QImage Tagaro::ImageGraphicsSource::elementImage(const QString& element, const QSize& size, bool timeConstraint) const
+QImage Tagaro::ImageGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
+	Q_UNUSED(processingInstruction) //does not define any processing instructions
 	Q_UNUSED(timeConstraint) //simple copying of images is not expensive (compared to setting up a renderer thread)
 	QImage image(size, QImage::Format_ARGB32_Premultiplied);
 	image.fill(QColor(Qt::transparent).rgba());

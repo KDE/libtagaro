@@ -92,6 +92,13 @@ class TAGARO_EXPORT GraphicsSource
 		///The names of frame elements (@a frame >= 0) shall be formed with
 		///frameElementKey().
 		///
+		///The @a processingInstruction is additional data specified by the
+		///programmer in the sprite client. The format of accepted processing
+		///instructions is defined by the implementing GraphicsSource subclass.
+		///
+		///The "@" sign may, because of Tagaro-internal use, not occur in both
+		///element keys and processing instructions.
+		///
 		///If @a timeConstraint is true, do not do any time-expensive
 		///operations, but return a QImage() instead to indicate that the
 		///operation should be continued in a separate worker thread.
@@ -104,7 +111,7 @@ class TAGARO_EXPORT GraphicsSource
 		///
 		///@warning This method must be thread-safe when @a timeConstraint is
 		///false.
-		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const = 0;
+		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const = 0;
 		///@return the frame count of the given @a element
 		///
 		///The semantics are similar to Tagaro::Sprite::frameCount:
@@ -157,7 +164,7 @@ class TAGARO_EXPORT CachedProxyGraphicsSource : public Tagaro::GraphicsSource
 
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
-		virtual QImage elementImage(const QString& element, const QSize& size, bool timeConstraint) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 		virtual int frameCount(const QString& element) const;
 	protected:
 		virtual bool load();

@@ -78,7 +78,7 @@ void Tagaro::SpriteClient::setSprite(Tagaro::Sprite* sprite)
 		if (sprite)
 		{
 			sprite->d->addClient(this);
-			d->m_fetcher = sprite->d->fetcher(d->m_size);
+			d->m_fetcher = sprite->d->fetcher(d->m_size, d->m_processingInstruction);
 		}
 		if (d->m_fetcher)
 		{
@@ -108,6 +108,25 @@ void Tagaro::SpriteClient::setFrame(int frame)
 	}
 }
 
+QString Tagaro::SpriteClient::processingInstruction() const
+{
+	return d->m_processingInstruction;
+}
+
+void Tagaro::SpriteClient::setProcessingInstruction(const QString& processingInstruction)
+{
+	if (d->m_processingInstruction != processingInstruction)
+	{
+		d->m_processingInstruction = processingInstruction;
+		Tagaro::SpriteFetcher* f = 0;
+		if (d->m_sprite)
+		{
+			f = d->m_sprite->d->fetcher(d->m_size, processingInstruction);
+		}
+		d->setFetcher(f);
+	}
+}
+
 QSize Tagaro::SpriteClient::renderSize() const
 {
 	return d->m_size;
@@ -118,23 +137,33 @@ void Tagaro::SpriteClient::setRenderSize(const QSize& size)
 	if (d->m_size != size)
 	{
 		d->m_size = size;
-		Tagaro::SpriteFetcher* fetcher = d->m_sprite ? d->m_sprite->d->fetcher(size) : 0;
-		if (d->m_fetcher != fetcher)
+		Tagaro::SpriteFetcher* f = 0;
+		if (d->m_sprite)
 		{
-			if (d->m_fetcher)
-			{
-				d->m_fetcher->removeClient(this);
-			}
-			d->m_fetcher = fetcher;
-			if (fetcher)
-			{
-				fetcher->addClient(this);
-			}
-			else
-			{
-				d->receivePixmap(QPixmap());
-			}
+			f = d->m_sprite->d->fetcher(size, d->m_processingInstruction);
 		}
+		d->setFetcher(f);
+	}
+}
+
+void Tagaro::SpriteClient::Private::setFetcher(Tagaro::SpriteFetcher* fetcher)
+{
+	if (m_fetcher == fetcher)
+	{
+		return;
+	}
+	if (m_fetcher)
+	{
+		m_fetcher->removeClient(q);
+	}
+	m_fetcher = fetcher;
+	if (fetcher)
+	{
+		fetcher->addClient(q);
+	}
+	else
+	{
+		receivePixmap(QPixmap());
 	}
 }
 

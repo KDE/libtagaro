@@ -64,6 +64,8 @@ class TAGARO_EXPORT ThemeProvider : public QObject
 		///ThemeProvider
 		const Tagaro::GraphicsSourceConfig& config() const;
 		///@return a Tagaro::Sprite instance for the given @a spriteKey
+		///
+		///The @a spriteKey may not contain "@" characters.
 		Tagaro::Sprite* sprite(const QString& spriteKey) const;
 
 		///@return a list-shaped model exposing the themes' data

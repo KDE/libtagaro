@@ -33,7 +33,7 @@ class SpriteFetcher : public QObject
 {
 	Q_OBJECT
 	public:
-		SpriteFetcher(const QSize& size, Tagaro::Sprite::Private* d) : d(d), m_size(size) {}
+		SpriteFetcher(const QSize& size, const QString& processingInstruction, Tagaro::Sprite::Private* d) : d(d), m_size(size), m_processingInstruction(processingInstruction) {}
 
 		void addClient(Tagaro::SpriteClient* client);
 		void removeClient(Tagaro::SpriteClient* client);
@@ -53,9 +53,10 @@ class SpriteFetcher : public QObject
 
 		Tagaro::Sprite::Private* const d;
 		QSize m_size;
+		QString m_processingInstruction;
 
 		QHash<int, QPixmap> m_pixmapCache;
-		QList<Tagaro::SpriteClient*> m_clients;
+		QList<Tagaro::SpriteClient*> m_clients; //FIXME: utterly broken
 };
 
 struct Sprite::Private
@@ -65,7 +66,7 @@ struct Sprite::Private
 
 		void addClient(Tagaro::SpriteClient* client);
 		void removeClient(Tagaro::SpriteClient* client);
-		Tagaro::SpriteFetcher* fetcher(const QSize& size);
+		Tagaro::SpriteFetcher* fetcher(const QSize& size, const QString& processingInstruction);
 	private:
 		friend class Tagaro::DeclarativeThemeProvider;
 		friend class Tagaro::Sprite;
@@ -75,7 +76,7 @@ struct Sprite::Private
 		const Tagaro::GraphicsSource* m_source;
 		QString m_element;
 	
-		QHash<QSize, SpriteFetcher*> m_fetchers;
+		QHash<QPair<QSize, QString>, SpriteFetcher*> m_fetchers; //key: size, processing instruction
 		QList<Tagaro::SpriteClient*> m_clients;
 };
 
@@ -83,12 +84,14 @@ struct SpriteClient::Private
 {
 	public:
 		Private(Tagaro::Sprite* sprite, Tagaro::SpriteClient* q);
+		void setFetcher(Tagaro::SpriteFetcher* fetcher);
 		void receivePixmap(const QPixmap& pixmap);
 	private:
 		friend class Tagaro::SpriteClient;
 		Tagaro::SpriteClient* q;
 		Tagaro::Sprite* m_sprite;
 		QSize m_size;
+		QString m_processingInstruction;
 		Tagaro::SpriteFetcher* m_fetcher;
 		int m_frame;
 		QPixmap m_pixmap;
