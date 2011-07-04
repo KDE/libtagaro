@@ -5,6 +5,8 @@ kde4_no_enable_final(libtagaro)
 
 #################### compile ####################
 
+configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
+
 set(tagaro_LIB_SRCS
 	audio/audioscene-${TAGAROAUDIO_BACKEND}.cpp
 	audio/sound-${TAGAROAUDIO_BACKEND}.cpp
@@ -33,14 +35,13 @@ target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLA
 target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS} ${QT_QTDECLARATIVE_LIBRARY})
 
 set_target_properties(tagaro PROPERTIES
-	VERSION 0.1.0
-	SOVERSION 0
+	VERSION ${TAGARO_VERSION} SOVERSION ${TAGARO_SOVERSION}
 	DEFINE_SYMBOL MAKE_TAGARO_LIB
 )
 
 #################### install ####################
 
-install(TARGETS tagaro ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS tagaro EXPORT TagaroLibraryDepends ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
