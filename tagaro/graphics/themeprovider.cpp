@@ -120,8 +120,15 @@ Tagaro::Sprite* Tagaro::ThemeProvider::sprite(const QString& spriteKey) const
 	{
 		//instantiate on first use
 		sprite = new Tagaro::Sprite;
-		const QPair<const Tagaro::GraphicsSource*, QString> renderElement = d->m_selectedTheme->mapSpriteKey(spriteKey);
-		sprite->d->setSource(renderElement.first, renderElement.second);
+		if (d->m_selectedTheme)
+		{
+			const QPair<const Tagaro::GraphicsSource*, QString> renderElement = d->m_selectedTheme->mapSpriteKey(spriteKey);
+			sprite->d->setSource(renderElement.first, renderElement.second);
+		}
+		else
+		{
+			sprite->d->setSource(0, QString());
+		}
 	}
 	return sprite;
 }
