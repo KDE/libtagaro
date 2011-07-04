@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright 2010-2011 Stefan Majewsky <majewsky@gmx.net>                *
+ *   Copyright 2011 Jeffrey Kelling <kelling.jeffrey@ages-skripte.org>     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -228,6 +229,12 @@ void Tagaro::Theme::addSource(const QByteArray& identifier, const QString& speci
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
 		Tagaro::QtSvgGraphicsSource* svgSource = new Tagaro::QtSvgGraphicsSource(path, d->m_provider->config());
+		source = new Tagaro::CachedProxyGraphicsSource(svgSource);
+	}
+	else if (type == QLatin1String("ccsvg")) // custom color svg
+	{
+		const QString path = resolveRelativePath(spec, refDirs);
+		Tagaro::QtColoredSvgGraphicsSource* svgSource = new Tagaro::QtColoredSvgGraphicsSource(path, d->m_provider->config());
 		source = new Tagaro::CachedProxyGraphicsSource(svgSource);
 	}
 	else if (type == QLatin1String("image"))

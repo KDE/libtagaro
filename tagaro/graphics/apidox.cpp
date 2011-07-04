@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright 2011 Stefan Majewsky <majewsky@gmx.net>                     *
+ *   Copyright 2011 Jeffrey Kelling <kelling.jeffrey@ages-skripte.org>     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -241,6 +242,16 @@ topleft=50x50+0+0
 topright=50x50+50+0
 bottomleft=50x50+0+50
 bottomright=50x50+50+50
+@endcode
+
+The "ccsvg" source works like the "svg" source. It is able to replace a given
+color key (default is #ff8989) by a color given as processingInstruction. The
+implementation performs a simple text replacement on the SVG document, so it is
+not rock solid. It is not covered by the automatic type recognition.
+
+@code
+SourceType=ccsvg:path/to/file.svg
+ColorKey=#ffffff
 @endcode
 
 */

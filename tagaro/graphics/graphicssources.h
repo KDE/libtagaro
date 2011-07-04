@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright 2010 Stefan Majewsky <majewsky@gmx.net>                     *
+ *   Copyright 2011 Jeffrey Kelling <kelling.jeffrey@ages-skripte.org>     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -29,6 +30,10 @@ class QtSvgGraphicsSource : public Tagaro::GraphicsSource
 {
 	public:
 		QtSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		/**This constructor may not be used in direct conjunction with
+		 * CachedProxyGraphicsSource, because of missing path.
+		 **/
+		QtSvgGraphicsSource(const QByteArray& svgData, const Tagaro::GraphicsSourceConfig& config);
 		virtual ~QtSvgGraphicsSource();
 
 		virtual uint lastModified() const;
@@ -37,6 +42,23 @@ class QtSvgGraphicsSource : public Tagaro::GraphicsSource
 		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 	protected:
 		virtual bool load();
+	private:
+		class Private;
+		Private* const d;
+};
+
+class QtColoredSvgGraphicsSource : public Tagaro::GraphicsSource
+{
+	public:
+		QtColoredSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		virtual ~QtColoredSvgGraphicsSource();
+
+		/// Implements option ColorKey, default is #ff8989
+		virtual void addConfiguration(const QMap<QString, QString>& configuration);
+		virtual uint lastModified() const;
+		virtual QRectF elementBounds(const QString& element) const;
+		virtual bool elementExists(const QString& element) const;
+		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 	private:
 		class Private;
 		Private* const d;
