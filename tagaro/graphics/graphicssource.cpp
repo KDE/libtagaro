@@ -23,7 +23,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QStringBuilder>
-#include <QtCrypto/QtCrypto>
 #include <KDE/KGlobal>
 #include <KDE/KImageCache>
 #include <KDE/KStandardDirs>
