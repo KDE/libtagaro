@@ -58,6 +58,7 @@ class QtColoredSvgGraphicsSource : public Tagaro::GraphicsSource
 		virtual uint lastModified() const;
 		virtual QRectF elementBounds(const QString& element) const;
 		virtual bool elementExists(const QString& element) const;
+		/// Passing an empty QString as @a processingInstruction gives unmodified Sprites
 		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const;
 	private:
 		class Private;

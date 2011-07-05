@@ -222,6 +222,7 @@ Tagaro::QtColoredSvgGraphicsSource::Private::~Private()
 Tagaro::QtColoredSvgGraphicsSource::QtColoredSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config)
 	: GraphicsSource(QFileInfo(path).absoluteFilePath(), config), d(new Private(readSVG(path), path))
 {
+	d->m_hash[QString()] = new QtSvgGraphicsSource(d->m_svgData, config);
 }
 
 Tagaro::QtColoredSvgGraphicsSource::~QtColoredSvgGraphicsSource()
@@ -236,13 +237,14 @@ void Tagaro::QtColoredSvgGraphicsSource::addConfiguration(const QMap<QString, QS
 	{
 		return;
 	}
-	if(!QColor::isValidColor(a.value()))
+	QColor c(a.value());
+	if(!c.isValid())
 	{
 		kWarning() << "invalid ColorKey" << a.value();
 	}
 	else
 	{
-		d->m_colorkey = a.value();
+		d->m_colorkey = c.name(); //be shure to use the #.. notation
 	}
 }
 
@@ -253,24 +255,20 @@ uint Tagaro::QtColoredSvgGraphicsSource::lastModified() const
 
 QRectF Tagaro::QtColoredSvgGraphicsSource::elementBounds(const QString& element) const
 {
-	if(!d->m_hash.isEmpty())
-	{
-		d->m_hash[QString()] = new QtSvgGraphicsSource(d->m_svgData, config());
-	}
 	return d->m_hash.begin().value()->elementBounds(element);
 }
 
 bool Tagaro::QtColoredSvgGraphicsSource::elementExists(const QString& element) const
 {
-	if(!d->m_hash.isEmpty())
-	{
-		d->m_hash[QString()] = new QtSvgGraphicsSource(d->m_svgData, config());
-	}
 	return d->m_hash.begin().value()->elementExists(element);
 }
 
 QImage Tagaro::QtColoredSvgGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
+	if(processingInstruction.isEmpty())
+	{
+		return d->m_hash[processingInstruction]->elementImage(element, size, QString(), timeConstraint);
+	}
 	QColor c(processingInstruction);
 	if(!c.isValid())
 	{
@@ -279,7 +277,7 @@ QImage Tagaro::QtColoredSvgGraphicsSource::elementImage(const QString& element, 
 		image.fill(QColor(Qt::transparent).rgba());
 		return image;
 	}
-	QtSvgGraphicsSource*& r = d->m_hash[processingInstruction];
+	QtSvgGraphicsSource*& r = d->m_hash[c.name()]; //be shure to use the #.. notation
 	if(!r)
 	{
 		QByteArray s = d->m_svgData;
