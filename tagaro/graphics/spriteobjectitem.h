@@ -87,6 +87,7 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Sp
 		///changes.
 		void sizeChanged(const QSizeF& size);
 	protected:
+		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value);
 		virtual void receivePixmap(const QPixmap& pixmap);
 	private:
 		class Private;

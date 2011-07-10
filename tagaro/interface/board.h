@@ -25,6 +25,8 @@
 
 namespace Tagaro {
 
+class SpriteObjectItem;
+
 /**
  * @class Tagaro::Board board.h <Tagaro/Board>
  *
@@ -34,7 +36,7 @@ namespace Tagaro {
  *     parent item (or the scene rect, if there is no parent item). This
  *     behavior is controlled by the alignment() property.
  * @li When it is resized, it will automatically adjust the renderSize of any
- *     contained Tagaro::SpriteObjectItems.
+ *     contained Tagaro::SpriteObjectItem instances.
  */
 class TAGARO_EXPORT Board : public QGraphicsObject
 {
@@ -65,10 +67,10 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		///@return the physical size factor @see setPhysicalSizeFactor
 		qreal physicalSizeFactor() const;
 		///Sets the physical size factor. This factor will be used in the
-		///calculation of renderSizes for contained Tagaro::SpriteObjectItems.
-		///Leave this at 1.0 (the default) if scene coordinates and viewport
-		///coordinates have an equal scale (e.g. Tagaro::Scene and its main
-		///view).
+		///calculation of renderSizes for contained Tagaro::SpriteObjectItem
+		///instances. Leave this at 1.0 (the default) if scene coordinates
+		///and viewport coordinates have an equal scale (e.g. Tagaro::Scene and
+		///its main view).
 		///
 		///Values between 0.0 and 1.0 mean that the render size of the item is
 		///smaller than its actual size, e.g. because the viewport is smaller
@@ -78,7 +80,7 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		///So if the viewport renders the board with size @a s in an area of
 		///size @a vs, you need to do:
 		///@code setPhysicalSizeFactor(vs.width() / s.width()); @endcode
-		///Of course, Repeat this whenever that ratio changes.
+		///Of course, repeat this whenever that ratio changes.
 		void setPhysicalSizeFactor(qreal physicalSizeFactor);
 
 		///@return the alignment of this board in the parent item's bounding
@@ -99,8 +101,8 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 	protected:
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value);
-		virtual void timerEvent(QTimerEvent* event);
 	private:
+		friend class Tagaro::SpriteObjectItem; //needs access to d->{,un}registerItem
 		class Private;
 		Private* const d;
 		Q_PRIVATE_SLOT(d, void _k_update());

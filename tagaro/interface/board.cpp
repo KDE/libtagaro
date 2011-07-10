@@ -17,32 +17,11 @@
  ***************************************************************************/
 
 #include "board.h"
+#include "board_p.h"
 #include "../graphics/spriteobjectitem.h"
 
-#include <QtCore/QBasicTimer>
-#include <QtCore/QTimerEvent>
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsScene>
-
-struct Tagaro::Board::Private
-{
-	Tagaro::Board* m_board;
-
-	Qt::Alignment m_alignment;
-	QSizeF m_logicalSize, m_size;
-	qreal m_physicalSizeFactor;
-	QPointF m_renderSizeFactor;
-
-	QList<Tagaro::SpriteObjectItem*> m_items;
-	QList<QGraphicsItem*> m_pendingItems;
-	QBasicTimer m_pendingItemsTimer;
-
-	void _k_update();
-	inline void update(Tagaro::SpriteObjectItem* item);
-	void _k_updateItem();
-
-	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_physicalSizeFactor(1), m_renderSizeFactor(1, 1) {}
-};
 
 Tagaro::Board::Board(QGraphicsItem* parent)
 	: QGraphicsObject(parent)
@@ -187,7 +166,15 @@ void Tagaro::Board::Private::_k_updateItem()
 
 void Tagaro::Board::Private::update(Tagaro::SpriteObjectItem* item)
 {
-	QSizeF size = item->size();
+	QSizeF size;
+	if (item->parentItem() == m_board)
+	{
+		size = item->size();
+	}
+	else
+	{
+		size = m_board->mapRectFromItem(item, item->boundingRect()).size();
+	}
 	size.rwidth() *= m_renderSizeFactor.x();
 	size.rheight() *= m_renderSizeFactor.y();
 	item->setRenderSize(size.toSize());
@@ -203,44 +190,22 @@ void Tagaro::Board::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 	Q_UNUSED(painter) Q_UNUSED(option) Q_UNUSED(widget)
 }
 
+void Tagaro::Board::Private::registerItem(Tagaro::SpriteObjectItem* item)
+{
+	m_items << item;
+	connect(item, SIGNAL(sizeChanged(QSizeF)), m_board, SLOT(_k_updateItem()));
+	update(item);
+}
+
+void Tagaro::Board::Private::unregisterItem(Tagaro::SpriteObjectItem* item)
+{
+	disconnect(item, 0, m_board, 0);
+	m_items.removeAll(item);
+}
+
 QVariant Tagaro::Board::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
 {
-	if (change == ItemChildRemovedChange)
-	{
-		QGraphicsItem* item = value.value<QGraphicsItem*>();
-		d->m_pendingItems.removeAll(item);
-		QGraphicsObject* object = item->toGraphicsObject();
-		Tagaro::SpriteObjectItem* objectItem = qobject_cast<Tagaro::SpriteObjectItem*>(object);
-		if (objectItem)
-		{
-			disconnect(objectItem, 0, this, 0);
-			d->m_items.removeAll(objectItem);
-		}
-	}
-	else if (change == ItemChildAddedChange)
-	{
-		//check if this is a Tagaro::SpriteObjectItem
-		QGraphicsItem* item = value.value<QGraphicsItem*>();
-		QGraphicsObject* object = item->toGraphicsObject();
-		Tagaro::SpriteObjectItem* objectItem = qobject_cast<Tagaro::SpriteObjectItem*>(object);
-		if (objectItem)
-		{
-			d->m_items << objectItem;
-			connect(objectItem, SIGNAL(sizeChanged(QSizeF)), SLOT(_k_updateItem()));
-			d->update(objectItem);
-		}
-		//if we cannot cast to Tagaro::SpriteObjectItem, it might be that the item is
-		//not fully constructed -> check again later
-		if (item && (!object || (object && object->metaObject()->className() != QByteArray("QGraphicsObject"))))
-		{
-			d->m_pendingItems << item;
-			if (!d->m_pendingItemsTimer.isActive())
-			{
-				d->m_pendingItemsTimer.start(0, this);
-			}
-		}
-	}
-	else if (change == ItemSceneChange)
+	if (change == ItemSceneChange)
 	{
 		QGraphicsScene* scene = value.value<QGraphicsScene*>();
 		if (scene)
@@ -258,33 +223,6 @@ QVariant Tagaro::Board::itemChange(QGraphicsItem::GraphicsItemChange change, con
 		}
 	}
 	return QGraphicsObject::itemChange(change, value);
-}
-
-void Tagaro::Board::timerEvent(QTimerEvent* event)
-{
-	if (event->timerId() == d->m_pendingItemsTimer.timerId())
-	{
-		d->m_pendingItemsTimer.stop();
-		//process pending ItemChildAddedChanges
-		QList<QGraphicsItem*>::const_iterator it1 = d->m_pendingItems.constBegin(), it2 = d->m_pendingItems.constEnd();
-		for (; it1 != it2; ++it1)
-		{
-			QGraphicsItem* item = *it1;
-			QGraphicsObject* object = item->toGraphicsObject();
-			Tagaro::SpriteObjectItem* objectItem = qobject_cast<Tagaro::SpriteObjectItem*>(object);
-			if (objectItem)
-			{
-				d->m_items << objectItem;
-				connect(objectItem, SIGNAL(sizeChanged(QSizeF)), SLOT(_k_updateItem()));
-				d->update(objectItem);
-			}
-		}
-		d->m_pendingItems.clear();
-	}
-	else
-	{
-		QGraphicsObject::timerEvent(event);
-	}
 }
 
 #include "board.moc"

@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "spriteobjectitem.h"
+#include "../interface/board_p.h"
 
 #include <QtCore/qmath.h>
 #include <QtGui/QGraphicsScene>
@@ -41,6 +42,10 @@ class Tagaro::SpriteObjectItem::Private : public QGraphicsPixmapItem
 		Private(QGraphicsItem* parent);
 		inline void updateTransform();
 
+		//relation to Tagaro::Board
+		QWeakPointer<Tagaro::Board> m_board;
+		void findBoardFromParent(Tagaro::SpriteObjectItem* q, QGraphicsItem* parent);
+
 		//QGraphicsItem reimplementations (see comment below for why we need all of this)
 		virtual bool contains(const QPointF& point) const;
 		virtual bool isObscuredBy(const QGraphicsItem* item) const;
@@ -60,23 +65,55 @@ Tagaro::SpriteObjectItem::SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem
 	, Tagaro::SpriteClient(sprite)
 	, d(new Private(this))
 {
+	d->findBoardFromParent(this, parent);
 }
 
 Tagaro::SpriteObjectItem::~SpriteObjectItem()
 {
-	//QGraphicsItem does not remove itself from the scene upon destruction
-	//(although one is advised to do this manually by calling removeItem before
-	//delete); this is in general not a problem, but if the SpriteObjectItem is
-	//embedded in a Tagaro::Board, the board needs the ItemChildRemovedChange
-	//message to remove the item from its internal data structures, so we do it
-	//manually
-	QGraphicsScene* scene = this->scene();
-	if (scene)
-	{
-		scene->removeItem(this);
-	}
+	//deregister from board, if any
+	d->findBoardFromParent(this, 0);
 	//usual cleanup
 	delete d;
+}
+
+void Tagaro::SpriteObjectItem::Private::findBoardFromParent(Tagaro::SpriteObjectItem* q, QGraphicsItem* parent)
+{
+	//find board among parents
+	Tagaro::Board* board = 0;
+	while (parent)
+	{
+		//is parent a board?
+		QGraphicsObject* obj = qgraphicsitem_cast<QGraphicsObject*>(parent);
+		if (obj && (board = qobject_cast<Tagaro::Board*>(obj)))
+		{
+			break;
+		}
+		//if not, continue with parent of parent
+		parent = parent->parentItem();
+	}
+	//disconnect from old board, connect to new board
+	//NOTE: also if m_board == board; findBoardFromParent() was usually called for a reason,
+	//and even parent changes inside the same board are a reason for an update delivered by
+	//registerItem()
+	QSharedPointer<Tagaro::Board> oldBoard = m_board.toStrongRef();
+	if (oldBoard)
+	{
+		oldBoard->d->unregisterItem(q);
+	}
+	m_board = board;
+	if (board)
+	{
+		board->d->registerItem(q);
+	}
+}
+
+QVariant Tagaro::SpriteObjectItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
+{
+	if (change == QGraphicsItem::ItemParentChange)
+	{
+		d->findBoardFromParent(this, value.value<QGraphicsItem*>());
+	}
+	return QGraphicsObject::itemChange(change, value);
 }
 
 QPointF Tagaro::SpriteObjectItem::offset() const
