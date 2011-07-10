@@ -196,7 +196,7 @@ bool Tagaro::CachedProxyGraphicsSource::load()
 		return d->m_valid = d->m_source->isValid();
 	}
 	//hash identifier to find name for cache
-	const QString cacheHash = QString::fromUtf8(QCryptographicHash::hash(identifier().toUtf8(), QCryptographicHash::Sha1));
+	const QString cacheHash = QString::fromLatin1(QCryptographicHash::hash(identifier().toUtf8(), QCryptographicHash::Sha1).toHex());
 	const QString appName = QCoreApplication::instance()->applicationName();
 	const QString cacheName = QString::fromLatin1("tagarorenderer/") % appName % QChar('/') % cacheHash;
 	kDebug() << "Opening cache:" << cacheName;
