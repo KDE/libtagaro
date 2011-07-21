@@ -13,6 +13,7 @@ X-KDE-ParentApp=kcontrol
 X-KDE-System-Settings-Parent-Category=system-administration
 
 Name=KDE Games
+Name[bg]=Игри в KDE
 Name[de]=KDE-Spiele
 Name[es]=Juegos de KDE
 Name[et]=KDE mängud
@@ -28,6 +29,7 @@ Name[x-test]=xxKDE Gamesxx
 Name[zh_CN]=KDE 游戏
 Name[zh_TW]=KDE 遊戲
 Comment=Configure general behavior of KDE games
+Comment[bg]=Настройка на общото поведение на игрите в KDE
 Comment[de]=Allgemeines Verhalten der KDE-Spiele festlegen
 Comment[es]=Configurar el comportamiento general de los juegos de KDE
 Comment[et]=KDE mängude üldise käitumise seadistamine
