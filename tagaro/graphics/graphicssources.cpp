@@ -282,8 +282,8 @@ QImage Tagaro::QtColoredSvgGraphicsSource::elementImage(const QString& element, 
 	QtSvgGraphicsSource*& r = d->m_hash[processingInstruction];
 	if(!r)
 	{
-		QString s = d->m_svgData;
-		s.replace(d->m_colorkey, processingInstruction);
+		QByteArray s = d->m_svgData;
+		s.replace(d->m_colorkey.toUtf8(), processingInstruction.toUtf8());
 		r = new QtSvgGraphicsSource(s, config());
 	}
 	return r->elementImage(element, size, QString(), timeConstraint);
