@@ -155,6 +155,10 @@ uint Tagaro::QtSvgGraphicsSource::lastModified() const
 QRectF Tagaro::QtSvgGraphicsSource::elementBounds(const QString& element) const
 {
 	QSvgRenderer* r = d->allocRenderer();
+	if (!r)
+	{
+		return QRectF();
+	}
 	const QRectF result = r->boundsOnElement(element);
 	d->freeRenderer(r);
 	return result;
@@ -163,6 +167,10 @@ QRectF Tagaro::QtSvgGraphicsSource::elementBounds(const QString& element) const
 bool Tagaro::QtSvgGraphicsSource::elementExists(const QString& element) const
 {
 	QSvgRenderer* r = d->allocRenderer();
+	if (!r)
+	{
+		return false;
+	}
 	const bool result = r->elementExists(element);
 	d->freeRenderer(r);
 	return result;
@@ -180,6 +188,10 @@ QImage Tagaro::QtSvgGraphicsSource::elementImage(const QString& element, const Q
 	image.fill(QColor(Qt::transparent).rgba());
 	QPainter painter(&image);
 	QSvgRenderer* r = d->allocRenderer();
+	if (!r)
+	{
+		return QImage();
+	}
 	r->render(&painter, element);
 	d->freeRenderer(r);
 	painter.end();
