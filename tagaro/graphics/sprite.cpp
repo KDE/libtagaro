@@ -143,19 +143,25 @@ void Tagaro::SpriteFetcher::updateClient(Tagaro::SpriteClient* client)
 		client->d->receivePixmap(it.value());
 		return;
 	}
-	//check if request can be served without much hassle
-	if (d->m_source)
+	//no source available?
+	if (!d->m_source)
 	{
-		const QString frameElement = d->m_source->frameElementKey(d->m_element, frame);
-		const QImage image = d->m_source->elementImage(frameElement, m_size, m_processingInstruction, true);
-		if (!image.isNull())
-		{
-			//This also sends the pixmap to the client in question.
-			cachePixmap(frame, image);
-		}
+		client->d->receivePixmap(QPixmap());
+		return;
 	}
-	//create rendering request
-	startJob(frame);
+	//check if request can be served without much hassle
+	const QString frameElement = d->m_source->frameElementKey(d->m_element, frame);
+	const QImage image = d->m_source->elementImage(frameElement, m_size, m_processingInstruction, true);
+	if (!image.isNull())
+	{
+		//This also sends the pixmap to the client in question.
+		cachePixmap(frame, image);
+	}
+	else
+	{
+		//create rendering request
+		startJob(frame);
+	}
 }
 
 void Tagaro::SpriteFetcher::updateAllClients()
