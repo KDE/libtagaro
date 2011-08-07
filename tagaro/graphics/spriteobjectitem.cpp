@@ -83,7 +83,7 @@ void Tagaro::SpriteObjectItem::Private::findBoardFromParent(Tagaro::SpriteObject
 	while (parent)
 	{
 		//is parent a board?
-		QGraphicsObject* obj = qgraphicsitem_cast<QGraphicsObject*>(parent);
+		QGraphicsObject* obj = parent->toGraphicsObject();
 		if (obj && (board = qobject_cast<Tagaro::Board*>(obj)))
 		{
 			break;
