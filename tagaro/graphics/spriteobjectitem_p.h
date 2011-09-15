@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright 2010-2011 Stefan Majewsky <majewsky@gmx.net>                *
+ *   Copyright 2010 Stefan Majewsky <majewsky@gmx.net>                     *
+ *   Copyright 2011 Jeffrey Kelling <>                                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License          *
@@ -16,33 +17,33 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_BOARD_P_H
-#define TAGARO_BOARD_P_H
+#ifndef TAGARO_SPRITEOBJECTITEM_P_H
+#define TAGARO_SPRITEOBJECTITEM_P_H
 
-#include "board.h"
+#include "spriteobjectitem.h"
 
-class Tagaro::Board::Private
+namespace Tagaro {
+	class Board;
+}
+
+class Tagaro::SpriteObjectItem::Private : public QGraphicsPixmapItem
 {
-	friend class Tagaro::Board;
-	Tagaro::Board* m_board;
+	public:
+		QSizeF m_size, m_pixmapSize;
 
-	Qt::Alignment m_alignment;
-	QSizeF m_logicalSize, m_size;
-	qreal m_physicalSizeFactor;
-	QPointF m_renderSizeFactor;
+		Private(QGraphicsItem* parent);
+		inline void updateTransform();
 
-	QList<Tagaro::SpriteObjectItem*> m_items;
+		//relation to Tagaro::Board
+		Tagaro::Board* m_board;
+		void findBoardFromParent(Tagaro::SpriteObjectItem* q, QGraphicsItem* parent);
+		inline void unsetBoard() {m_board = 0;}
 
-	void _k_update();
-	void update(Tagaro::SpriteObjectItem* item);
-	void _k_updateItem();
-
-	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_physicalSizeFactor(1), m_renderSizeFactor(1, 1) {}
-	~Private();
-
-	public: //interface to Tagaro::SpriteObjectItem
-		void registerItem(Tagaro::SpriteObjectItem* item);
-		void unregisterItem(Tagaro::SpriteObjectItem* item);
+		//QGraphicsItem reimplementations (see comment below for why we need all of this)
+		virtual bool contains(const QPointF& point) const;
+		virtual bool isObscuredBy(const QGraphicsItem* item) const;
+		virtual QPainterPath opaqueArea() const;
+		virtual QPainterPath shape() const;
 };
 
-#endif // TAGARO_BOARD_P_H
+#endif

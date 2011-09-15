@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "spriteobjectitem.h"
+#include "spriteobjectitem_p.h"
 #include "../interface/board_p.h"
 
 #include <QtCore/qmath.h>
@@ -34,30 +35,13 @@ static QPixmap dummyPixmap()
 	return pix;
 }
 
-class Tagaro::SpriteObjectItem::Private : public QGraphicsPixmapItem
-{
-	public:
-		QSizeF m_size, m_pixmapSize;
-
-		Private(QGraphicsItem* parent);
-		inline void updateTransform();
-
-		//relation to Tagaro::Board
-		QWeakPointer<Tagaro::Board> m_board;
-		void findBoardFromParent(Tagaro::SpriteObjectItem* q, QGraphicsItem* parent);
-
-		//QGraphicsItem reimplementations (see comment below for why we need all of this)
-		virtual bool contains(const QPointF& point) const;
-		virtual bool isObscuredBy(const QGraphicsItem* item) const;
-		virtual QPainterPath opaqueArea() const;
-		virtual QPainterPath shape() const;
-};
-
 Tagaro::SpriteObjectItem::Private::Private(QGraphicsItem* parent)
 	: QGraphicsPixmapItem(dummyPixmap(), parent)
 	, m_size(1, 1)
 	, m_pixmapSize(1, 1)
+	, m_board(0)
 {
+	setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
 Tagaro::SpriteObjectItem::SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent)
@@ -95,10 +79,9 @@ void Tagaro::SpriteObjectItem::Private::findBoardFromParent(Tagaro::SpriteObject
 	//NOTE: also if m_board == board; findBoardFromParent() was usually called for a reason,
 	//and even parent changes inside the same board are a reason for an update delivered by
 	//registerItem()
-	QSharedPointer<Tagaro::Board> oldBoard = m_board.toStrongRef();
-	if (oldBoard)
+	if (m_board)
 	{
-		oldBoard->d->unregisterItem(q);
+		m_board->d->unregisterItem(q);
 	}
 	m_board = board;
 	if (board)

@@ -19,6 +19,7 @@
 #include "board.h"
 #include "board_p.h"
 #include "../graphics/spriteobjectitem.h"
+#include "../graphics/spriteobjectitem_p.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsScene>
@@ -37,6 +38,13 @@ Tagaro::Board::Board(QGraphicsItem* parent)
 Tagaro::Board::~Board()
 {
 	delete d;
+}
+
+Tagaro::Board::Private::~Private()
+{
+	QList<Tagaro::SpriteObjectItem*> m_items;
+	for(QList<Tagaro::SpriteObjectItem*>::const_iterator a = m_items.constBegin(); a != m_items.constEnd(); ++a)
+		(*a)->d->unsetBoard();
 }
 
 QSizeF Tagaro::Board::logicalSize() const
@@ -200,7 +208,6 @@ void Tagaro::Board::Private::registerItem(Tagaro::SpriteObjectItem* item)
 void Tagaro::Board::Private::unregisterItem(Tagaro::SpriteObjectItem* item)
 {
 	disconnect(item, 0, m_board, 0);
-	m_items.removeAll(item);
 }
 
 QVariant Tagaro::Board::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)

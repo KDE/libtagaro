@@ -90,6 +90,7 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Sp
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value);
 		virtual void receivePixmap(const QPixmap& pixmap);
 	private:
+		friend class Board; // need access to drop item
 		class Private;
 		Private* const d;
 };
