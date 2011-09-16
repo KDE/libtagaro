@@ -208,6 +208,7 @@ void Tagaro::Board::Private::registerItem(Tagaro::SpriteObjectItem* item)
 void Tagaro::Board::Private::unregisterItem(Tagaro::SpriteObjectItem* item)
 {
 	disconnect(item, 0, m_board, 0);
+	m_items.removeAll(item);
 }
 
 QVariant Tagaro::Board::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
