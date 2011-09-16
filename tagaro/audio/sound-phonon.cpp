@@ -18,18 +18,39 @@
 
 #include "sound.h"
 
+#include <Phonon/MediaObject>
+#include <QDateTime>
 #include <KDE/KDebug>
 
 struct Tagaro::Sound::Private
 {
-	//TODO
+	qreal m_volume;
+	bool m_valid;
+	qint64 m_lastPlayedTime;
+	int m_nextSource;
+	Phonon::MediaObject* m_sound1;
+	Phonon::MediaObject* m_sound2;
+	
+	Private() : m_volume(1.0), m_valid(false), m_lastPlayedTime(0), m_nextSource(1), m_sound1(NULL), m_sound2(NULL) {}
+	
+	~Private()
+	{
+		delete m_sound1;
+		delete m_sound2;
+		m_sound1 = 0;
+		m_sound2 = 0;
+	}
 };
 
 Tagaro::Sound::Sound(const QString& file, QObject* parent)
 	: QObject(parent)
 	, d(new Private)
 {
-	//TODO
+	d->m_sound1 = Phonon::createPlayer(Phonon::GameCategory);
+	d->m_sound1->setCurrentSource(file);
+	d->m_sound2 = Phonon::createPlayer(Phonon::GameCategory);
+	d->m_sound2->setCurrentSource(file);
+	d->m_valid = d->m_sound1->isValid() && d->m_sound2->isValid();
 }
 
 Tagaro::Sound::~Sound()
@@ -39,7 +60,7 @@ Tagaro::Sound::~Sound()
 
 bool Tagaro::Sound::isValid() const
 {
-	//TODO
+	return d->m_valid;
 }
 
 Tagaro::Sound::PlaybackType Tagaro::Sound::playbackType() const
@@ -77,6 +98,7 @@ void Tagaro::Sound::setPos(const QPointF& pos)
 qreal Tagaro::Sound::volume() const
 {
 	//TODO
+	return 1.0;
 }
 
 void Tagaro::Sound::setVolume(qreal volume)
@@ -86,7 +108,42 @@ void Tagaro::Sound::setVolume(qreal volume)
 
 void Tagaro::Sound::start()
 {
-	//TODO
+	if(!d->m_sound1 || !d->m_sound2)
+	{
+		return;
+	}
+	
+	QDateTime now = QDateTime::currentDateTime();
+	qint64 timeNow = now.toTime_t() * 1000 + now.time().msec();
+	
+	if(timeNow - d->m_lastPlayedTime > 20)
+	{
+		if(d->m_nextSource == 1)
+		{                    
+			if(d->m_sound1->state() == Phonon::StoppedState)
+			{
+				d->m_nextSource = 2;
+				d->m_sound1->play();
+			}
+			else
+			{
+				d->m_sound1->stop();
+			}
+		}
+		else
+		{
+			if(d->m_sound2->state() == Phonon::StoppedState)
+			{
+				d->m_nextSource = 1;
+				d->m_sound2->play();
+			}
+			else
+			{
+				d->m_sound2->stop();
+			}
+		}
+		d->m_lastPlayedTime = timeNow;
+	}
 }
 
 void Tagaro::Sound::start(const QPointF& pos)
@@ -104,7 +161,13 @@ void Tagaro::Sound::start(const QPointF& pos)
 
 void Tagaro::Sound::stop()
 {
-	//TODO
+	if(!d->m_sound1 || !d->m_sound2)
+	{
+		return;
+	}
+	
+	d->m_sound1->stop();
+	d->m_sound2->stop();
 }
 
 #include "sound.moc"
