@@ -1,0 +1,13 @@
+# - Config file for the KGame package
+
+# our own dependencies
+find_package(KDE4 4.6 REQUIRED)
+include(KDE4Defaults)
+
+# tell the user project where to find our headers and libraries
+set(KGAME_INCLUDE_DIRS ${KDE4_INCLUDES} "@KGAME_INCLUDE_DIRS@")
+set(KGAME_LIBRARY_DIRS "@KGAME_LIB_DIR@")
+
+# our library dependencies (contains definitions for imported targets)
+include("@KGAME_CMAKE_DIR@/KGameLibraryDepends.cmake")
+set(KGAME_LIBRARIES kgame)

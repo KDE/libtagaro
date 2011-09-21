@@ -2,7 +2,7 @@
 Exec=kcmshell4 kcmtagaro
 Icon=games-config-custom
 
-X-DocPath=libtagaro/index.html
+X-DocPath=libkgame/index.html
 
 Type=Service
 X-KDE-ServiceTypes=KCModule
@@ -44,5 +44,5 @@ Comment[uk]=Налаштування загальної поведінки іг�
 Comment[x-test]=xxConfigure general behavior of KDE gamesxx
 Comment[zh_CN]=配置 KDE 游戏的常规行为
 Comment[zh_TW]=設定 KDE 遊戲的一般行為
-X-KDE-Keywords=games,graphics,rendering,tagaro,libtagaro
+X-KDE-Keywords=games,kdegames,graphics,rendering
 Categories=Qt;KDE;X-KDE-settings-system;

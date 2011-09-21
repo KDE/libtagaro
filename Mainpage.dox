@@ -1,5 +1,7 @@
 /**
- * @mainpage libtagaroprivate reference
+ * @mainpage KGame reference
  *
- * @warning This is a private library which is only available inside kdegames.
+ * The KGame library is the successor to libkdegames.
+ *
+ * @warning No API or even ABI stability promise is made, for good reasons.
  */

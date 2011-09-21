@@ -1,15 +1,15 @@
 enable_testing()
-project(libtagaro)
+project(libkgame)
 
-kde4_no_enable_final(libtagaro)
+kde4_no_enable_final(libkgame)
 
 #################### compile ####################
 
 configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 
-set(tagaro_LIB_SRCS
-	audio/audioscene-${TAGAROAUDIO_BACKEND}.cpp
-	audio/sound-${TAGAROAUDIO_BACKEND}.cpp
+set(kgame_LIB_SRCS
+	audio/audioscene-${KGAMEAUDIO_BACKEND}.cpp
+	audio/sound-${KGAMEAUDIO_BACKEND}.cpp
 	core/application.cpp
 	graphics/declthemeprovider.cpp
 	graphics/graphicsconfigdialog.cpp
@@ -28,20 +28,20 @@ set(tagaro_LIB_SRCS
 	interface/messageoverlay.cpp
 	interface/scene.cpp
 )
-kde4_add_kcfg_files(tagaro_LIB_SRCS settings.kcfgc)
+kde4_add_kcfg_files(kgame_LIB_SRCS settings.kcfgc)
 
-kde4_add_library(tagaro SHARED ${tagaro_LIB_SRCS})
-target_link_libraries(tagaro ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${TAGAROAUDIO_LINKLIBS})
-target_link_libraries(tagaro LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS} ${QT_QTDECLARATIVE_LIBRARY})
+kde4_add_library(kgame SHARED ${kgame_LIB_SRCS})
+target_link_libraries(kgame ${KDE4_KDEUI_LIBS} ${QT_QTSVG_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${KGAMEAUDIO_LINKLIBS})
+target_link_libraries(kgame LINK_INTERFACE_LIBRARIES ${KDE4_KDEUI_LIBS} ${QT_QTDECLARATIVE_LIBRARY})
 
-set_target_properties(tagaro PROPERTIES
-	VERSION ${TAGARO_VERSION} SOVERSION ${TAGARO_SOVERSION}
-	DEFINE_SYMBOL MAKE_TAGARO_LIB
+set_target_properties(kgame PROPERTIES
+	VERSION ${KGAME_VERSION} SOVERSION ${KGAME_SOVERSION}
+	DEFINE_SYMBOL MAKE_KGAME_LIB
 )
 
 #################### install ####################
 
-install(TARGETS tagaro EXPORT TagaroLibraryDepends ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS kgame EXPORT KGameLibraryDepends ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
