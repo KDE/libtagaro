@@ -23,7 +23,7 @@
 #include <QtGui/QGraphicsItem>
 
 #include "spriteclient.h"
-#include <libtagaro_export.h>
+#include <libkgame_export.h>
 
 namespace KGame {
 

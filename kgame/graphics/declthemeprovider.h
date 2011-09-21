@@ -21,7 +21,7 @@
 
 #include <QtDeclarative/QDeclarativeImageProvider>
 
-#include <libtagaro_export.h>
+#include <libkgame_export.h>
 
 namespace KGame
 {

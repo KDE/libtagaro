@@ -22,7 +22,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QVariant>
 
-#include <libtagaro_export.h>
+#include <libkgame_export.h>
 
 namespace KGame {
 

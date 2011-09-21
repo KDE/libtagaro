@@ -23,7 +23,7 @@
 
 #include <kdemacros.h>
 
-//export macro for libtagaro
+//export macro for libkgame
 
 #ifndef KGAME_EXPORT
 #	if defined(MAKE_KGAME_LIB)

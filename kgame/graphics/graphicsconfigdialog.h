@@ -19,7 +19,7 @@
 #ifndef KGAME_GRAPHICSCONFIGDIALOG_H
 #define KGAME_GRAPHICSCONFIGDIALOG_H
 
-#include <libtagaro_export.h>
+#include <libkgame_export.h>
 
 #include <KDE/KPageDialog>
 

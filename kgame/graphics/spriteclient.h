@@ -21,7 +21,7 @@
 
 #include <QtGui/QPixmap>
 
-#include <libtagaro_export.h>
+#include <libkgame_export.h>
 
 namespace KGame {
 
