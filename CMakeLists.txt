@@ -34,14 +34,14 @@ add_definitions(-DTAGAROAUDIO_BACKEND=${TAGAROAUDIO_BACKEND})
 
 # find uninstalled Tagaro includes correctly
 set(BUILD_TREE_INCLUDE_DIRS
-	"${PROJECT_SOURCE_DIR}"          # e.g. <tagaro/graphics/themeprovider.h>
+	"${PROJECT_SOURCE_DIR}"          # e.g. <kgame/graphics/themeprovider.h>
 	                                 # also <libtagaro_export.h>
-	"${PROJECT_SOURCE_DIR}/includes" # e.g. <Tagaro/ThemeProvider>
-	"${PROJECT_BINARY_DIR}"          # only <tagaro/settings.h>
+	"${PROJECT_SOURCE_DIR}/includes" # e.g. <KGame/ThemeProvider>
+	"${PROJECT_BINARY_DIR}"          # only <kgame/settings.h>
 )
 include_directories(${BUILD_TREE_INCLUDE_DIRS})
 
-add_subdirectory(tagaro)
+add_subdirectory(kgame)
 add_subdirectory(includes)
 add_subdirectory(tools)
 macro_optional_add_subdirectory(examples)

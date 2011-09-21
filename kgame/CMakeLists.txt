@@ -45,16 +45,16 @@ install(TARGETS tagaro EXPORT TagaroLibraryDepends ${INSTALL_TARGETS_DEFAULT_ARG
 
 install(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro COMPONENT Devel)
+DESTINATION ${INCLUDE_INSTALL_DIR}/kgame COMPONENT Devel)
 
 install(FILES
 	audio/audioscene.h
 	audio/sound.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/audio COMPONENT Devel)
+DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/audio COMPONENT Devel)
 
 install(FILES
 	core/application.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/core COMPONENT Devel)
+DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/core COMPONENT Devel)
 
 install(FILES
 	graphics/declthemeprovider.h
@@ -67,10 +67,10 @@ install(FILES
 	graphics/spriteobjectitem.h
 	graphics/theme.h
 	graphics/themeprovider.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/graphics COMPONENT Devel)
+DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/graphics COMPONENT Devel)
 
 install(FILES
 	interface/board.h
 	interface/messageoverlay.h
 	interface/scene.h
-DESTINATION ${INCLUDE_INSTALL_DIR}/tagaro/interface COMPONENT Devel)
+DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/interface COMPONENT Devel)

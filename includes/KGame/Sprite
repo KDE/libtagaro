@@ -1,1 +1,1 @@
-#include <tagaro/graphics/sprite.h>
+#include <kgame/graphics/sprite.h>

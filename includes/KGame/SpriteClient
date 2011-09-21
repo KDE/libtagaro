@@ -1,1 +1,1 @@
-#include <tagaro/graphics/spriteclient.h>
+#include <kgame/graphics/spriteclient.h>

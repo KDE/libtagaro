@@ -5,7 +5,7 @@
 
 # configuration
 EXPORT_MACRO=KGAME_EXPORT   # the macro which denotes exported classes
-HEADER_DIR=tagaro           # the directory which contains the headers of your lib
+HEADER_DIR=kgame            # the directory which contains the headers of your lib
 NAMESPACE=KGame             # the namespace in which the classes reside
 INCLUDE_DIR=includes/KGame  # the directory which shall be filled with the pretty headers
 INCLUDE_INSTALL_DIR='${INCLUDE_INSTALL_DIR}/KGame'
