@@ -20,7 +20,7 @@
 //This file is not compiled. It only contains general API documentation.
 
 /**
-@page tagarographics TagaroGraphics overview
+@page kgamegraphics KGameGraphics overview
 
 Applications with 2D graphics usually build their interface from sprites. For
 example, a card game may define 52 sprites which represent the single cards.
@@ -33,7 +33,7 @@ meaning, but a distinct visual appearance. For example, a card game may offer
 multiple carddeck themes. Each theme must contain 52 sprites which represent
 the single cards.
 
-TagaroGraphics is a rendering framework that makes it easy to manage themes
+KGameGraphics is a rendering framework that makes it easy to manage themes
 and sprites. It also understands animated sprites consisting of multiple frames.
 
 @section basic-workflow Basic workflow
@@ -59,7 +59,7 @@ advantages:
 	and they will fetch their pixmaps themselves, and update them automatically
 	when the theme provider selects another theme.
 
-	@li Sprite clients fetch pixmaps asynchronously, which allows Tagaro to use
+	@li Sprite clients fetch pixmaps asynchronously, which allows KGame to use
 	multi-threaded rendering for complex graphics sources (e.g. big SVG files).
 
 	@li KGame::SpriteClient subclasses for QGraphicsView are already
@@ -68,7 +68,7 @@ advantages:
 	usually size-independent, so each client must define the size of the pixmap
 	which it wants to display. You usually want this to match the screen size
 	of the client to improve painting speed. Calculating the render size can be
-	automated by using KGame::Board from TagaroInterface.
+	automated by using KGame::Board from KGameInterface.
 
 @section theme-structure Structure of a theme
 
@@ -106,8 +106,7 @@ See below for the definition of this format.
 @section theme-file-format Format of theme definition files
 
 Standard theme definition files are standalone KConfig files. They must contain
-a group called "Tagaro Theme" ("KGameTheme" is also allowed for backwards
-compatibility) which contains general metadata for this theme.
+a group called "KGameTheme" which contains general metadata for this theme.
 
 	@li Name
 	@li Description (optional)
@@ -127,7 +126,7 @@ theme has only one SVG file, go on to the last sentence of this section.]
 The file may also contain a group "Sources" which defines the graphics sources
 of this theme. Each graphics source corresponds to one group below the
 "Sources" group. The group's key -- the source identifier -- is currently only
-used inside this file, though it may later be used by Tagaro. (It's also
+used inside this file, though it may later be used by KGame. (It's also
 exposed in the API as the argument to KGame::Theme::source.)
 
 Each source group must contain a key "SourceType". The value specifies the type
@@ -153,7 +152,7 @@ the window background (sprite "kdiamond-background") and rectangles with plain
 color filling for the diamonds (sprites "kdiamond-red", "kdiamond-green" etc.):
 
 @code
-[Tagaro Theme]
+[KGameTheme]
 Name=Debug Theme
 Description=No complicated vector drawings or animations.
 Author=John Doe
@@ -191,10 +190,9 @@ various shortcuts for this usecase:
 1-element=%1
 @endcode
 
-	@li If the "Tagaro Theme"/"KGameTheme" group of the theme definition file
-	    contains the key "FileName", its value is used to instantiate the
-		"default" graphics source. Writing "FileName=foo" in this group is
-		therefore equivalent to:
+	@li If the "KGameTheme" group of the theme definition file contains the key
+		"FileName", its value is used to instantiate the "default" graphics
+		source. Writing "FileName=foo" in this group is therefore equivalent to:
 
 @code
 [Sources][default]
@@ -202,7 +200,7 @@ SourceType=foo
 @endcode
 
 So if you have a single SVG file for your theme, just write "FileName=foo.svg"
-in the "Tagaro Theme" or "KGameTheme" group and you're done.
+in the "KGameTheme" group and you're done.
 
 @section graphicssources Graphics sources
 

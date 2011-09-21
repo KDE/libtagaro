@@ -198,7 +198,7 @@ bool KGame::CachedProxyGraphicsSource::load()
 	//hash identifier to find name for cache
 	const QString cacheHash = QString::fromLatin1(QCryptographicHash::hash(identifier().toUtf8(), QCryptographicHash::Sha1).toHex());
 	const QString appName = QCoreApplication::instance()->applicationName();
-	const QString cacheName = QString::fromLatin1("tagarorenderer/") % appName % QChar('/') % cacheHash;
+	const QString cacheName = QString::fromLatin1("kgamerenderer/") % appName % QChar('/') % cacheHash;
 	kDebug() << "Opening cache:" << cacheName;
 	//does cache exist at all? if not, check graphics source before continuing
 	const bool cacheExists = KStandardDirs::exists(KStandardDirs::locate("cache", cacheName + QLatin1String(".kcache")));

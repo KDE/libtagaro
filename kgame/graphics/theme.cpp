@@ -344,17 +344,7 @@ void KGame::StandardTheme::Private::init(KGame::StandardTheme* theme, const QStr
 {
 	//open configuration
 	const KConfig themeConfigFile(filePath, KConfig::SimpleConfig);
-	//find group with theme properties
-	const char* groupName = 0;
-	if (themeConfigFile.hasGroup("Tagaro Theme"))
-	{
-		groupName = "Tagaro Theme";
-	}
-	else if (themeConfigFile.hasGroup("KGameTheme"))
-	{
-		groupName = "KGameTheme";
-	}
-	const KConfigGroup themeConfig(&themeConfigFile, groupName);
+	const KConfigGroup themeConfig(&themeConfigFile, "KGameTheme");
 	//read standard properties
 	const QString graphicsFile = themeConfig.readEntry("FileName", QString());
 	if (!graphicsFile.isEmpty())

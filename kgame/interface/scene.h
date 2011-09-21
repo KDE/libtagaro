@@ -33,7 +33,7 @@ class Sprite;
  * @class KGame::Scene scene.h <KGame/Scene>
  * @brief QGraphicsScene with automatic viewport transform adjustments
  *
- * This QGraphicsScene subclass provides integration with Tagaro and
+ * This QGraphicsScene subclass provides integration with KGame and
  * miscellaneous convenience features:
  * @li It acts as a KGame::SpriteClient to fetch a scene background pixmap.
  * @li It can be used to keep the QGraphicsScene's sceneRect() in sync

@@ -96,7 +96,7 @@ class KGAME_EXPORT GraphicsSource
 		///programmer in the sprite client. The format of accepted processing
 		///instructions is defined by the implementing GraphicsSource subclass.
 		///
-		///The "@" sign may, because of Tagaro-internal use, not occur in both
+		///The "@" sign may, because of KGame-internal use, not occur in both
 		///element keys and processing instructions.
 		///
 		///If @a timeConstraint is true, do not do any time-expensive

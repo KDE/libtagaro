@@ -39,7 +39,7 @@ namespace KGame {
  * Because there can only be one listener, all methods in this class are static.
  *
  * @warning Not all functionally exposed by the API of this class is guaranteed
- *          to be available on the compiled TagaroAudio backend. If a property
+ *          to be available on the compiled KGameAudio backend. If a property
  *          is not supported, the getter will return a sensible default value
  *          and the setter will do nothing except for warning via kDebug().
  */
@@ -51,9 +51,9 @@ class KGAME_EXPORT AudioScene
 		///Sets the position of the listener. The default is (0.0, 0.0), the
 		///point of origin.
 		static void setListenerPos(const QPointF& pos);
-		///@return the master volume for sounds outputted by TagaroAudio
+		///@return the master volume for sounds outputted by KGameAudio
 		static qreal volume();
-		///Sets the master volume for sounds outputted by TagaroAudio. The
+		///Sets the master volume for sounds outputted by KGameAudio. The
 		///default is 1.0, which means no volume change, compared to the
 		///original sounds. 0.0 means that all sounds are muted.
 		static void setVolume(qreal volume);

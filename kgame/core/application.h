@@ -28,7 +28,7 @@ namespace KGame {
 /**
  * @class KGame::Application application.h <KGame/Application>
  *
- * This KApplication provides additional services specific to Tagaro games:
+ * This KApplication provides additional services specific to KDE games:
  * @li an application-global object pool
  *
  * From the restriction to one KApplication instance per process arises an

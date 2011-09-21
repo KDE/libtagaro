@@ -35,7 +35,7 @@ class SpriteFetcher;
  * This class is the asynchronous rendering interface for KGame::Sprite (in
  * contrast to the synchronous KGame::Sprite::pixmap() method). Given a render
  * size and possibly a frame index, it returns the QPixmap for this sprite
- * (frame) once it becomes available. See @ref tagarographics for details.
+ * (frame) once it becomes available. See @ref kgamegraphics for details.
  *
  * Subclasses have to reimplement the receivePixmap() method.
  */
