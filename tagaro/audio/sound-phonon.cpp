@@ -20,34 +20,34 @@
 
 #include <KDE/KDebug>
 
-struct Tagaro::Sound::Private
+struct KGame::Sound::Private
 {
 	//TODO
 };
 
-Tagaro::Sound::Sound(const QString& file, QObject* parent)
+KGame::Sound::Sound(const QString& file, QObject* parent)
 	: QObject(parent)
 	, d(new Private)
 {
 	//TODO
 }
 
-Tagaro::Sound::~Sound()
+KGame::Sound::~Sound()
 {
 	delete d;
 }
 
-bool Tagaro::Sound::isValid() const
+bool KGame::Sound::isValid() const
 {
 	//TODO
 }
 
-Tagaro::Sound::PlaybackType Tagaro::Sound::playbackType() const
+KGame::Sound::PlaybackType KGame::Sound::playbackType() const
 {
-	return Tagaro::Sound::AmbientPlayback;
+	return KGame::Sound::AmbientPlayback;
 }
 
-void Tagaro::Sound::setPlaybackType(Tagaro::Sound::PlaybackType type)
+void KGame::Sound::setPlaybackType(KGame::Sound::PlaybackType type)
 {
 	Q_UNUSED(type)
 	static bool onlyOnce = true;
@@ -58,12 +58,12 @@ void Tagaro::Sound::setPlaybackType(Tagaro::Sound::PlaybackType type)
 	}
 }
 
-QPointF Tagaro::Sound::pos() const
+QPointF KGame::Sound::pos() const
 {
 	return QPointF(0.0, 0.0);
 }
 
-void Tagaro::Sound::setPos(const QPointF& pos)
+void KGame::Sound::setPos(const QPointF& pos)
 {
 	Q_UNUSED(pos)
 	static bool onlyOnce = true;
@@ -74,22 +74,22 @@ void Tagaro::Sound::setPos(const QPointF& pos)
 	}
 }
 
-qreal Tagaro::Sound::volume() const
+qreal KGame::Sound::volume() const
 {
 	//TODO
 }
 
-void Tagaro::Sound::setVolume(qreal volume)
+void KGame::Sound::setVolume(qreal volume)
 {
 	//TODO
 }
 
-void Tagaro::Sound::start()
+void KGame::Sound::start()
 {
 	//TODO
 }
 
-void Tagaro::Sound::start(const QPointF& pos)
+void KGame::Sound::start(const QPointF& pos)
 {
 	Q_UNUSED(pos)
 	static bool onlyOnce = true;
@@ -102,7 +102,7 @@ void Tagaro::Sound::start(const QPointF& pos)
 	start();
 }
 
-void Tagaro::Sound::stop()
+void KGame::Sound::stop()
 {
 	//TODO
 }

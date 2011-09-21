@@ -1,1 +1,1 @@
-add_subdirectory(Tagaro)
+add_subdirectory(KGame)

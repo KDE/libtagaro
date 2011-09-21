@@ -18,23 +18,23 @@
 
 #include "application.h"
 
-static Tagaro::Application* g_tapp = 0;
+static KGame::Application* g_tapp = 0;
 
-struct Tagaro::Application::Private
+struct KGame::Application::Private
 {
 	QHash<QByteArray, QObject*> m_objects;
 
 	void _t_objectDestroyed(QObject* object);
 };
 
-Tagaro::Application::Application(bool GUIenabled)
+KGame::Application::Application(bool GUIenabled)
 	: KApplication(GUIenabled)
 	, d(new Private)
 {
 	g_tapp = this;
 }
 
-Tagaro::Application::~Application()
+KGame::Application::~Application()
 {
 	//clean object pool (act on a local copy of d->m_objects because that one
 	//is modified during the deletions)
@@ -45,12 +45,12 @@ Tagaro::Application::~Application()
 	delete d;
 }
 
-/*static*/ Tagaro::Application* Tagaro::Application::instance()
+/*static*/ KGame::Application* KGame::Application::instance()
 {
 	return g_tapp;
 }
 
-void Tagaro::Application::addObject(const QByteArray& key, QObject* object)
+void KGame::Application::addObject(const QByteArray& key, QObject* object)
 {
 	//empty keys are forbidden
 	if (key.isEmpty() || !object)
@@ -62,7 +62,7 @@ void Tagaro::Application::addObject(const QByteArray& key, QObject* object)
 	connect(object, SIGNAL(destroyed(QObject*)), SLOT(_t_objectDestroyed(QObject*)));
 }
 
-void Tagaro::Application::Private::_t_objectDestroyed(QObject* object)
+void KGame::Application::Private::_t_objectDestroyed(QObject* object)
 {
 	//remove all occurrences of given object from object pool
 	QMutableHashIterator<QByteArray, QObject*> it(m_objects);
@@ -77,12 +77,12 @@ void Tagaro::Application::Private::_t_objectDestroyed(QObject* object)
 	}
 }
 
-QObject* Tagaro::Application::object(const QByteArray& key) const
+QObject* KGame::Application::object(const QByteArray& key) const
 {
 	return d->m_objects.value(key, 0);
 }
 
-QHash<QByteArray, QObject*> Tagaro::Application::objects() const
+QHash<QByteArray, QObject*> KGame::Application::objects() const
 {
 	return d->m_objects;
 }

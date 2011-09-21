@@ -26,8 +26,8 @@
 #include <QtGui/QStyleOptionGraphicsItem>
 #include <QtGui/QTextDocument>
 
-Tagaro::Scene::Private::Private(Tagaro::Sprite* backgroundSprite, Tagaro::Scene* parent)
-	: Tagaro::SpriteClient(backgroundSprite)
+KGame::Scene::Private::Private(KGame::Sprite* backgroundSprite, KGame::Scene* parent)
+	: KGame::SpriteClient(backgroundSprite)
 	, m_parent(parent)
 	, m_mainView(0)
 	, m_renderSize() //constructed with invalid size (as documented)
@@ -37,31 +37,31 @@ Tagaro::Scene::Private::Private(Tagaro::Sprite* backgroundSprite, Tagaro::Scene*
 	connect(parent, SIGNAL(sceneRectChanged(QRectF)), parent, SLOT(_k_updateSceneRect(QRectF)));
 }
 
-Tagaro::Scene::Scene(QObject* parent)
+KGame::Scene::Scene(QObject* parent)
 	: QGraphicsScene(parent)
 	, d(new Private(0, this))
 {
 }
 
-Tagaro::Scene::Scene(Tagaro::Sprite* backgroundSprite, QObject* parent)
+KGame::Scene::Scene(KGame::Sprite* backgroundSprite, QObject* parent)
 	: QGraphicsScene(parent)
 	, d(new Private(backgroundSprite, this))
 {
 }
 
-Tagaro::Scene::~Scene()
+KGame::Scene::~Scene()
 {
 	delete d;
 }
 
 //BEGIN scene rect stuff
 
-QGraphicsView* Tagaro::Scene::mainView() const
+QGraphicsView* KGame::Scene::mainView() const
 {
 	return d->m_mainView;
 }
 
-void Tagaro::Scene::setMainView(QGraphicsView* mainView)
+void KGame::Scene::setMainView(QGraphicsView* mainView)
 {
 	if (d->m_mainView == mainView)
 	{
@@ -83,7 +83,7 @@ void Tagaro::Scene::setMainView(QGraphicsView* mainView)
 	}
 }
 
-bool Tagaro::Scene::Private::_k_resetSceneRect()
+bool KGame::Scene::Private::_k_resetSceneRect()
 {
 	//force correct scene rect if necessary
 	if (m_mainView && !m_adjustingSceneRect)
@@ -97,7 +97,7 @@ bool Tagaro::Scene::Private::_k_resetSceneRect()
 	return false;
 }
 
-bool Tagaro::Scene::eventFilter(QObject* watched, QEvent* event)
+bool KGame::Scene::eventFilter(QObject* watched, QEvent* event)
 {
 	if (watched == d->m_mainView && event->type() == QEvent::Resize)
 	{
@@ -106,7 +106,7 @@ bool Tagaro::Scene::eventFilter(QObject* watched, QEvent* event)
 	return QGraphicsScene::eventFilter(watched, event);
 }
 
-void Tagaro::Scene::Private::_k_updateSceneRect(const QRectF& rect)
+void KGame::Scene::Private::_k_updateSceneRect(const QRectF& rect)
 {
 	if (!_k_resetSceneRect())
 	{
@@ -119,17 +119,17 @@ void Tagaro::Scene::Private::_k_updateSceneRect(const QRectF& rect)
 //END scene rect stuff
 //BEGIN background brush stuff
 
-Tagaro::SpriteClient* Tagaro::Scene::backgroundBrushClient() const
+KGame::SpriteClient* KGame::Scene::backgroundBrushClient() const
 {
 	return d;
 }
 
-QSize Tagaro::Scene::backgroundBrushRenderSize() const
+QSize KGame::Scene::backgroundBrushRenderSize() const
 {
 	return d->m_renderSize;
 }
 
-void Tagaro::Scene::setBackgroundBrushRenderSize(const QSize& size)
+void KGame::Scene::setBackgroundBrushRenderSize(const QSize& size)
 {
 	if (d->m_renderSize != size)
 	{
@@ -138,12 +138,12 @@ void Tagaro::Scene::setBackgroundBrushRenderSize(const QSize& size)
 	}
 }
 
-void Tagaro::Scene::Private::updateRenderSize(const QSize& sceneSize)
+void KGame::Scene::Private::updateRenderSize(const QSize& sceneSize)
 {
 	setRenderSize(m_renderSize.isValid() ? m_renderSize : sceneSize);
 }
 
-void Tagaro::Scene::Private::receivePixmap(const QPixmap& pixmap)
+void KGame::Scene::Private::receivePixmap(const QPixmap& pixmap)
 {
 	m_parent->setBackgroundBrush(pixmap);
 }
@@ -151,7 +151,7 @@ void Tagaro::Scene::Private::receivePixmap(const QPixmap& pixmap)
 //END background brush stuff
 //BEGIN message overlays
 
-void Tagaro::Scene::Private::addMessageOverlay(Tagaro::MessageOverlay* overlay)
+void KGame::Scene::Private::addMessageOverlay(KGame::MessageOverlay* overlay)
 {
 	//This is called during MessageOverlay instantiation. It is guaranteed that
 	//this overlay is not visible at this point.
@@ -161,9 +161,9 @@ void Tagaro::Scene::Private::addMessageOverlay(Tagaro::MessageOverlay* overlay)
 	connect(overlay, SIGNAL(visibleChanged(bool)), m_parent, SLOT(_k_moVisibleChanged(bool)));
 }
 
-void Tagaro::Scene::Private::_k_moDestroyed(QObject* object)
+void KGame::Scene::Private::_k_moDestroyed(QObject* object)
 {
-	Tagaro::MessageOverlay* overlay = reinterpret_cast<Tagaro::MessageOverlay*>(object);
+	KGame::MessageOverlay* overlay = reinterpret_cast<KGame::MessageOverlay*>(object);
 	m_overlays.removeAll(overlay);
 	if (m_currentOverlay == overlay)
 	{
@@ -172,7 +172,7 @@ void Tagaro::Scene::Private::_k_moDestroyed(QObject* object)
 	}
 }
 
-void Tagaro::Scene::Private::_k_moTextChanged(const QString& text)
+void KGame::Scene::Private::_k_moTextChanged(const QString& text)
 {
 	Q_UNUSED(text)
 	if (m_currentOverlay == m_parent->sender())
@@ -181,12 +181,12 @@ void Tagaro::Scene::Private::_k_moTextChanged(const QString& text)
 	}
 }
 
-void Tagaro::Scene::Private::_k_moVisibleChanged(bool isVisible)
+void KGame::Scene::Private::_k_moVisibleChanged(bool isVisible)
 {
 	Q_UNUSED(isVisible)
 	//choose new current overlay
 	m_currentOverlay = 0;
-	foreach (Tagaro::MessageOverlay* overlay, m_overlays)
+	foreach (KGame::MessageOverlay* overlay, m_overlays)
 	{
 		if (overlay->isVisible())
 		{
@@ -196,7 +196,7 @@ void Tagaro::Scene::Private::_k_moVisibleChanged(bool isVisible)
 	m_parent->invalidate(m_parent->sceneRect(), QGraphicsScene::ForegroundLayer);
 }
 
-void Tagaro::Scene::drawForeground(QPainter* painter, const QRectF& rect)
+void KGame::Scene::drawForeground(QPainter* painter, const QRectF& rect)
 {
 	QGraphicsScene::drawForeground(painter, rect);
 	if (!d->m_currentOverlay)

@@ -20,12 +20,12 @@
 
 #include <KDE/KDebug>
 
-QPointF Tagaro::AudioScene::listenerPos()
+QPointF KGame::AudioScene::listenerPos()
 {
 	return QPointF(0.0, 0.0);
 }
 
-void Tagaro::AudioScene::setListenerPos(const QPointF& pos)
+void KGame::AudioScene::setListenerPos(const QPointF& pos)
 {
 	Q_UNUSED(pos)
 	static bool onlyOnce = true;
@@ -36,12 +36,12 @@ void Tagaro::AudioScene::setListenerPos(const QPointF& pos)
 	}
 }
 
-qreal Tagaro::AudioScene::volume()
+qreal KGame::AudioScene::volume()
 {
 	return 1.0;
 }
 
-void Tagaro::AudioScene::setVolume(qreal volume)
+void KGame::AudioScene::setVolume(qreal volume)
 {
 	Q_UNUSED(volume)
 	static bool onlyOnce = true;

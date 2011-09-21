@@ -21,7 +21,7 @@
 #include <KDE/KAboutData>
 #include <KDE/KPluginFactory>
 
-#include <Tagaro/Settings>
+#include <KGame/Settings>
 #include "ui_visuals.h"
 
 K_PLUGIN_FACTORY(KCMTagaroFactory, registerPlugin<KCMTagaro>();)
@@ -44,7 +44,7 @@ KCMTagaro::KCMTagaro(QWidget* parent, const QVariantList& args)
 	setAboutData(about);
 	//setup configuration widgets
 	d->m_visualsUi.setupUi(this);
-	addConfig(Tagaro::Settings::self(), this);
+	addConfig(KGame::Settings::self(), this);
 }
 
 KCMTagaro::~KCMTagaro()

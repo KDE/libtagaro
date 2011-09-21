@@ -16,29 +16,29 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_MESSAGEOVERLAY_H
-#define TAGARO_MESSAGEOVERLAY_H
+#ifndef KGAME_MESSAGEOVERLAY_H
+#define KGAME_MESSAGEOVERLAY_H
 
 #include <QtCore/QObject>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class Scene;
 
-class TAGARO_EXPORT MessageOverlay : public QObject
+class KGAME_EXPORT MessageOverlay : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 	Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
 	public:
-		///Creates a new Tagaro::MessageOverlay on the given @a scene. The
+		///Creates a new KGame::MessageOverlay on the given @a scene. The
 		///MessageOverlay is hidden until you explicitly show it.
 		///
-		///The @a scene takes ownership of the Tagaro::MessageOverlay instance.
-		MessageOverlay(Tagaro::Scene* scene);
-		///Destroys this Tagaro::MessageOverlay instance.
+		///The @a scene takes ownership of the KGame::MessageOverlay instance.
+		MessageOverlay(KGame::Scene* scene);
+		///Destroys this KGame::MessageOverlay instance.
 		virtual ~MessageOverlay();
 
 		///@return the text which is shown on the overlay when it is visible.
@@ -83,6 +83,6 @@ class TAGARO_EXPORT MessageOverlay : public QObject
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_MESSAGEOVERLAY_H
+#endif // KGAME_MESSAGEOVERLAY_H

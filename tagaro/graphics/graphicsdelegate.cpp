@@ -32,7 +32,7 @@ namespace Metrics
 	const QSize ThumbnailBaseSize(64, 64);
 }
 
-Tagaro::GraphicsDelegate::GraphicsDelegate(QObject* parent)
+KGame::GraphicsDelegate::GraphicsDelegate(QObject* parent)
 	: QStyledItemDelegate(parent)
 {
 	QAbstractItemView* view = qobject_cast<QAbstractItemView*>(parent);
@@ -40,7 +40,7 @@ Tagaro::GraphicsDelegate::GraphicsDelegate(QObject* parent)
 		view->setItemDelegate(this);
 }
 
-QRect Tagaro::GraphicsDelegate::thumbnailRect(const QRect& baseRect) const
+QRect KGame::GraphicsDelegate::thumbnailRect(const QRect& baseRect) const
 {
 	QRect thumbnailBaseRect(QPoint(Metrics::Padding + baseRect.left(), 0), Metrics::ThumbnailBaseSize);
 	thumbnailBaseRect.moveCenter(QPoint(thumbnailBaseRect.center().x(), baseRect.center().y()));
@@ -49,7 +49,7 @@ QRect Tagaro::GraphicsDelegate::thumbnailRect(const QRect& baseRect) const
 	return thumbnailBaseRect;
 }
 
-void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void KGame::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	const bool rtl = option.direction == Qt::RightToLeft;
 	QRect baseRect = option.rect;
@@ -126,7 +126,7 @@ void Tagaro::GraphicsDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 	painter->restore();
 }
 
-QSize Tagaro::GraphicsDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize KGame::GraphicsDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	Q_UNUSED(option) Q_UNUSED(index)
 	//TODO: take text size into account

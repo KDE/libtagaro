@@ -16,26 +16,26 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SOUND_H
-#define TAGARO_SOUND_H
+#ifndef KGAME_SOUND_H
+#define KGAME_SOUND_H
 
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class PlaybackEvent;
 
 /**
- * @class Tagaro::Sound sound.h <Tagaro/Sound>
+ * @class KGame::Sound sound.h <KGame/Sound>
  *
  * This class models a sound file. Because it is implicitly added to this
- * application's Tagaro::AudioScene, it can be played at different positions.
+ * application's KGame::AudioScene, it can be played at different positions.
  *
  * Compared to many other media playback classes, the notable difference of
- * Tagaro::Sound is that one sound instance can be played multiple times at the
+ * KGame::Sound is that one sound instance can be played multiple times at the
  * same point in time, by calling start() multiple times (possibly with
  * different playback positions). This behavior can be suppressed by calling
  * stop() before start().
@@ -44,10 +44,10 @@ class PlaybackEvent;
  *       Ogg/Vorbis are supported. (The non-WAV formats require a reasonably
  *       recent version of libsndfile.)
  */
-class TAGARO_EXPORT Sound : public QObject
+class KGAME_EXPORT Sound : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(Tagaro::Sound::PlaybackType playbackType READ playbackType WRITE setPlaybackType)
+	Q_PROPERTY(KGame::Sound::PlaybackType playbackType READ playbackType WRITE setPlaybackType)
 	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 	Q_PROPERTY(qreal volume READ volume WRITE setVolume)
 	public:
@@ -76,23 +76,23 @@ class TAGARO_EXPORT Sound : public QObject
 		///startup. However, you can reuse the same Sound instance for multiple
 		///playback events.
 		explicit Sound(const QString& file, QObject* parent = 0);
-		///Destroys this Tagaro::Sound instance.
+		///Destroys this KGame::Sound instance.
 		virtual ~Sound();
 
 		///@return whether the sound file could be loaded successfully
 		bool isValid() const;
 		///@return the playback type for this sound
-		Tagaro::Sound::PlaybackType playbackType() const;
+		KGame::Sound::PlaybackType playbackType() const;
 		///Sets the playback type for this sound. This affects how the sound
 		///will be perceived by the listener. The default is AmbientPlayback.
 		///
 		///@note Changes to this property will not be propagated to running
 		///      playbacks of this sound.
-		void setPlaybackType(Tagaro::Sound::PlaybackType type);
+		void setPlaybackType(KGame::Sound::PlaybackType type);
 		///@return the position of this sound
 		QPointF pos() const;
 		///Sets the position of this sound. It depends on the playbackType() how
-		///this is position interpreted. See the Tagaro::Sound::PlaybackType
+		///this is position interpreted. See the KGame::Sound::PlaybackType
 		///enumeration documentation for details.
 		///
 		///@note Changes to this property will not be propagated to running
@@ -104,7 +104,7 @@ class TAGARO_EXPORT Sound : public QObject
 		///volume change, compared to the original sound file. 0.0 means that
 		///the sound is inaudible.
 		///
-		///If you think of the Tagaro::Sound as a loudspeaker, the
+		///If you think of the KGame::Sound as a loudspeaker, the
 		///volume which is controlled by this method is what you regulate at its
 		///volume control. If positional playback is enabled (see
 		///playbackType()), this will not be the actual volume which the
@@ -125,11 +125,11 @@ class TAGARO_EXPORT Sound : public QObject
 		///Stops any playbacks of this sounds.
 		void stop();
 	private:
-		friend class Tagaro::PlaybackEvent;
+		friend class KGame::PlaybackEvent;
 		class Private;
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_SOUND_H
+#endif // KGAME_SOUND_H

@@ -16,39 +16,39 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SPRITEITEM_H
-#define TAGARO_SPRITEITEM_H
+#ifndef KGAME_SPRITEITEM_H
+#define KGAME_SPRITEITEM_H
 
 #include <QtGui/QGraphicsPixmapItem>
 
 #include "spriteclient.h"
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class SpriteItemPrivate;
 
 /**
- * @class Tagaro::SpriteItem spriteitem.h <Tagaro/SpriteItem>
+ * @class KGame::SpriteItem spriteitem.h <KGame/SpriteItem>
  * @short A QGraphicsPixmapItem which reacts to theme changes automatically.
  *
  * This class is a QGraphicsPixmapItem which retrieves its pixmap from a
- * Tagaro::Sprite, and updates it automatically when the corresponding
- * Tagaro::ThemeProvider changes the theme.
+ * KGame::Sprite, and updates it automatically when the corresponding
+ * KGame::ThemeProvider changes the theme.
  */
-class TAGARO_EXPORT SpriteItem : public QGraphicsPixmapItem, public Tagaro::SpriteClient
+class KGAME_EXPORT SpriteItem : public QGraphicsPixmapItem, public KGame::SpriteClient
 {
 	public:
-		///Creates a new Tagaro::SpriteItem which renders the given @a sprite.
-		explicit SpriteItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
+		///Creates a new KGame::SpriteItem which renders the given @a sprite.
+		explicit SpriteItem(KGame::Sprite* sprite, QGraphicsItem* parent = 0);
 		virtual ~SpriteItem();
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);
 	private:
-		friend class Tagaro::SpriteItemPrivate;
-		Tagaro::SpriteItemPrivate* const d;
+		friend class KGame::SpriteItemPrivate;
+		KGame::SpriteItemPrivate* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_SPRITEITEM_H
+#endif // KGAME_SPRITEITEM_H

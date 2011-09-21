@@ -27,7 +27,7 @@
 #include <QtGui/QVBoxLayout>
 #include <KDE/KLocale>
 
-Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider)
+KGame::ThemeSelector::ThemeSelector(KGame::ThemeProvider* provider)
 	: m_provider(provider)
 	, m_themeList(new QListView(this))
 {
@@ -36,7 +36,7 @@ Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider)
 	setLayout(layout);
 	layout->addWidget(m_themeList);
 #if 0
-	if (options & Tagaro::ConfigDialog::WithNewStuffDownload)
+	if (options & KGame::ConfigDialog::WithNewStuffDownload)
 	{
 		QPushButton* knsButton = new QPushButton(KIcon("get-hot-new-stuff"), i18n("Get New Themes..."), this);
 		knsButton->setEnabled(false); //KNS not implemented yet
@@ -49,27 +49,27 @@ Tagaro::ThemeSelector::ThemeSelector(Tagaro::ThemeProvider* provider)
 	m_themeList->setSelectionMode(QAbstractItemView::SingleSelection);
 	updateSelectedTheme(provider->selectedTheme());
 	connect(m_themeList->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(storeSelection(QItemSelection)));
-	connect(provider, SIGNAL(selectedThemeChanged(const Tagaro::Theme*)), SLOT(updateSelectedTheme(const Tagaro::Theme*)));
+	connect(provider, SIGNAL(selectedThemeChanged(const KGame::Theme*)), SLOT(updateSelectedTheme(const KGame::Theme*)));
 	//setup appearance of theme list (minimum size = 4 items)
-	Tagaro::GraphicsDelegate* delegate = new Tagaro::GraphicsDelegate(m_themeList);
+	KGame::GraphicsDelegate* delegate = new KGame::GraphicsDelegate(m_themeList);
 	const QSize itemSizeHint = delegate->sizeHint(QStyleOptionViewItem(), QModelIndex());
 	const QSize scrollBarSizeHint = m_themeList->verticalScrollBar()->sizeHint();
 	m_themeList->setMinimumSize(itemSizeHint.width() + 2 * scrollBarSizeHint.width(), 4 * itemSizeHint.height());
 }
 
-Tagaro::ThemeProvider* Tagaro::ThemeSelector::provider() const
+KGame::ThemeProvider* KGame::ThemeSelector::provider() const
 {
 	return m_provider;
 }
 
-void Tagaro::ThemeSelector::updateSelectedTheme(const Tagaro::Theme* selectedTheme)
+void KGame::ThemeSelector::updateSelectedTheme(const KGame::Theme* selectedTheme)
 {
 	const int selectedIndex = m_provider->themes().indexOf(selectedTheme);
 	const QModelIndex selectedModelIndex = m_themeList->model()->index(selectedIndex, 0);
 	m_themeList->selectionModel()->setCurrentIndex(selectedModelIndex, QItemSelectionModel::ClearAndSelect);
 }
 
-void Tagaro::ThemeSelector::storeSelection(const QItemSelection& selection)
+void KGame::ThemeSelector::storeSelection(const QItemSelection& selection)
 {
 	const int selectedIndex = selection.indexes().value(0).row();
 	m_provider->setSelectedTheme(m_provider->themes().value(selectedIndex));

@@ -17,16 +17,16 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SPRITEOBJECTITEM_P_H
-#define TAGARO_SPRITEOBJECTITEM_P_H
+#ifndef KGAME_SPRITEOBJECTITEM_P_H
+#define KGAME_SPRITEOBJECTITEM_P_H
 
 #include "spriteobjectitem.h"
 
-namespace Tagaro {
+namespace KGame {
 	class Board;
 }
 
-class Tagaro::SpriteObjectItem::Private : public QGraphicsPixmapItem
+class KGame::SpriteObjectItem::Private : public QGraphicsPixmapItem
 {
 	public:
 		QSizeF m_size, m_pixmapSize;
@@ -34,9 +34,9 @@ class Tagaro::SpriteObjectItem::Private : public QGraphicsPixmapItem
 		Private(QGraphicsItem* parent);
 		inline void updateTransform();
 
-		//relation to Tagaro::Board
-		Tagaro::Board* m_board;
-		void findBoardFromParent(Tagaro::SpriteObjectItem* q, QGraphicsItem* parent);
+		//relation to KGame::Board
+		KGame::Board* m_board;
+		void findBoardFromParent(KGame::SpriteObjectItem* q, QGraphicsItem* parent);
 		inline void unsetBoard() {m_board = 0;}
 
 		//QGraphicsItem reimplementations (see comment below for why we need all of this)

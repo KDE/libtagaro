@@ -16,41 +16,41 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SCENE_H
-#define TAGARO_SCENE_H
+#ifndef KGAME_SCENE_H
+#define KGAME_SCENE_H
 
 #include <QtGui/QGraphicsScene>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class MessageOverlay;
 class SpriteClient;
 class Sprite;
 
 /**
- * @class Tagaro::Scene scene.h <Tagaro/Scene>
+ * @class KGame::Scene scene.h <KGame/Scene>
  * @brief QGraphicsScene with automatic viewport transform adjustments
  *
  * This QGraphicsScene subclass provides integration with Tagaro and
  * miscellaneous convenience features:
- * @li It acts as a Tagaro::SpriteClient to fetch a scene background pixmap.
+ * @li It acts as a KGame::SpriteClient to fetch a scene background pixmap.
  * @li It can be used to keep the QGraphicsScene's sceneRect() in sync
  *     with the rect() of a QGraphicsView instance (the "main view").
- * @li It can display Tagaro::MessageOverlay instances.
+ * @li It can display KGame::MessageOverlay instances.
  */
-class TAGARO_EXPORT Scene : public QGraphicsScene
+class KGAME_EXPORT Scene : public QGraphicsScene
 {
 	Q_OBJECT
 	public:
-		///Creates a new Tagaro::Scene instance.
+		///Creates a new KGame::Scene instance.
 		explicit Scene(QObject* parent = 0);
 		///@overload
 		///Initializes the renderer client for the scene background brush with
 		///the given @a sprite.
-		explicit Scene(Tagaro::Sprite* backgroundSprite, QObject* parent = 0);
-		///Destroys this Tagaro::Scene instance.
+		explicit Scene(KGame::Sprite* backgroundSprite, QObject* parent = 0);
+		///Destroys this KGame::Scene instance.
 		virtual ~Scene();
 
 		///@return the main view of this scene
@@ -70,7 +70,7 @@ class TAGARO_EXPORT Scene : public QGraphicsScene
 		///@warning Do not call setRenderSize() on this instance! The render
 		///size is managed by the scene. Use setBackgroundBrushRenderSize()
 		///instead.
-		Tagaro::SpriteClient* backgroundBrushClient() const;
+		KGame::SpriteClient* backgroundBrushClient() const;
 		///@return the background brush's render size
 		///
 		///If the render size is determined from the size of the sceneRect()
@@ -95,6 +95,6 @@ class TAGARO_EXPORT Scene : public QGraphicsScene
 		Q_PRIVATE_SLOT(d, void _k_moVisibleChanged(bool));
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_SCENE_H
+#endif // KGAME_SCENE_H

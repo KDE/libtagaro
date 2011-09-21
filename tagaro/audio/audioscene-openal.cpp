@@ -22,16 +22,16 @@
 #include <KDE/KDebug>
 #include <KDE/KGlobal>
 
-K_GLOBAL_STATIC(Tagaro::OpenALRuntime, g_runtime)
+K_GLOBAL_STATIC(KGame::OpenALRuntime, g_runtime)
 
-//BEGIN Tagaro::AudioScene
+//BEGIN KGame::AudioScene
 
-QPointF Tagaro::AudioScene::listenerPos()
+QPointF KGame::AudioScene::listenerPos()
 {
 	return g_runtime->m_listenerPos;
 }
 
-void Tagaro::AudioScene::setListenerPos(const QPointF& pos)
+void KGame::AudioScene::setListenerPos(const QPointF& pos)
 {
 	if (g_runtime->m_listenerPos != pos)
 	{
@@ -40,12 +40,12 @@ void Tagaro::AudioScene::setListenerPos(const QPointF& pos)
 	}
 }
 
-qreal Tagaro::AudioScene::volume()
+qreal KGame::AudioScene::volume()
 {
 	return g_runtime->m_volume;
 }
 
-void Tagaro::AudioScene::setVolume(qreal volume)
+void KGame::AudioScene::setVolume(qreal volume)
 {
 	if (g_runtime->m_volume != volume)
 	{
@@ -54,10 +54,10 @@ void Tagaro::AudioScene::setVolume(qreal volume)
 	}
 }
 
-//END Tagaro::AudioScene
-//BEGIN Tagaro::OpenALRuntime
+//END KGame::AudioScene
+//BEGIN KGame::OpenALRuntime
 
-Tagaro::OpenALRuntime::OpenALRuntime()
+KGame::OpenALRuntime::OpenALRuntime()
 	: m_volume(1)
 	, m_context(0)
 	, m_device(alcOpenDevice(""))
@@ -78,7 +78,7 @@ Tagaro::OpenALRuntime::OpenALRuntime()
 	configureListener();
 }
 
-Tagaro::OpenALRuntime::~OpenALRuntime()
+KGame::OpenALRuntime::~OpenALRuntime()
 {
 	if (m_context == alcGetCurrentContext())
 	{
@@ -88,12 +88,12 @@ Tagaro::OpenALRuntime::~OpenALRuntime()
 	alcCloseDevice(m_device);
 }
 
-Tagaro::OpenALRuntime* Tagaro::OpenALRuntime::instance()
+KGame::OpenALRuntime* KGame::OpenALRuntime::instance()
 {
 	return g_runtime;
 }
 
-void Tagaro::OpenALRuntime::configureListener()
+void KGame::OpenALRuntime::configureListener()
 {
 	int error; alGetError(); //clear error cache
 	alListener3f(AL_POSITION, m_listenerPos.x(), m_listenerPos.y(), 0);
@@ -104,4 +104,4 @@ void Tagaro::OpenALRuntime::configureListener()
 	}
 }
 
-//END Tagaro::OpenALRuntime
+//END KGame::OpenALRuntime

@@ -1,7 +1,7 @@
 File=settings.kcfg
-Namespace=Tagaro
+Namespace=KGame
 ClassName=Settings
 IncludeFiles=libtagaro_export.h
-Visibility=TAGARO_EXPORT
+Visibility=KGAME_EXPORT
 Singleton=true
 Mutators=true

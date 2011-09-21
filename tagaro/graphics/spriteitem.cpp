@@ -18,25 +18,25 @@
 
 #include "spriteitem.h"
 
-class Tagaro::SpriteItemPrivate
+class KGame::SpriteItemPrivate
 {
 	//NOTE: reserved for later use
 };
 
-Tagaro::SpriteItem::SpriteItem(Tagaro::Sprite* sprite, QGraphicsItem* parent)
+KGame::SpriteItem::SpriteItem(KGame::Sprite* sprite, QGraphicsItem* parent)
 	: QGraphicsPixmapItem(parent)
-	, Tagaro::SpriteClient(sprite)
+	, KGame::SpriteClient(sprite)
 	, d(0)
 {
 	setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
-Tagaro::SpriteItem::~SpriteItem()
+KGame::SpriteItem::~SpriteItem()
 {
 	delete d;
 }
 
-void Tagaro::SpriteItem::receivePixmap(const QPixmap& pixmap)
+void KGame::SpriteItem::receivePixmap(const QPixmap& pixmap)
 {
 	QGraphicsPixmapItem::setPixmap(pixmap);
 }

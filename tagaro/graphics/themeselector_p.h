@@ -16,14 +16,14 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_THEMESELECTOR_P_H
-#define TAGARO_THEMESELECTOR_P_H
+#ifndef KGAME_THEMESELECTOR_P_H
+#define KGAME_THEMESELECTOR_P_H
 
 class QItemSelection;
 class QListView;
 #include <QtGui/QWidget>
 
-namespace Tagaro {
+namespace KGame {
 
 class Theme;
 class ThemeProvider;
@@ -33,17 +33,17 @@ class ThemeSelector : public QWidget
 {
 	Q_OBJECT
 	public:
-		ThemeSelector(Tagaro::ThemeProvider* provider);
+		ThemeSelector(KGame::ThemeProvider* provider);
 
-		Tagaro::ThemeProvider* provider() const;
+		KGame::ThemeProvider* provider() const;
 	private Q_SLOTS:
-		void updateSelectedTheme(const Tagaro::Theme* selectedTheme);
+		void updateSelectedTheme(const KGame::Theme* selectedTheme);
 		void storeSelection(const QItemSelection& selection);
 	private:
-		Tagaro::ThemeProvider* m_provider;
+		KGame::ThemeProvider* m_provider;
 		QListView* m_themeList;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_THEMESELECTOR_P_H
+#endif // KGAME_THEMESELECTOR_P_H

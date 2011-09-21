@@ -31,54 +31,54 @@
 
 //TODO: share identical sources between Themes at least in the same ThemeProvider -> move source instantiation to ThemeProvider?
 
-//BEGIN Tagaro::Theme
+//BEGIN KGame::Theme
 
 struct ThemeMapping
 {
 	QRegExp spriteKey;
 	QString elementKey;
-	const Tagaro::GraphicsSource* source;
+	const KGame::GraphicsSource* source;
 };
 
-struct Tagaro::Theme::Private
+struct KGame::Theme::Private
 {
 	QByteArray m_identifier;
-	const Tagaro::ThemeProvider* m_provider;
+	const KGame::ThemeProvider* m_provider;
 	//metadata
 	QString m_name, m_description, m_author, m_authorEmail;
 	QPixmap m_preview;
 	QMap<QString, QString> m_customData;
 	//routing table
-	QHash<QByteArray, Tagaro::GraphicsSource*> m_sources;
+	QHash<QByteArray, KGame::GraphicsSource*> m_sources;
 	QList<ThemeMapping> m_mappings;
 
-	Private(const QByteArray& identifier, const Tagaro::ThemeProvider* provider) : m_identifier(identifier), m_provider(provider) {}
+	Private(const QByteArray& identifier, const KGame::ThemeProvider* provider) : m_identifier(identifier), m_provider(provider) {}
 	~Private() { qDeleteAll(m_sources); }
 };
 
-Tagaro::Theme::Theme(const QByteArray& identifier, const Tagaro::ThemeProvider* provider)
+KGame::Theme::Theme(const QByteArray& identifier, const KGame::ThemeProvider* provider)
 	: d(new Private(identifier, provider))
 {
 }
 
-Tagaro::Theme::~Theme()
+KGame::Theme::~Theme()
 {
 	delete d;
 }
 
-QByteArray Tagaro::Theme::identifier() const
+QByteArray KGame::Theme::identifier() const
 {
 	return d->m_identifier;
 }
 
-const Tagaro::ThemeProvider* Tagaro::Theme::provider() const
+const KGame::ThemeProvider* KGame::Theme::provider() const
 {
 	return d->m_provider;
 }
 
-bool Tagaro::Theme::isValid() const
+bool KGame::Theme::isValid() const
 {
-	QHash<QByteArray, Tagaro::GraphicsSource*>::const_iterator it1 = d->m_sources.constBegin(), it2 = d->m_sources.constEnd();
+	QHash<QByteArray, KGame::GraphicsSource*>::const_iterator it1 = d->m_sources.constBegin(), it2 = d->m_sources.constEnd();
 	for (; it1 != it2; ++it1)
 	{
 		if (!(it1.value() && it1.value()->isValid()))
@@ -89,70 +89,70 @@ bool Tagaro::Theme::isValid() const
 	return true;
 }
 
-QString Tagaro::Theme::name() const
+QString KGame::Theme::name() const
 {
 	return d->m_name;
 }
 
-void Tagaro::Theme::setName(const QString& name)
+void KGame::Theme::setName(const QString& name)
 {
 	d->m_name = name;
 }
 
-QString Tagaro::Theme::description() const
+QString KGame::Theme::description() const
 {
 	return d->m_description;
 }
 
-void Tagaro::Theme::setDescription(const QString& description)
+void KGame::Theme::setDescription(const QString& description)
 {
 	d->m_description = description;
 }
 
-QString Tagaro::Theme::author() const
+QString KGame::Theme::author() const
 {
 	return d->m_author;
 }
 
-void Tagaro::Theme::setAuthor(const QString& author)
+void KGame::Theme::setAuthor(const QString& author)
 {
 	d->m_author = author;
 }
 
-QString Tagaro::Theme::authorEmail() const
+QString KGame::Theme::authorEmail() const
 {
 	return d->m_authorEmail;
 }
 
-void Tagaro::Theme::setAuthorEmail(const QString& authorEmail)
+void KGame::Theme::setAuthorEmail(const QString& authorEmail)
 {
 	d->m_authorEmail = authorEmail;
 }
 
-QPixmap Tagaro::Theme::preview() const
+QPixmap KGame::Theme::preview() const
 {
 	return d->m_preview;
 }
 
-void Tagaro::Theme::setPreview(const QPixmap& preview)
+void KGame::Theme::setPreview(const QPixmap& preview)
 {
 	d->m_preview = preview;
 }
 
-QMap<QString, QString> Tagaro::Theme::customData() const
+QMap<QString, QString> KGame::Theme::customData() const
 {
 	return d->m_customData;
 }
 
-void Tagaro::Theme::setCustomData(const QMap<QString, QString>& customData)
+void KGame::Theme::setCustomData(const QMap<QString, QString>& customData)
 {
 	d->m_customData = customData;
 }
 
-void Tagaro::Theme::addSource(const QByteArray& identifier_, Tagaro::GraphicsSource* source)
+void KGame::Theme::addSource(const QByteArray& identifier_, KGame::GraphicsSource* source)
 {
 	const QByteArray identifier = (identifier_ == "default") ? QByteArray() : identifier_;
-	QHash<QByteArray, Tagaro::GraphicsSource*>::const_iterator it = d->m_sources.constFind(identifier);
+	QHash<QByteArray, KGame::GraphicsSource*>::const_iterator it = d->m_sources.constFind(identifier);
 	if (it != d->m_sources.constEnd())
 	{
 		delete it.value();
@@ -182,7 +182,7 @@ static QString resolveRelativePath(const QString& fileName, const QList<QDir>& r
 	return file.absoluteFilePath();
 }
 
-void Tagaro::Theme::addSource(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& sourceConfig)
+void KGame::Theme::addSource(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& sourceConfig)
 {
 	const QChar typeSymbol(':');
 	QString spec(specification), type(QLatin1String("auto"));
@@ -224,27 +224,27 @@ void Tagaro::Theme::addSource(const QByteArray& identifier, const QString& speci
 		}
 	}
 	//resolve specifications - Add new types below here.
-	Tagaro::GraphicsSource* source;
+	KGame::GraphicsSource* source;
 	if (type == QLatin1String("svg"))
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
-		Tagaro::QtSvgGraphicsSource* svgSource = new Tagaro::QtSvgGraphicsSource(path, d->m_provider->config());
-		source = new Tagaro::CachedProxyGraphicsSource(svgSource);
+		KGame::QtSvgGraphicsSource* svgSource = new KGame::QtSvgGraphicsSource(path, d->m_provider->config());
+		source = new KGame::CachedProxyGraphicsSource(svgSource);
 	}
 	else if (type == QLatin1String("ccsvg")) // custom color svg
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
-		Tagaro::QtColoredSvgGraphicsSource* svgSource = new Tagaro::QtColoredSvgGraphicsSource(path, d->m_provider->config());
-		source = new Tagaro::CachedProxyGraphicsSource(svgSource);
+		KGame::QtColoredSvgGraphicsSource* svgSource = new KGame::QtColoredSvgGraphicsSource(path, d->m_provider->config());
+		source = new KGame::CachedProxyGraphicsSource(svgSource);
 	}
 	else if (type == QLatin1String("image"))
 	{
 		const QString path = resolveRelativePath(spec, refDirs);
-		source = new Tagaro::ImageGraphicsSource(path, d->m_provider->config());
+		source = new KGame::ImageGraphicsSource(path, d->m_provider->config());
 	}
 	else if (type == QLatin1String("color"))
 	{
-		source = new Tagaro::ColorGraphicsSource(d->m_provider->config());
+		source = new KGame::ColorGraphicsSource(d->m_provider->config());
 	}
 	else
 	{
@@ -259,15 +259,15 @@ void Tagaro::Theme::addSource(const QByteArray& identifier, const QString& speci
 	addSource(identifier, source);
 }
 
-const Tagaro::GraphicsSource* Tagaro::Theme::source(const QByteArray& identifier_) const
+const KGame::GraphicsSource* KGame::Theme::source(const QByteArray& identifier_) const
 {
 	const QByteArray identifier = (identifier_ == "default") ? QByteArray() : identifier_;
 	return d->m_sources.value(identifier);
 }
 
-void Tagaro::Theme::addMapping(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::GraphicsSource* source)
+void KGame::Theme::addMapping(const QRegExp& spriteKey, const QString& elementKey, const KGame::GraphicsSource* source)
 {
-	Q_ASSERT(!d->m_sources.key(const_cast<Tagaro::GraphicsSource*>(source)).isEmpty());
+	Q_ASSERT(!d->m_sources.key(const_cast<KGame::GraphicsSource*>(source)).isEmpty());
 	ThemeMapping mapping = { spriteKey, elementKey, source };
 	d->m_mappings << mapping;
 }
@@ -283,7 +283,7 @@ static void resolveCaptures(QString& pattern, const QStringList& captures)
 	}
 }
 
-QPair<const Tagaro::GraphicsSource*, QString> Tagaro::Theme::mapSpriteKey(const QString& spriteKey) const
+QPair<const KGame::GraphicsSource*, QString> KGame::Theme::mapSpriteKey(const QString& spriteKey) const
 {
 	//check routing table
 	const int mappingCount = d->m_mappings.count();
@@ -302,18 +302,18 @@ QPair<const Tagaro::GraphicsSource*, QString> Tagaro::Theme::mapSpriteKey(const 
 	return qMakePair(source(QByteArray()), spriteKey);
 }
 
-//END Tagaro::Theme
-//BEGIN Tagaro::StandardTheme
+//END KGame::Theme
+//BEGIN KGame::StandardTheme
 
-struct Tagaro::StandardTheme::Private
+struct KGame::StandardTheme::Private
 {
 	QList<QDir> m_directories;
 
-	void init(Tagaro::StandardTheme* theme, const QString& filePath);
+	void init(KGame::StandardTheme* theme, const QString& filePath);
 };
 
-Tagaro::StandardTheme::StandardTheme(const QString& filePath, const Tagaro::ThemeProvider* provider)
-	: Tagaro::Theme(QFileInfo(filePath).absoluteFilePath().toUtf8(), provider)
+KGame::StandardTheme::StandardTheme(const QString& filePath, const KGame::ThemeProvider* provider)
+	: KGame::Theme(QFileInfo(filePath).absoluteFilePath().toUtf8(), provider)
 	, d(new Private)
 {
 	QFileInfo file(filePath);
@@ -329,8 +329,8 @@ static const QByteArray dftIdentifier(const QString& ksdDirectory, const QString
 		return (ksdDirectory + QChar('/') + fileName).toUtf8();
 }
 
-Tagaro::StandardTheme::StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName, const Tagaro::ThemeProvider* provider)
-	: Tagaro::Theme(dftIdentifier(ksdDirectory, fileName), provider)
+KGame::StandardTheme::StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName, const KGame::ThemeProvider* provider)
+	: KGame::Theme(dftIdentifier(ksdDirectory, fileName), provider)
 	, d(new Private)
 {
 	foreach (const QString& dirPath, KGlobal::dirs()->findDirs(ksdResource, ksdDirectory))
@@ -340,7 +340,7 @@ Tagaro::StandardTheme::StandardTheme(const QByteArray& ksdResource, const QStrin
 	d->init(this, KStandardDirs::locate(ksdResource, ksdDirectory + QChar('/') + fileName));
 }
 
-void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QString& filePath)
+void KGame::StandardTheme::Private::init(KGame::StandardTheme* theme, const QString& filePath)
 {
 	//open configuration
 	const KConfig themeConfigFile(filePath, KConfig::SimpleConfig);
@@ -392,7 +392,7 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 		QMap<QString, QString> sourceConfigMap = sourceConfig.entryMap();
 		sourceConfigMap.remove(QLatin1String("SourceType"));
 		theme->addSource(sourceNameRaw, sourceSpec, m_directories, sourceConfigMap);
-		const Tagaro::GraphicsSource* source = theme->source(sourceNameRaw);
+		const KGame::GraphicsSource* source = theme->source(sourceNameRaw);
 		//read mappings; each mapping is stored as two key-value pairs
 		//   N-sprite=SPRITEKEY (as QRegExp)
 		//   N-element=ELEMENTKEY (with %0, %1, %2, etc. corresponding to the captured texts)
@@ -422,4 +422,4 @@ void Tagaro::StandardTheme::Private::init(Tagaro::StandardTheme* theme, const QS
 	}
 }
 
-//END Tagaro::StandardTheme
+//END KGame::StandardTheme

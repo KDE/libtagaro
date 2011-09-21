@@ -16,37 +16,37 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SCENE_P_H
-#define TAGARO_SCENE_P_H
+#ifndef KGAME_SCENE_P_H
+#define KGAME_SCENE_P_H
 
 #include "scene.h"
 #include "../graphics/spriteclient.h"
 
-struct Tagaro::Scene::Private : public Tagaro::SpriteClient
+struct KGame::Scene::Private : public KGame::SpriteClient
 {
 	public:
-		Private(Tagaro::Sprite* backgroundSprite, Tagaro::Scene* parent);
+		Private(KGame::Sprite* backgroundSprite, KGame::Scene* parent);
 
 		//Returns whether sceneRect() was reset to mainView->rect().
 		bool _k_resetSceneRect();
 		void _k_updateSceneRect(const QRectF& rect);
 		inline void updateRenderSize(const QSize& sceneSize);
 
-		//interface to Tagaro::MessageOverlay
-		void addMessageOverlay(Tagaro::MessageOverlay* overlay);
+		//interface to KGame::MessageOverlay
+		void addMessageOverlay(KGame::MessageOverlay* overlay);
 		void _k_moDestroyed(QObject* object);
 		void _k_moTextChanged(const QString& text);
 		void _k_moVisibleChanged(bool isVisible);
 
-		Tagaro::Scene* m_parent;
+		KGame::Scene* m_parent;
 		QGraphicsView* m_mainView;
 		QSize m_renderSize;
 		bool m_adjustingSceneRect;
 
-		QList<Tagaro::MessageOverlay*> m_overlays;
-		Tagaro::MessageOverlay* m_currentOverlay;
+		QList<KGame::MessageOverlay*> m_overlays;
+		KGame::MessageOverlay* m_currentOverlay;
 	protected:
 		virtual void receivePixmap(const QPixmap& pixmap);
 };
 
-#endif // TAGARO_SCENE_P_H
+#endif // KGAME_SCENE_P_H

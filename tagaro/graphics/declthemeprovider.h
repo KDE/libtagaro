@@ -16,31 +16,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_DECLTHEMEPROVIDER_H
-#define TAGARO_DECLTHEMEPROVIDER_H
+#ifndef KGAME_DECLTHEMEPROVIDER_H
+#define KGAME_DECLTHEMEPROVIDER_H
 
 #include <QtDeclarative/QDeclarativeImageProvider>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro
+namespace KGame
 {
 
 class ThemeProvider;
 
 /**
- * @class Tagaro::DeclarativeThemeProvider declthemeprovider.h <Tagaro/DeclarativeThemeProvider>
+ * @class KGame::DeclarativeThemeProvider declthemeprovider.h <KGame/DeclarativeThemeProvider>
  *
- * This class makes Tagaro::ThemeProvider available to QML Image elements.
+ * This class makes KGame::ThemeProvider available to QML Image elements.
  * @code
- * Tagaro::SomeThemeProvider tp(...);
+ * KGame::SomeThemeProvider tp(...);
  * QDeclarativeEngine engine;
  * ...
- * engine.addImageProvider(QLatin1String("foo"), new Tagaro::DeclarativeThemeProvider(&tp);
+ * engine.addImageProvider(QLatin1String("foo"), new KGame::DeclarativeThemeProvider(&tp);
  * @endcode
  * The last line should be executed before any QML files are loaded into the
  * engine. The engine takes ownership of the eclarativeThemeProvider, so ensure
- * that the Tagaro::ThemeProvider lives at least as long as the engine.
+ * that the KGame::ThemeProvider lives at least as long as the engine.
  *
  * After that, images can be fetched in QML with "image://foo/" URLs
  * (where "theme" was the first argument to addImageProvider).
@@ -57,10 +57,10 @@ class ThemeProvider;
  * TODO: merge this into ThemeProvider?
  * TODO: need QML access to other properties of Sprite (at least frameCount)
  */
-class TAGARO_EXPORT DeclarativeThemeProvider : public QDeclarativeImageProvider
+class KGAME_EXPORT DeclarativeThemeProvider : public QDeclarativeImageProvider
 {
 	public:
-		DeclarativeThemeProvider(const Tagaro::ThemeProvider* tp);
+		DeclarativeThemeProvider(const KGame::ThemeProvider* tp);
 		~DeclarativeThemeProvider();
 
 		virtual QImage requestImage(const QString& id, QSize* size, const QSize& requestedSize);
@@ -69,6 +69,6 @@ class TAGARO_EXPORT DeclarativeThemeProvider : public QDeclarativeImageProvider
 		Private* const d;
 };
 
-} // namespace Tagaro
+} // namespace KGame
 
-#endif // TAGARO_DECLTHEMEPROVIDER_H
+#endif // KGAME_DECLTHEMEPROVIDER_H

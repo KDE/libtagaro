@@ -16,42 +16,42 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_THEME_H
-#define TAGARO_THEME_H
+#ifndef KGAME_THEME_H
+#define KGAME_THEME_H
 
 #include <QtCore/QDir>
 #include <QtCore/QVariant>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class GraphicsSource;
 class ThemeProvider;
 
 /**
- * @class Tagaro::Theme theme.h <Tagaro/Theme>
+ * @class KGame::Theme theme.h <KGame/Theme>
  *
  * A theme is an entity consisting of graphics sources and metadata. Theme
- * instances are usually created and managed by a Tagaro::ThemeProvider.
+ * instances are usually created and managed by a KGame::ThemeProvider.
  *
  * The most important part of a theme is its routing table: The routing table
  * maps the keys of sprites used by the game to elements in graphics sources.
  */
-class TAGARO_EXPORT Theme
+class KGAME_EXPORT Theme
 {
 	Q_DISABLE_COPY(Theme)
 	public:
-		///Creates a new Tagaro::Theme with the given @a identifier. The
+		///Creates a new KGame::Theme with the given @a identifier. The
 		///identifier must be application-unique.
-		Theme(const QByteArray& identifier, const Tagaro::ThemeProvider* provider);
-		///Destroys this Tagaro::Theme instance.
+		Theme(const QByteArray& identifier, const KGame::ThemeProvider* provider);
+		///Destroys this KGame::Theme instance.
 		~Theme();
 
 		///@return the internal identifier for this theme
 		QByteArray identifier() const;
 		///@return the provider which manages this theme
-		const Tagaro::ThemeProvider* provider() const;
+		const KGame::ThemeProvider* provider() const;
 		///@return whether all graphics sources could be loaded successfully
 		bool isValid() const;
 
@@ -86,40 +86,40 @@ class TAGARO_EXPORT Theme
 
 		///Adds a new @a source to this theme. If @a identifier is empty, it
 		///is replaced by the default identifier "default".
-		void addSource(const QByteArray& identifier, Tagaro::GraphicsSource* source);
+		void addSource(const QByteArray& identifier, KGame::GraphicsSource* source);
 		///Adds a new source to this theme by instantiating one with the given
 		///@a specification. Relative file paths are resolved against the
 		///reference directories in the @a refDirs parameter. If the
 		///specification is invalid, a null source is created to indicate that
 		///the theme could not be loaded properly. The @a sourceConfig is
-		///passed to Tagaro::GraphicsSource::addConfiguration.
+		///passed to KGame::GraphicsSource::addConfiguration.
 		void addSource(const QByteArray& identifier, const QString& specification, const QList<QDir>& refDirs, const QMap<QString, QString>& sourceConfig);
 		///@return the source with the given @a identifier, or 0 if no such
 		///source exists
 		///
 		///If @a identifier is empty, it is replaced by the default identifier
 		///"default".
-		const Tagaro::GraphicsSource* source(const QByteArray& identifier) const;
+		const KGame::GraphicsSource* source(const QByteArray& identifier) const;
 		///Adds a new mapping to this theme's routing table.
 		///@param spriteKey  a regular expression matching the sprite keys
 		///                  affected by this mapping (the sprite key is what you
-		///                  give to Tagaro::Renderer::sprite())
+		///                  give to KGame::Renderer::sprite())
 		///@param elementKey the element key for the graphics source (this is
-		///                  what you give to Tagaro::GraphicsSource methods);
+		///                  what you give to KGame::GraphicsSource methods);
 		///                  the argument can contain "%0", "%1", "%2", ...
 		///                  which are replaced by the regexp's capturedTexts()
 		///@param source    the source which serves the matching elements
-		void addMapping(const QRegExp& spriteKey, const QString& elementKey, const Tagaro::GraphicsSource* source);
+		void addMapping(const QRegExp& spriteKey, const QString& elementKey, const KGame::GraphicsSource* source);
 		///Resolve sprite keys to sources and element keys with the routing
 		///table of this theme.
-		QPair<const Tagaro::GraphicsSource*, QString> mapSpriteKey(const QString& spriteKey) const;
+		QPair<const KGame::GraphicsSource*, QString> mapSpriteKey(const QString& spriteKey) const;
 	private:
 		class Private;
 		Private* const d;
 };
 
 /**
- * @class Tagaro::StandardTheme theme.h <Tagaro/StandardTheme>
+ * @class KGame::StandardTheme theme.h <KGame/StandardTheme>
  *
  * This subclass implements loading of themes which are stored in a format
  * loosely based on the freedesktop.org Desktop File Specification.
@@ -127,13 +127,13 @@ class TAGARO_EXPORT Theme
  * Also, this class provides legacy support for KGameTheme.
  */
 //TODO: provide legacy support for KMahjonggBackground, KMahjonggTileset
-class TAGARO_EXPORT StandardTheme : public Tagaro::Theme
+class KGAME_EXPORT StandardTheme : public KGame::Theme
 {
 	public:
-		///Creates a new Tagaro::StandardTheme instance by reading in the
+		///Creates a new KGame::StandardTheme instance by reading in the
 		///desktop file at the given @a filePath.
-		StandardTheme(const QString& filePath, const Tagaro::ThemeProvider* provider);
-		///Creates a new Tagaro::StandardTheme instance by reading in the
+		StandardTheme(const QString& filePath, const KGame::ThemeProvider* provider);
+		///Creates a new KGame::StandardTheme instance by reading in the
 		///desktop file at
 		///@code
 		///KStandardDirs::locate(ksdResource, ksdDirectory + fileName);
@@ -141,12 +141,12 @@ class TAGARO_EXPORT StandardTheme : public Tagaro::Theme
 		///The important difference to the single-argument constructor is that
 		///references to graphics files are also resolved via
 		///KStandardDirs::locate rather than just looking in the same directory.
-		StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName, const Tagaro::ThemeProvider* provider);
+		StandardTheme(const QByteArray& ksdResource, const QString& ksdDirectory, const QString& fileName, const KGame::ThemeProvider* provider);
 	private:
 		class Private;
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_THEME_H
+#endif // KGAME_THEME_H

@@ -4,11 +4,11 @@
 # forward includes for all these classes.
 
 # configuration
-EXPORT_MACRO=TAGARO_EXPORT  # the macro which denotes exported classes
+EXPORT_MACRO=KGAME_EXPORT   # the macro which denotes exported classes
 HEADER_DIR=tagaro           # the directory which contains the headers of your lib
-NAMESPACE=Tagaro            # the namespace in which the classes reside
-INCLUDE_DIR=includes/Tagaro # the directory which shall be filled with the pretty headers
-INCLUDE_INSTALL_DIR='${INCLUDE_INSTALL_DIR}/Tagaro'
+NAMESPACE=KGame             # the namespace in which the classes reside
+INCLUDE_DIR=includes/KGame  # the directory which shall be filled with the pretty headers
+INCLUDE_INSTALL_DIR='${INCLUDE_INSTALL_DIR}/KGame'
                             # the directory into which CMake shall install the pretty headers
 MANUAL_HEADERS='Settings'   # specify manually created headers in this list (separated by spaces)
 

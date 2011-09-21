@@ -16,44 +16,44 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SPRITECLIENT_H
-#define TAGARO_SPRITECLIENT_H
+#ifndef KGAME_SPRITECLIENT_H
+#define KGAME_SPRITECLIENT_H
 
 #include <QtGui/QPixmap>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class Sprite;
 class SpriteFetcher;
 
 /**
- * @class Tagaro::SpriteClient spriteclient.h <Tagaro/SpriteClient>
- * @short An object that receives pixmaps from a Tagaro::Sprite.
+ * @class KGame::SpriteClient spriteclient.h <KGame/SpriteClient>
+ * @short An object that receives pixmaps from a KGame::Sprite.
  *
- * This class is the asynchronous rendering interface for Tagaro::Sprite (in
- * contrast to the synchronous Tagaro::Sprite::pixmap() method). Given a render
+ * This class is the asynchronous rendering interface for KGame::Sprite (in
+ * contrast to the synchronous KGame::Sprite::pixmap() method). Given a render
  * size and possibly a frame index, it returns the QPixmap for this sprite
  * (frame) once it becomes available. See @ref tagarographics for details.
  *
  * Subclasses have to reimplement the receivePixmap() method.
  */
-class TAGARO_EXPORT SpriteClient
+class KGAME_EXPORT SpriteClient
 {
 	public:
 		///Creates a new client which receives pixmaps for the given @a sprite.
 		///You may give a null pointer to @a sprite to disable pixmap fetching.
 		///The pixmap() will then be invalid.
-		SpriteClient(Tagaro::Sprite* sprite);
-		///Destroys this Tagaro::SpriteClient.
+		SpriteClient(KGame::Sprite* sprite);
+		///Destroys this KGame::SpriteClient.
 		virtual ~SpriteClient();
 
 		///@return the sprite rendered by this client
-		Tagaro::Sprite* sprite() const;
+		KGame::Sprite* sprite() const;
 		///Sets the sprite rendered by this client. Set to a null pointer to
 		///disable pixmap fetching.
-		void setSprite(Tagaro::Sprite* sprite);
+		void setSprite(KGame::Sprite* sprite);
 
 		///@return the current frame number, or -1 for non-animated sprites
 		int frame() const;
@@ -61,7 +61,7 @@ class TAGARO_EXPORT SpriteClient
 		///normalized by taking the modulo of the frame count, so the following
 		///code works fine:
 		///@code
-		///    class MyClient : public Tagaro::SpriteClient { ... }
+		///    class MyClient : public KGame::SpriteClient { ... }
 		///    MyClient client;
 		///    client.setFrame(client.frame() + 1); //cycle to next frame
 		///    client.setFrame(KRandom::random());  //choose a random frame
@@ -75,10 +75,10 @@ class TAGARO_EXPORT SpriteClient
 		///It may not contain "@" characters.
 		void setProcessingInstruction(const QString& processingInstruction);
 
-		///@return the size of the pixmap requested from Tagaro::Renderer
+		///@return the size of the pixmap requested from KGame::Renderer
 		QSize renderSize() const;
 		///Defines the size of the pixmap that will be requested from
-		///Tagaro::Renderer. For pixmaps rendered on the screen, you usually
+		///KGame::Renderer. For pixmaps rendered on the screen, you usually
 		///want to set this size such that the pixmap does not have to be scaled
 		///when it is rendered onto your primary view (for speed reasons).
 		///
@@ -93,11 +93,11 @@ class TAGARO_EXPORT SpriteClient
 		///client (esp. after theme changes and calls to the client's setters).
 		virtual void receivePixmap(const QPixmap& pixmap) = 0;
 	private:
-		friend class Tagaro::SpriteFetcher;
+		friend class KGame::SpriteFetcher;
 		class Private;
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_SPRITECLIENT_H
+#endif // KGAME_SPRITECLIENT_H

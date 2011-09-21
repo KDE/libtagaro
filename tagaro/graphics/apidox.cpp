@@ -41,7 +41,7 @@ and sprites. It also understands animated sprites consisting of multiple frames.
 Themes are created and managed by a ThemeProvider, e.g. StandardThemeProvider
 locates theme description files in the KStandardDirs. The ThemeProvider keeps
 track of the selected theme, i.e. the theme which is used to actually render
-pixmaps. The theme provider also creates Tagaro::Sprite instances, which
+pixmaps. The theme provider also creates KGame::Sprite instances, which
 represent single sprites.
 
 The sprites are theme-independent, but tied to one theme provider. This is
@@ -51,8 +51,8 @@ sprites for which themes can be selected independently (e.g. foreground and
 background elements). In this case, multiple theme providers need to be
 instantiated, which manage the corresponding themes.
 
-Tagaro::Sprite provides a synchronous interface (Tagaro::Sprite::pixmap), but
-you will usually use Tagaro::SpriteClient instances. This approach has multiple
+KGame::Sprite provides a synchronous interface (KGame::Sprite::pixmap), but
+you will usually use KGame::SpriteClient instances. This approach has multiple
 advantages:
 
 	@li Sprite clients work in a fire-and-forget manner. You set them up once,
@@ -62,13 +62,13 @@ advantages:
 	@li Sprite clients fetch pixmaps asynchronously, which allows Tagaro to use
 	multi-threaded rendering for complex graphics sources (e.g. big SVG files).
 
-	@li Tagaro::SpriteClient subclasses for QGraphicsView are already
+	@li KGame::SpriteClient subclasses for QGraphicsView are already
 	available. They work similar to QGraphicsPixmapItem or QGraphicsSvgItem.
 	The only difference is that you have to specify a render size: Sprites are
 	usually size-independent, so each client must define the size of the pixmap
 	which it wants to display. You usually want this to match the screen size
 	of the client to improve painting speed. Calculating the render size can be
-	automated by using Tagaro::Board from TagaroInterface.
+	automated by using KGame::Board from TagaroInterface.
 
 @section theme-structure Structure of a theme
 
@@ -80,7 +80,7 @@ theme-file-format for the standard representation of themes as files.
 Both sprites and elements of graphics sources are identified by QString keys.
 Therefore, there is an ambiguity when there are multiple graphics sources in
 one theme: If a sprite "foo" is requested, which graphics source shall be used?
-To answer this question, Tagaro::Theme maintains a mapping table which maps
+To answer this question, KGame::Theme maintains a mapping table which maps
 sprite keys to graphics sources. By using regular expressions, the sprite keys
 can also be rewritten systematically before they are used as element keys.
 
@@ -121,14 +121,14 @@ key called "FileName" is recognized, which instantiates the default graphics
 source. See below for details.
 
 [Beware: What follows is a lengthy explanation of all the bells and whistles
-that Tagaro::Theme offers for themes with multiple graphics sources. If your
+that KGame::Theme offers for themes with multiple graphics sources. If your
 theme has only one SVG file, go on to the last sentence of this section.]
 
 The file may also contain a group "Sources" which defines the graphics sources
 of this theme. Each graphics source corresponds to one group below the
 "Sources" group. The group's key -- the source identifier -- is currently only
 used inside this file, though it may later be used by Tagaro. (It's also
-exposed in the API as the argument to Tagaro::Theme::source.)
+exposed in the API as the argument to KGame::Theme::source.)
 
 Each source group must contain a key "SourceType". The value specifies the type
 of graphics source. The general format is "type:location", where either type or
@@ -177,7 +177,7 @@ SourceType=color
 Most themes will only use one graphics source, e.g. a SVG file which can
 contain arbitrarily many arbitrarily complex elements. They will also not need
 to use the mapping table because the source file has been made specifically for
-the application, using the sprite keys as element keys. Tagaro::Theme has
+the application, using the sprite keys as element keys. KGame::Theme has
 various shortcuts for this usecase:
 
 	@li If the mapping table is empty (or no mappings apply), the element key

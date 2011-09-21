@@ -22,4 +22,4 @@ install(FILES
 	StandardThemeProvider
 	Theme
 	ThemeProvider
-DESTINATION ${INCLUDE_INSTALL_DIR}/Tagaro COMPONENT Devel)
+DESTINATION ${INCLUDE_INSTALL_DIR}/KGame COMPONENT Devel)

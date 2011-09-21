@@ -16,14 +16,14 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_GRAPHICSDELEGATE_P_H
-#define TAGARO_GRAPHICSDELEGATE_P_H
+#ifndef KGAME_GRAPHICSDELEGATE_P_H
+#define KGAME_GRAPHICSDELEGATE_P_H
 
 #include <QtGui/QStyledItemDelegate>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 //This delegate can be used in list views which allow to select graphical components (such as themes).
 class GraphicsDelegate : public QStyledItemDelegate
@@ -43,6 +43,6 @@ class GraphicsDelegate : public QStyledItemDelegate
 		QRect thumbnailRect(const QRect& baseRect) const;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_GRAPHICSDELEGATE_P_H
+#endif // KGAME_GRAPHICSDELEGATE_P_H

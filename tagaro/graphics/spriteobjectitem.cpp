@@ -35,7 +35,7 @@ static QPixmap dummyPixmap()
 	return pix;
 }
 
-Tagaro::SpriteObjectItem::Private::Private(QGraphicsItem* parent)
+KGame::SpriteObjectItem::Private::Private(QGraphicsItem* parent)
 	: QGraphicsPixmapItem(dummyPixmap(), parent)
 	, m_size(1, 1)
 	, m_pixmapSize(1, 1)
@@ -44,15 +44,15 @@ Tagaro::SpriteObjectItem::Private::Private(QGraphicsItem* parent)
 	setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
-Tagaro::SpriteObjectItem::SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent)
+KGame::SpriteObjectItem::SpriteObjectItem(KGame::Sprite* sprite, QGraphicsItem* parent)
 	: QGraphicsObject(parent)
-	, Tagaro::SpriteClient(sprite)
+	, KGame::SpriteClient(sprite)
 	, d(new Private(this))
 {
 	d->findBoardFromParent(this, parent);
 }
 
-Tagaro::SpriteObjectItem::~SpriteObjectItem()
+KGame::SpriteObjectItem::~SpriteObjectItem()
 {
 	//deregister from board, if any
 	d->findBoardFromParent(this, 0);
@@ -60,15 +60,15 @@ Tagaro::SpriteObjectItem::~SpriteObjectItem()
 	delete d;
 }
 
-void Tagaro::SpriteObjectItem::Private::findBoardFromParent(Tagaro::SpriteObjectItem* q, QGraphicsItem* parent)
+void KGame::SpriteObjectItem::Private::findBoardFromParent(KGame::SpriteObjectItem* q, QGraphicsItem* parent)
 {
 	//find board among parents
-	Tagaro::Board* board = 0;
+	KGame::Board* board = 0;
 	while (parent)
 	{
 		//is parent a board?
 		QGraphicsObject* obj = parent->toGraphicsObject();
-		if (obj && (board = qobject_cast<Tagaro::Board*>(obj)))
+		if (obj && (board = qobject_cast<KGame::Board*>(obj)))
 		{
 			break;
 		}
@@ -90,7 +90,7 @@ void Tagaro::SpriteObjectItem::Private::findBoardFromParent(Tagaro::SpriteObject
 	}
 }
 
-QVariant Tagaro::SpriteObjectItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
+QVariant KGame::SpriteObjectItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
 {
 	if (change == QGraphicsItem::ItemParentChange)
 	{
@@ -99,12 +99,12 @@ QVariant Tagaro::SpriteObjectItem::itemChange(QGraphicsItem::GraphicsItemChange 
 	return QGraphicsObject::itemChange(change, value);
 }
 
-QPointF Tagaro::SpriteObjectItem::offset() const
+QPointF KGame::SpriteObjectItem::offset() const
 {
 	return d->pos();
 }
 
-void Tagaro::SpriteObjectItem::setOffset(const QPointF& offset)
+void KGame::SpriteObjectItem::setOffset(const QPointF& offset)
 {
 	if (d->pos() != offset)
 	{
@@ -114,12 +114,12 @@ void Tagaro::SpriteObjectItem::setOffset(const QPointF& offset)
 	}
 }
 
-QSizeF Tagaro::SpriteObjectItem::size() const
+QSizeF KGame::SpriteObjectItem::size() const
 {
 	return d->m_size;
 }
 
-void Tagaro::SpriteObjectItem::setSize(const QSizeF& size)
+void KGame::SpriteObjectItem::setSize(const QSizeF& size)
 {
 	if (d->m_size != size && size.isValid())
 	{
@@ -131,7 +131,7 @@ void Tagaro::SpriteObjectItem::setSize(const QSizeF& size)
 	}
 }
 
-void Tagaro::SpriteObjectItem::receivePixmap(const QPixmap& pixmap)
+void KGame::SpriteObjectItem::receivePixmap(const QPixmap& pixmap)
 {
 	QPixmap pixmapUse = pixmap.size().isEmpty() ? dummyPixmap() : pixmap;
 	const QSizeF pixmapSize = pixmapUse.size();
@@ -145,7 +145,7 @@ void Tagaro::SpriteObjectItem::receivePixmap(const QPixmap& pixmap)
 	update();
 }
 
-void Tagaro::SpriteObjectItem::Private::updateTransform()
+void KGame::SpriteObjectItem::Private::updateTransform()
 {
 	setTransform(QTransform::fromScale(
 		m_size.width() / m_pixmapSize.width(),
@@ -159,20 +159,20 @@ void Tagaro::SpriteObjectItem::Private::updateTransform()
 //At the same time, we do not want the contained QGraphicsPixmapItem to slow
 //down operations like QGraphicsScene::collidingItems().
 //So the strategy is to use the QGraphicsPixmapItem implementation from
-//Tagaro::SpriteObjectItem::Private for Tagaro::SpriteObjectItem.
-//Then the relevant methods in Tagaro::SpriteObjectItem::Private are reimplemented
+//KGame::SpriteObjectItem::Private for KGame::SpriteObjectItem.
+//Then the relevant methods in KGame::SpriteObjectItem::Private are reimplemented
 //empty to clear the item and hide it from any collision detection. This
 //strategy allows us to use the nifty QGraphicsPixmapItem logic without exposing
 //a QGraphicsPixmapItem subclass (which would conflict with QGraphicsObject).
 
-//BEGIN QGraphicsItem reimplementation of Tagaro::SpriteObjectItem
+//BEGIN QGraphicsItem reimplementation of KGame::SpriteObjectItem
 
-QRectF Tagaro::SpriteObjectItem::boundingRect() const
+QRectF KGame::SpriteObjectItem::boundingRect() const
 {
 	return d->mapRectToParent(d->QGraphicsPixmapItem::boundingRect());
 }
 
-bool Tagaro::SpriteObjectItem::contains(const QPointF& point) const
+bool KGame::SpriteObjectItem::contains(const QPointF& point) const
 {
 	//return d->QGraphicsPixmapItem::contains(d->mapFromParent(point));
 	//This does not work because QGraphicsPixmapItem::contains is actually not
@@ -184,51 +184,51 @@ bool Tagaro::SpriteObjectItem::contains(const QPointF& point) const
 	return pixmap.copy(QRect(pixmapPoint, QSize(1, 1))).toImage().pixel(0, 0);
 }
 
-bool Tagaro::SpriteObjectItem::isObscuredBy(const QGraphicsItem* item) const
+bool KGame::SpriteObjectItem::isObscuredBy(const QGraphicsItem* item) const
 {
 	return d->QGraphicsPixmapItem::isObscuredBy(item);
 }
 
-QPainterPath Tagaro::SpriteObjectItem::opaqueArea() const
+QPainterPath KGame::SpriteObjectItem::opaqueArea() const
 {
 	return d->mapToParent(d->QGraphicsPixmapItem::opaqueArea());
 }
 
-void Tagaro::SpriteObjectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void KGame::SpriteObjectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	Q_UNUSED(painter) Q_UNUSED(option) Q_UNUSED(widget)
 }
 
-QPainterPath Tagaro::SpriteObjectItem::shape() const
+QPainterPath KGame::SpriteObjectItem::shape() const
 {
 	return d->mapToParent(d->QGraphicsPixmapItem::shape());
 }
 
-//END QGraphicsItem reimplementation of Tagaro::SpriteObjectItem
-//BEGIN QGraphicsItem reimplementation of Tagaro::SpriteObjectItem::Private
+//END QGraphicsItem reimplementation of KGame::SpriteObjectItem
+//BEGIN QGraphicsItem reimplementation of KGame::SpriteObjectItem::Private
 
-bool Tagaro::SpriteObjectItem::Private::contains(const QPointF& point) const
+bool KGame::SpriteObjectItem::Private::contains(const QPointF& point) const
 {
 	Q_UNUSED(point)
 	return false;
 }
 
-bool Tagaro::SpriteObjectItem::Private::isObscuredBy(const QGraphicsItem* item) const
+bool KGame::SpriteObjectItem::Private::isObscuredBy(const QGraphicsItem* item) const
 {
 	Q_UNUSED(item)
 	return false;
 }
 
-QPainterPath Tagaro::SpriteObjectItem::Private::opaqueArea() const
+QPainterPath KGame::SpriteObjectItem::Private::opaqueArea() const
 {
 	return QPainterPath();
 }
 
-QPainterPath Tagaro::SpriteObjectItem::Private::shape() const
+QPainterPath KGame::SpriteObjectItem::Private::shape() const
 {
 	return QPainterPath();
 }
 
-//END QGraphicsItem reimplementation of Tagaro::SpriteObjectItem::Private
+//END QGraphicsItem reimplementation of KGame::SpriteObjectItem::Private
 
 #include "spriteobjectitem.moc"

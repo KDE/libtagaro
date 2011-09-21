@@ -22,24 +22,24 @@
 #include "sprite_p.h"
 #include "themeprovider.h"
 
-struct Tagaro::DeclarativeThemeProvider::Private
+struct KGame::DeclarativeThemeProvider::Private
 {
-	const Tagaro::ThemeProvider* m_tp;
-	Private(const Tagaro::ThemeProvider* tp): m_tp(tp) {}
+	const KGame::ThemeProvider* m_tp;
+	Private(const KGame::ThemeProvider* tp): m_tp(tp) {}
 };
 
-Tagaro::DeclarativeThemeProvider::DeclarativeThemeProvider(const Tagaro::ThemeProvider* tp)
+KGame::DeclarativeThemeProvider::DeclarativeThemeProvider(const KGame::ThemeProvider* tp)
 	: QDeclarativeImageProvider(QDeclarativeImageProvider::Image)
 	, d(new Private(tp))
 {
 }
 
-Tagaro::DeclarativeThemeProvider::~DeclarativeThemeProvider()
+KGame::DeclarativeThemeProvider::~DeclarativeThemeProvider()
 {
 	delete d;
 }
 
-QImage Tagaro::DeclarativeThemeProvider::requestImage(const QString& id, QSize* size, const QSize& requestedSize)
+QImage KGame::DeclarativeThemeProvider::requestImage(const QString& id, QSize* size, const QSize& requestedSize)
 {
 	//split "~frame" suffix (where "frame" == uint) from sprite key
 	QString spriteKey; int frame;
@@ -64,7 +64,7 @@ QImage Tagaro::DeclarativeThemeProvider::requestImage(const QString& id, QSize* 
 		}
 	}
 	//get sprite, default size
-	Tagaro::Sprite* sprite = d->m_tp->sprite(spriteKey);
+	KGame::Sprite* sprite = d->m_tp->sprite(spriteKey);
 	const QSize defaultSize = sprite->bounds().size().toSize();
 	if (size)
 	{
@@ -79,10 +79,10 @@ QImage Tagaro::DeclarativeThemeProvider::requestImage(const QString& id, QSize* 
 	{
 		return QImage();
 	}
-	//fetch image (NOTE: this is completely parallel to Tagaro::SpriteFetcher,
+	//fetch image (NOTE: this is completely parallel to KGame::SpriteFetcher,
 	//because I expect QML environments not to use the normal SpriteClient etc.
 	//at all, so the advantage of populating the other cache too is nil)
-	const Tagaro::GraphicsSource* source = sprite->d->m_source;
+	const KGame::GraphicsSource* source = sprite->d->m_source;
 	const QString element = source->frameElementKey(sprite->d->m_element, frame);
 	return source->elementImage(element, renderSize, QString(), false);
 }

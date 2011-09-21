@@ -17,23 +17,23 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_GRAPHICSSOURCES_H
-#define TAGARO_GRAPHICSSOURCES_H
+#ifndef KGAME_GRAPHICSSOURCES_H
+#define KGAME_GRAPHICSSOURCES_H
 
 #include "graphicssource.h"
 
 //TODO: make these graphics sources available publicly
 
-namespace Tagaro {
+namespace KGame {
 
-class QtSvgGraphicsSource : public Tagaro::GraphicsSource
+class QtSvgGraphicsSource : public KGame::GraphicsSource
 {
 	public:
-		QtSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		QtSvgGraphicsSource(const QString& path, const KGame::GraphicsSourceConfig& config);
 		/**This constructor may not be used in direct conjunction with
 		 * CachedProxyGraphicsSource, because of missing path.
 		 **/
-		QtSvgGraphicsSource(const QByteArray& svgData, const Tagaro::GraphicsSourceConfig& config);
+		QtSvgGraphicsSource(const QByteArray& svgData, const KGame::GraphicsSourceConfig& config);
 		virtual ~QtSvgGraphicsSource();
 
 		virtual uint lastModified() const;
@@ -47,10 +47,10 @@ class QtSvgGraphicsSource : public Tagaro::GraphicsSource
 		Private* const d;
 };
 
-class QtColoredSvgGraphicsSource : public Tagaro::GraphicsSource
+class QtColoredSvgGraphicsSource : public KGame::GraphicsSource
 {
 	public:
-		QtColoredSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		QtColoredSvgGraphicsSource(const QString& path, const KGame::GraphicsSourceConfig& config);
 		virtual ~QtColoredSvgGraphicsSource();
 
 		/// Implements option ColorKey, default is #ff8989
@@ -65,10 +65,10 @@ class QtColoredSvgGraphicsSource : public Tagaro::GraphicsSource
 		Private* const d;
 };
 
-class ColorGraphicsSource : public Tagaro::GraphicsSource
+class ColorGraphicsSource : public KGame::GraphicsSource
 {
 	public:
-		ColorGraphicsSource(const Tagaro::GraphicsSourceConfig& config);
+		ColorGraphicsSource(const KGame::GraphicsSourceConfig& config);
 		virtual ~ColorGraphicsSource();
 
 		virtual bool elementExists(const QString& element) const;
@@ -78,10 +78,10 @@ class ColorGraphicsSource : public Tagaro::GraphicsSource
 		Private* const d;
 };
 
-class ImageGraphicsSource : public Tagaro::GraphicsSource
+class ImageGraphicsSource : public KGame::GraphicsSource
 {
 	public:
-		ImageGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config);
+		ImageGraphicsSource(const QString& path, const KGame::GraphicsSourceConfig& config);
 		virtual ~ImageGraphicsSource();
 
 		virtual void addConfiguration(const QMap<QString, QString>& configuration);
@@ -95,6 +95,6 @@ class ImageGraphicsSource : public Tagaro::GraphicsSource
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_GRAPHICSSOURCES_H
+#endif // KGAME_GRAPHICSSOURCES_H

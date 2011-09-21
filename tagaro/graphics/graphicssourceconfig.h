@@ -16,34 +16,34 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_GRAPHICSSOURCECONFIG_H
-#define TAGARO_GRAPHICSSOURCECONFIG_H
+#ifndef KGAME_GRAPHICSSOURCECONFIG_H
+#define KGAME_GRAPHICSSOURCECONFIG_H
 
 #include <QtCore/QString>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 /**
- * @class Tagaro::GraphicsSourceConfig graphicssourceconfig.h <Tagaro/GraphicsSourceConfig>
+ * @class KGame::GraphicsSourceConfig graphicssourceconfig.h <KGame/GraphicsSourceConfig>
  *
  * This class represents general configurable parameters for
- * Tagaro::GraphicsSource instances.
+ * KGame::GraphicsSource instances.
  */
-class TAGARO_EXPORT GraphicsSourceConfig
+class KGAME_EXPORT GraphicsSourceConfig
 {
 	public:
-		///Creates a new Tagaro::GraphicsSourceConfig instance with default values:
+		///Creates a new KGame::GraphicsSourceConfig instance with default values:
 		///@li cacheSize() == 3 (megabytes)
 		///@li frameBaseIndex() == 0
 		///@li frameSuffix() = "_%1"
 		GraphicsSourceConfig();
 		///Copies the given config.
-		GraphicsSourceConfig(const Tagaro::GraphicsSourceConfig& other);
+		GraphicsSourceConfig(const KGame::GraphicsSourceConfig& other);
 		///Copies the given config.
-		Tagaro::GraphicsSourceConfig& operator=(const Tagaro::GraphicsSourceConfig& other);
-		///Destroys this Tagaro::GraphicsSourceConfig instance.
+		KGame::GraphicsSourceConfig& operator=(const KGame::GraphicsSourceConfig& other);
+		///Destroys this KGame::GraphicsSourceConfig instance.
 		~GraphicsSourceConfig();
 
 		///@return the cache size in megabytes @see setCacheSize
@@ -52,7 +52,7 @@ class TAGARO_EXPORT GraphicsSourceConfig
 		///is only used by sources which can use caches. Set to 0 megabytes to
 		///disable caching.
 		///
-		///@see Tagaro::CachedProxyGraphicsSource
+		///@see KGame::CachedProxyGraphicsSource
 		void setCacheSize(int cacheSize);
 		///@return the frame base index @see setFrameBaseIndex()
 		int frameBaseIndex() const;
@@ -85,6 +85,6 @@ class TAGARO_EXPORT GraphicsSourceConfig
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_GRAPHICSSOURCECONFIG_H
+#endif // KGAME_GRAPHICSSOURCECONFIG_H

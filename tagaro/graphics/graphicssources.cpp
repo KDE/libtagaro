@@ -56,9 +56,9 @@ static QByteArray readSVG(const QString& path)
 	return file;
 }
 
-//BEGIN Tagaro::QtSvgGraphicsSource
+//BEGIN KGame::QtSvgGraphicsSource
 
-struct Tagaro::QtSvgGraphicsSource::Private
+struct KGame::QtSvgGraphicsSource::Private
 {
 	Private(const QByteArray& svgData = QByteArray(), const QString& path = QString())
 		: m_svgData(svgData), m_path(path), m_checked(false), m_invalid(false) {}
@@ -78,7 +78,7 @@ struct Tagaro::QtSvgGraphicsSource::Private
 	inline void freeRenderer(QSvgRenderer* renderer);
 };
 
-QSvgRenderer* Tagaro::QtSvgGraphicsSource::Private::allocRenderer()
+QSvgRenderer* KGame::QtSvgGraphicsSource::Private::allocRenderer()
 {
 	//quick check: was the file found to be invalid already?
 	if (m_checked && m_invalid)
@@ -104,26 +104,26 @@ QSvgRenderer* Tagaro::QtSvgGraphicsSource::Private::allocRenderer()
 	return m_invalid ? 0 : renderer;
 }
 
-void Tagaro::QtSvgGraphicsSource::Private::freeRenderer(QSvgRenderer* renderer)
+void KGame::QtSvgGraphicsSource::Private::freeRenderer(QSvgRenderer* renderer)
 {
 	//mark renderer as available
 	QMutexLocker locker(&m_mutex);
 	m_hash.insert(renderer, 0);
 }
 
-Tagaro::QtSvgGraphicsSource::QtSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config)
-	: Tagaro::GraphicsSource(QFileInfo(path).absoluteFilePath(), config)
+KGame::QtSvgGraphicsSource::QtSvgGraphicsSource(const QString& path, const KGame::GraphicsSourceConfig& config)
+	: KGame::GraphicsSource(QFileInfo(path).absoluteFilePath(), config)
 	, d(new Private(readSVG(path), path))
 {
 }
 
-Tagaro::QtSvgGraphicsSource::QtSvgGraphicsSource(const QByteArray& svgData, const Tagaro::GraphicsSourceConfig& config)
-	: Tagaro::GraphicsSource(QString(), config)
+KGame::QtSvgGraphicsSource::QtSvgGraphicsSource(const QByteArray& svgData, const KGame::GraphicsSourceConfig& config)
+	: KGame::GraphicsSource(QString(), config)
 	, d(new Private(svgData))
 {
 }
 
-Tagaro::QtSvgGraphicsSource::~QtSvgGraphicsSource()
+KGame::QtSvgGraphicsSource::~QtSvgGraphicsSource()
 {
 	{
 		QMutexLocker l(&d->m_mutex);
@@ -137,7 +137,7 @@ Tagaro::QtSvgGraphicsSource::~QtSvgGraphicsSource()
 	delete d;
 }
 
-bool Tagaro::QtSvgGraphicsSource::load()
+bool KGame::QtSvgGraphicsSource::load()
 {
 	if (!d->m_checked)
 	{
@@ -147,12 +147,12 @@ bool Tagaro::QtSvgGraphicsSource::load()
 	return !d->m_invalid;
 }
 
-uint Tagaro::QtSvgGraphicsSource::lastModified() const
+uint KGame::QtSvgGraphicsSource::lastModified() const
 {
 	return QFileInfo(d->m_path).lastModified().toTime_t();
 }
 
-QRectF Tagaro::QtSvgGraphicsSource::elementBounds(const QString& element) const
+QRectF KGame::QtSvgGraphicsSource::elementBounds(const QString& element) const
 {
 	QSvgRenderer* r = d->allocRenderer();
 	if (!r)
@@ -164,7 +164,7 @@ QRectF Tagaro::QtSvgGraphicsSource::elementBounds(const QString& element) const
 	return result;
 }
 
-bool Tagaro::QtSvgGraphicsSource::elementExists(const QString& element) const
+bool KGame::QtSvgGraphicsSource::elementExists(const QString& element) const
 {
 	QSvgRenderer* r = d->allocRenderer();
 	if (!r)
@@ -176,7 +176,7 @@ bool Tagaro::QtSvgGraphicsSource::elementExists(const QString& element) const
 	return result;
 }
 
-QImage Tagaro::QtSvgGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
+QImage KGame::QtSvgGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
 	Q_UNUSED(processingInstruction) //does not define any processing instructions
 	if (timeConstraint)
@@ -198,10 +198,10 @@ QImage Tagaro::QtSvgGraphicsSource::elementImage(const QString& element, const Q
 	return image;
 }
 
-//END Tagaro::QtSvgGraphicsSource
-//BEGIN Tagaro::QtColoredSvgGraphicsSource
+//END KGame::QtSvgGraphicsSource
+//BEGIN KGame::QtColoredSvgGraphicsSource
 
-struct Tagaro::QtColoredSvgGraphicsSource::Private
+struct KGame::QtColoredSvgGraphicsSource::Private
 {
 	Private(const QByteArray& svgData, const QString& path)
 		: m_svgData(svgData), m_path(path), m_colorkey(QLatin1String("#ff8989")) {}
@@ -214,23 +214,23 @@ struct Tagaro::QtColoredSvgGraphicsSource::Private
 	mutable QHash<QString, QtSvgGraphicsSource*> m_hash;
 };
 
-Tagaro::QtColoredSvgGraphicsSource::Private::~Private()
+KGame::QtColoredSvgGraphicsSource::Private::~Private()
 {
 	qDeleteAll(m_hash);
 }
 
-Tagaro::QtColoredSvgGraphicsSource::QtColoredSvgGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config)
+KGame::QtColoredSvgGraphicsSource::QtColoredSvgGraphicsSource(const QString& path, const KGame::GraphicsSourceConfig& config)
 	: GraphicsSource(QFileInfo(path).absoluteFilePath(), config), d(new Private(readSVG(path), path))
 {
 	d->m_hash[QString()] = new QtSvgGraphicsSource(d->m_svgData, config);
 }
 
-Tagaro::QtColoredSvgGraphicsSource::~QtColoredSvgGraphicsSource()
+KGame::QtColoredSvgGraphicsSource::~QtColoredSvgGraphicsSource()
 {
 	delete d;
 }
 
-void Tagaro::QtColoredSvgGraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
+void KGame::QtColoredSvgGraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
 {
 	QMap<QString, QString>::const_iterator a = configuration.constFind(QLatin1String("ColorKey"));
 	if(a == configuration.end())
@@ -248,22 +248,22 @@ void Tagaro::QtColoredSvgGraphicsSource::addConfiguration(const QMap<QString, QS
 	}
 }
 
-uint Tagaro::QtColoredSvgGraphicsSource::lastModified() const
+uint KGame::QtColoredSvgGraphicsSource::lastModified() const
 {
 	return QFileInfo(d->m_path).lastModified().toTime_t();
 }
 
-QRectF Tagaro::QtColoredSvgGraphicsSource::elementBounds(const QString& element) const
+QRectF KGame::QtColoredSvgGraphicsSource::elementBounds(const QString& element) const
 {
 	return d->m_hash.begin().value()->elementBounds(element);
 }
 
-bool Tagaro::QtColoredSvgGraphicsSource::elementExists(const QString& element) const
+bool KGame::QtColoredSvgGraphicsSource::elementExists(const QString& element) const
 {
 	return d->m_hash.begin().value()->elementExists(element);
 }
 
-QImage Tagaro::QtColoredSvgGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
+QImage KGame::QtColoredSvgGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
 	if(processingInstruction.isEmpty())
 	{
@@ -287,31 +287,31 @@ QImage Tagaro::QtColoredSvgGraphicsSource::elementImage(const QString& element, 
 	return r->elementImage(element, size, QString(), timeConstraint);
 }
 
-//END Tagaro::QtColoredSvgGraphicsSource
-//BEGIN Tagaro::ColorGraphicsSource
+//END KGame::QtColoredSvgGraphicsSource
+//BEGIN KGame::ColorGraphicsSource
 
-struct Tagaro::ColorGraphicsSource::Private
+struct KGame::ColorGraphicsSource::Private
 {
 	//reserved for later use
 };
 
-Tagaro::ColorGraphicsSource::ColorGraphicsSource(const Tagaro::GraphicsSourceConfig& config)
-	: Tagaro::GraphicsSource("color", config)
+KGame::ColorGraphicsSource::ColorGraphicsSource(const KGame::GraphicsSourceConfig& config)
+	: KGame::GraphicsSource("color", config)
 	, d(0)
 {
 }
 
-Tagaro::ColorGraphicsSource::~ColorGraphicsSource()
+KGame::ColorGraphicsSource::~ColorGraphicsSource()
 {
 	delete d;
 }
 
-bool Tagaro::ColorGraphicsSource::elementExists(const QString& element) const
+bool KGame::ColorGraphicsSource::elementExists(const QString& element) const
 {
 	return QColor::isValidColor(element);
 }
 
-QImage Tagaro::ColorGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
+QImage KGame::ColorGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
 	Q_UNUSED(processingInstruction) //does not define any processing instructions
 	Q_UNUSED(timeConstraint) //constructing plain color images is not expensive (compared to setting up a renderer thread)
@@ -321,10 +321,10 @@ QImage Tagaro::ColorGraphicsSource::elementImage(const QString& element, const Q
 	return image;
 }
 
-//END Tagaro::ColorGraphicsSource
-//BEGIN Tagaro::ImageGraphicsSource
+//END KGame::ColorGraphicsSource
+//BEGIN KGame::ImageGraphicsSource
 
-struct Tagaro::ImageGraphicsSource::Private
+struct KGame::ImageGraphicsSource::Private
 {
 	QString m_path;
 	QImage m_image;
@@ -333,18 +333,18 @@ struct Tagaro::ImageGraphicsSource::Private
 	Private(const QString& path) : m_path(path) {}
 };
 
-Tagaro::ImageGraphicsSource::ImageGraphicsSource(const QString& path, const Tagaro::GraphicsSourceConfig& config)
-	: Tagaro::GraphicsSource(QFileInfo(path).absoluteFilePath(), config)
+KGame::ImageGraphicsSource::ImageGraphicsSource(const QString& path, const KGame::GraphicsSourceConfig& config)
+	: KGame::GraphicsSource(QFileInfo(path).absoluteFilePath(), config)
 	, d(new Private(path))
 {
 }
 
-Tagaro::ImageGraphicsSource::~ImageGraphicsSource()
+KGame::ImageGraphicsSource::~ImageGraphicsSource()
 {
 	delete d;
 }
 
-void Tagaro::ImageGraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
+void KGame::ImageGraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
 {
 	const QRegExp rx("(\\d+)x(\\d+)\\+(\\d+)\\+(\\d+)");
 	QMap<QString, QString>::const_iterator it1 = configuration.constBegin(), it2 = configuration.constEnd();
@@ -359,7 +359,7 @@ void Tagaro::ImageGraphicsSource::addConfiguration(const QMap<QString, QString>&
 	}
 }
 
-bool Tagaro::ImageGraphicsSource::load()
+bool KGame::ImageGraphicsSource::load()
 {
 	if (!d->m_image.load(d->m_path))
 	{
@@ -369,17 +369,17 @@ bool Tagaro::ImageGraphicsSource::load()
 	return true;
 }
 
-QRectF Tagaro::ImageGraphicsSource::elementBounds(const QString& element) const
+QRectF KGame::ImageGraphicsSource::elementBounds(const QString& element) const
 {
 	return d->m_elements.value(element);
 }
 
-bool Tagaro::ImageGraphicsSource::elementExists(const QString& element) const
+bool KGame::ImageGraphicsSource::elementExists(const QString& element) const
 {
 	return d->m_elements.contains(element);
 }
 
-QImage Tagaro::ImageGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
+QImage KGame::ImageGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
 	Q_UNUSED(processingInstruction) //does not define any processing instructions
 	Q_UNUSED(timeConstraint) //simple copying of images is not expensive (compared to setting up a renderer thread)
@@ -398,4 +398,4 @@ QImage Tagaro::ImageGraphicsSource::elementImage(const QString& element, const Q
 	return image;
 }
 
-//END Tagaro::ImageGraphicsSource
+//END KGame::ImageGraphicsSource

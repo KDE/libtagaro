@@ -25,20 +25,20 @@
 #include <QtCore/QSet>
 #include <QtCore/QThreadPool>
 
-Tagaro::Sprite::Sprite()
+KGame::Sprite::Sprite()
 	: d(new Private)
 {
 }
 
-Tagaro::Sprite::Private::Private()
+KGame::Sprite::Private::Private()
 	: m_source(0)
 {
 }
 
-Tagaro::Sprite::~Sprite()
+KGame::Sprite::~Sprite()
 {
-	//disconnect clients (take a copy of d->m_clients because this list is modified by Tagaro::SpriteClient::setSprite)
-	const QList<Tagaro::SpriteClient*> clients = d->m_clients;
+	//disconnect clients (take a copy of d->m_clients because this list is modified by KGame::SpriteClient::setSprite)
+	const QList<KGame::SpriteClient*> clients = d->m_clients;
 	const int clientCount = clients.count();
 	for (int i = 0; i < clientCount; ++i)
 	{
@@ -49,30 +49,30 @@ Tagaro::Sprite::~Sprite()
 	delete d;
 }
 
-void Tagaro::Sprite::Private::addClient(Tagaro::SpriteClient* client)
+void KGame::Sprite::Private::addClient(KGame::SpriteClient* client)
 {
 	m_clients << client;
 }
 
-void Tagaro::Sprite::Private::removeClient(Tagaro::SpriteClient* client)
+void KGame::Sprite::Private::removeClient(KGame::SpriteClient* client)
 {
 	m_clients.removeAll(client);
 }
 
-void Tagaro::Sprite::Private::setSource(const Tagaro::GraphicsSource* source, const QString& element)
+void KGame::Sprite::Private::setSource(const KGame::GraphicsSource* source, const QString& element)
 {
 	if (m_source != source || m_element != element)
 	{
 		m_source = source;
 		m_element = element;
-		foreach (Tagaro::SpriteFetcher* fetcher, m_fetchers)
+		foreach (KGame::SpriteFetcher* fetcher, m_fetchers)
 		{
 			fetcher->updateAllClients();
 		}
 	}
 }
 
-QRectF Tagaro::Sprite::bounds(int frame) const
+QRectF KGame::Sprite::bounds(int frame) const
 {
 	if (!d->m_source)
 	{
@@ -82,36 +82,36 @@ QRectF Tagaro::Sprite::bounds(int frame) const
 	return d->m_source->elementBounds(frameElement);
 }
 
-bool Tagaro::Sprite::exists() const
+bool KGame::Sprite::exists() const
 {
 	return frameCount() >= 0;
 }
 
-int Tagaro::Sprite::frameCount() const
+int KGame::Sprite::frameCount() const
 {
 	return d->m_source ? d->m_source->frameCount(d->m_element) : -1;
 }
 
-QString Tagaro::Sprite::key() const
+QString KGame::Sprite::key() const
 {
 	return d->m_element;
 }
 
-Tagaro::SpriteFetcher* Tagaro::Sprite::Private::fetcher(const QSize& size, const QString& processingInstruction)
+KGame::SpriteFetcher* KGame::Sprite::Private::fetcher(const QSize& size, const QString& processingInstruction)
 {
 	if (size.isEmpty())
 	{
 		return 0;
 	}
-	Tagaro::SpriteFetcher*& fetcher = m_fetchers[qMakePair(size, processingInstruction)];
+	KGame::SpriteFetcher*& fetcher = m_fetchers[qMakePair(size, processingInstruction)];
 	if (!fetcher)
 	{
-		fetcher = new Tagaro::SpriteFetcher(size, processingInstruction, this);
+		fetcher = new KGame::SpriteFetcher(size, processingInstruction, this);
 	}
 	return fetcher;
 }
 
-QPixmap Tagaro::Sprite::pixmap(const QSize& size, int frame, const QString& processingInstruction) const
+QPixmap KGame::Sprite::pixmap(const QSize& size, int frame, const QString& processingInstruction) const
 {
 	if (!d->m_source || size.isEmpty())
 	{
@@ -122,18 +122,18 @@ QPixmap Tagaro::Sprite::pixmap(const QSize& size, int frame, const QString& proc
 
 //BEGIN asynchronous pixmap serving
 
-void Tagaro::SpriteFetcher::addClient(Tagaro::SpriteClient* client)
+void KGame::SpriteFetcher::addClient(KGame::SpriteClient* client)
 {
 	m_clients << client;
 	updateClient(client);
 }
 
-void Tagaro::SpriteFetcher::removeClient(Tagaro::SpriteClient* client)
+void KGame::SpriteFetcher::removeClient(KGame::SpriteClient* client)
 {
 	m_clients.removeAll(client);
 }
 
-void Tagaro::SpriteFetcher::updateClient(Tagaro::SpriteClient* client)
+void KGame::SpriteFetcher::updateClient(KGame::SpriteClient* client)
 {
 	const int frame = client->frame();
 	//check if request can be served immediately
@@ -164,7 +164,7 @@ void Tagaro::SpriteFetcher::updateClient(Tagaro::SpriteClient* client)
 	}
 }
 
-void Tagaro::SpriteFetcher::updateAllClients()
+void KGame::SpriteFetcher::updateAllClients()
 {
 	m_pixmapCache.clear();
 	//determine which frames are used
@@ -182,18 +182,18 @@ void Tagaro::SpriteFetcher::updateAllClients()
 	}
 }
 
-namespace Tagaro {
+namespace KGame {
 	class SpriteFetcherWorker : public QRunnable
 	{
 		private:
-			const Tagaro::GraphicsSource* m_source;
+			const KGame::GraphicsSource* m_source;
 			QString m_element;
 			int m_frame;
 			QSize m_size;
 			QString m_processingInstruction;
-			Tagaro::SpriteFetcher* m_receiver;
+			KGame::SpriteFetcher* m_receiver;
 		public:
-			SpriteFetcherWorker(const Tagaro::GraphicsSource* source, const QString& element, int frame, const QSize& size, const QString& processingInstruction, Tagaro::SpriteFetcher* receiver)
+			SpriteFetcherWorker(const KGame::GraphicsSource* source, const QString& element, int frame, const QSize& size, const QString& processingInstruction, KGame::SpriteFetcher* receiver)
 				: m_source(source)
 				  //DO NOT do the following in the worker thread. frameElementKey() is not guaranteed to be thread-safe!
 				, m_element(m_source->frameElementKey(element, frame))
@@ -222,11 +222,11 @@ namespace Tagaro {
 	};
 }
 
-void Tagaro::SpriteFetcher::startJob(int frame)
+void KGame::SpriteFetcher::startJob(int frame)
 {
-	if (Tagaro::Settings::useRenderingThreads())
+	if (KGame::Settings::useRenderingThreads())
 	{
-		QThreadPool::globalInstance()->start(new Tagaro::SpriteFetcherWorker(d->m_source, d->m_element, frame, m_size, m_processingInstruction, this));
+		QThreadPool::globalInstance()->start(new KGame::SpriteFetcherWorker(d->m_source, d->m_element, frame, m_size, m_processingInstruction, this));
 	}
 	else
 	{
@@ -236,7 +236,7 @@ void Tagaro::SpriteFetcher::startJob(int frame)
 	}
 }
 
-QPixmap Tagaro::SpriteFetcher::cachePixmap(int frame, const QImage& image)
+QPixmap KGame::SpriteFetcher::cachePixmap(int frame, const QImage& image)
 {
 	//look in cache
 	QHash<int, QPixmap>::const_iterator it = m_pixmapCache.find(frame);

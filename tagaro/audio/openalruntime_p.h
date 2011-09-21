@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_OPENALRUNTIME_P_H
-#define TAGARO_OPENALRUNTIME_P_H
+#ifndef KGAME_OPENALRUNTIME_P_H
+#define KGAME_OPENALRUNTIME_P_H
 
 #include <QtCore/QHash>
 #include <QtCore/QPointF>
@@ -25,7 +25,7 @@
 #include <al.h>
 #include <alc.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class Sound;
 
@@ -34,7 +34,7 @@ class PlaybackEvent
 {
 	public:
 		//Creates and starts the playback. Also registers with the OpenALRuntime.
-		PlaybackEvent(Tagaro::Sound* sound, const QPointF& pos);
+		PlaybackEvent(KGame::Sound* sound, const QPointF& pos);
 		//Stops playback if it is still running.
 		~PlaybackEvent();
 
@@ -45,7 +45,7 @@ class PlaybackEvent
 		bool m_valid;
 };
 
-typedef QList<Tagaro::PlaybackEvent*> PlaybackEventList;
+typedef QList<KGame::PlaybackEvent*> PlaybackEventList;
 
 ///@internal
 class OpenALRuntime
@@ -54,7 +54,7 @@ class OpenALRuntime
 		OpenALRuntime();
 		~OpenALRuntime();
 
-		static Tagaro::OpenALRuntime* instance();
+		static KGame::OpenALRuntime* instance();
 
 		void configureListener();
 		void cleanupUnusedSources();
@@ -63,12 +63,12 @@ class OpenALRuntime
 		QPointF m_listenerPos;
 		qreal m_volume;
 		//active sound and playback instances
-		QHash<Tagaro::Sound*, Tagaro::PlaybackEventList> m_soundsEvents;
+		QHash<KGame::Sound*, KGame::PlaybackEventList> m_soundsEvents;
 	private:
 		ALCcontext* m_context;
 		ALCdevice* m_device;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_OPENALRUNTIME_P_H
+#endif // KGAME_OPENALRUNTIME_P_H

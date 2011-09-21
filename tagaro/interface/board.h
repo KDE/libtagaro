@@ -16,38 +16,38 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_BOARD_H
-#define TAGARO_BOARD_H
+#ifndef KGAME_BOARD_H
+#define KGAME_BOARD_H
 
 #include <QtGui/QGraphicsObject>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class SpriteObjectItem;
 
 /**
- * @class Tagaro::Board board.h <Tagaro/Board>
+ * @class KGame::Board board.h <KGame/Board>
  *
- * The Tagaro::Board is basically a usual QGraphicsItem which can be used to
+ * The KGame::Board is basically a usual QGraphicsItem which can be used to
  * group items. However, it has two special features:
  * @li It can adjust its size automatically to fit into the bounding rect of the
  *     parent item (or the scene rect, if there is no parent item). This
  *     behavior is controlled by the alignment() property.
  * @li When it is resized, it will automatically adjust the renderSize of any
- *     contained Tagaro::SpriteObjectItem instances.
+ *     contained KGame::SpriteObjectItem instances.
  */
-class TAGARO_EXPORT Board : public QGraphicsObject
+class KGAME_EXPORT Board : public QGraphicsObject
 {
 	Q_OBJECT
 	public:
-		///Creates a new Tagaro::Board instance below the given @a parent item.
+		///Creates a new KGame::Board instance below the given @a parent item.
 		///The logicalSize() is initialized to (1,1). The physicalSize() is
 		///determined from the parent item's bounding rect by using the default
 		///alignment Qt::AlignCenter.
 		Board(QGraphicsItem* parent = 0);
-		///Destroys the Tagaro::Board and all its children.
+		///Destroys the KGame::Board and all its children.
 		virtual ~Board();
 
 		///@return the logical size of this board, i.e. the size of its
@@ -67,9 +67,9 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 		///@return the physical size factor @see setPhysicalSizeFactor
 		qreal physicalSizeFactor() const;
 		///Sets the physical size factor. This factor will be used in the
-		///calculation of renderSizes for contained Tagaro::SpriteObjectItem
+		///calculation of renderSizes for contained KGame::SpriteObjectItem
 		///instances. Leave this at 1.0 (the default) if scene coordinates
-		///and viewport coordinates have an equal scale (e.g. Tagaro::Scene and
+		///and viewport coordinates have an equal scale (e.g. KGame::Scene and
 		///its main view).
 		///
 		///Values between 0.0 and 1.0 mean that the render size of the item is
@@ -102,13 +102,13 @@ class TAGARO_EXPORT Board : public QGraphicsObject
 	protected:
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value);
 	private:
-		friend class Tagaro::SpriteObjectItem; //needs access to d->{,un}registerItem
+		friend class KGame::SpriteObjectItem; //needs access to d->{,un}registerItem
 		class Private;
 		Private* const d;
 		Q_PRIVATE_SLOT(d, void _k_update());
 		Q_PRIVATE_SLOT(d, void _k_updateItem());
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_BOARD_H
+#endif // KGAME_BOARD_H

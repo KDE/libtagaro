@@ -23,7 +23,7 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QTimerEvent>
 
-struct Tagaro::MessageOverlay::Private
+struct KGame::MessageOverlay::Private
 {
 	QString m_text;
 	int m_timeout;
@@ -37,24 +37,24 @@ struct Tagaro::MessageOverlay::Private
 //GUI. It is just a data class. The actual MessageOverlay GUI is constructed by
 //the scene as part of its drawForeground().
 
-Tagaro::MessageOverlay::MessageOverlay(Tagaro::Scene* scene)
+KGame::MessageOverlay::MessageOverlay(KGame::Scene* scene)
 	: d(new Private)
 {
 	//WARNING: The scene requires that this overlay is not visible during the following call.
 	scene->d->addMessageOverlay(this);
 }
 
-Tagaro::MessageOverlay::~MessageOverlay()
+KGame::MessageOverlay::~MessageOverlay()
 {
 	delete d;
 }
 
-QString Tagaro::MessageOverlay::text() const
+QString KGame::MessageOverlay::text() const
 {
 	return d->m_text;
 }
 
-void Tagaro::MessageOverlay::setText(const QString& text)
+void KGame::MessageOverlay::setText(const QString& text)
 {
 	if (d->m_text != text)
 	{
@@ -63,12 +63,12 @@ void Tagaro::MessageOverlay::setText(const QString& text)
 	}
 }
 
-int Tagaro::MessageOverlay::timeout() const
+int KGame::MessageOverlay::timeout() const
 {
 	return d->m_timeout;
 }
 
-void Tagaro::MessageOverlay::setTimeout(int timeout)
+void KGame::MessageOverlay::setTimeout(int timeout)
 {
 	if (timeout <= 0)
 	{
@@ -89,12 +89,12 @@ void Tagaro::MessageOverlay::setTimeout(int timeout)
 	}
 }
 
-bool Tagaro::MessageOverlay::isVisible() const
+bool KGame::MessageOverlay::isVisible() const
 {
 	return d->m_visible;
 }
 
-void Tagaro::MessageOverlay::setVisible(bool visible)
+void KGame::MessageOverlay::setVisible(bool visible)
 {
 	if (d->m_visible == visible)
 	{
@@ -114,17 +114,17 @@ void Tagaro::MessageOverlay::setVisible(bool visible)
 	emit visibleChanged(visible);
 }
 
-void Tagaro::MessageOverlay::show()
+void KGame::MessageOverlay::show()
 {
 	setVisible(true);
 }
 
-void Tagaro::MessageOverlay::hide()
+void KGame::MessageOverlay::hide()
 {
 	setVisible(false);
 }
 
-void Tagaro::MessageOverlay::timerEvent(QTimerEvent* event)
+void KGame::MessageOverlay::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() != d->m_timer.timerId())
 	{

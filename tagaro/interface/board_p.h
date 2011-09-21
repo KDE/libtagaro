@@ -16,33 +16,33 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_BOARD_P_H
-#define TAGARO_BOARD_P_H
+#ifndef KGAME_BOARD_P_H
+#define KGAME_BOARD_P_H
 
 #include "board.h"
 
-class Tagaro::Board::Private
+class KGame::Board::Private
 {
-	friend class Tagaro::Board;
-	Tagaro::Board* m_board;
+	friend class KGame::Board;
+	KGame::Board* m_board;
 
 	Qt::Alignment m_alignment;
 	QSizeF m_logicalSize, m_size;
 	qreal m_physicalSizeFactor;
 	QPointF m_renderSizeFactor;
 
-	QList<Tagaro::SpriteObjectItem*> m_items;
+	QList<KGame::SpriteObjectItem*> m_items;
 
 	void _k_update();
-	void update(Tagaro::SpriteObjectItem* item);
+	void update(KGame::SpriteObjectItem* item);
 	void _k_updateItem();
 
-	Private(Tagaro::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_physicalSizeFactor(1), m_renderSizeFactor(1, 1) {}
+	Private(KGame::Board* board) : m_board(board), m_alignment(Qt::AlignCenter), m_logicalSize(1, 1), m_size(1, 1), m_physicalSizeFactor(1), m_renderSizeFactor(1, 1) {}
 	~Private();
 
-	public: //interface to Tagaro::SpriteObjectItem
-		void registerItem(Tagaro::SpriteObjectItem* item);
-		void unregisterItem(Tagaro::SpriteObjectItem* item);
+	public: //interface to KGame::SpriteObjectItem
+		void registerItem(KGame::SpriteObjectItem* item);
+		void unregisterItem(KGame::SpriteObjectItem* item);
 };
 
-#endif // TAGARO_BOARD_P_H
+#endif // KGAME_BOARD_P_H

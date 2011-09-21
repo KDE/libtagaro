@@ -28,71 +28,71 @@
 #include <KDE/KStandardDirs>
 #include <kdeversion.h>
 
-//BEGIN Tagaro::GraphicsSource
+//BEGIN KGame::GraphicsSource
 
-struct Tagaro::GraphicsSource::Private
+struct KGame::GraphicsSource::Private
 {
-	Tagaro::GraphicsSourceConfig m_config;
+	KGame::GraphicsSourceConfig m_config;
 	QString m_identifier;
 	bool m_valid, m_loaded;
 
-	Private(const QString& identifier, const Tagaro::GraphicsSourceConfig& config) : m_config(config), m_identifier(identifier), m_loaded(false) {}
+	Private(const QString& identifier, const KGame::GraphicsSourceConfig& config) : m_config(config), m_identifier(identifier), m_loaded(false) {}
 };
 
-Tagaro::GraphicsSource::GraphicsSource(const QString& identifier, const Tagaro::GraphicsSourceConfig& config)
+KGame::GraphicsSource::GraphicsSource(const QString& identifier, const KGame::GraphicsSourceConfig& config)
 	: d(new Private(identifier, config))
 {
 }
 
-Tagaro::GraphicsSource::~GraphicsSource()
+KGame::GraphicsSource::~GraphicsSource()
 {
 	delete d;
 }
 
-const Tagaro::GraphicsSourceConfig& Tagaro::GraphicsSource::config() const
+const KGame::GraphicsSourceConfig& KGame::GraphicsSource::config() const
 {
 	return d->m_config;
 }
 
-QString Tagaro::GraphicsSource::identifier() const
+QString KGame::GraphicsSource::identifier() const
 {
 	return d->m_identifier;
 }
 
-bool Tagaro::GraphicsSource::isValid() const
+bool KGame::GraphicsSource::isValid() const
 {
 	//ensure that load() is only called once
 	if (!d->m_loaded)
 	{
-		d->m_valid = const_cast<Tagaro::GraphicsSource*>(this)->load();
+		d->m_valid = const_cast<KGame::GraphicsSource*>(this)->load();
 		d->m_loaded = true;
 	}
 	return d->m_valid;
 }
 
-bool Tagaro::GraphicsSource::load()
+bool KGame::GraphicsSource::load()
 {
 	return true;
 }
 
-void Tagaro::GraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
+void KGame::GraphicsSource::addConfiguration(const QMap<QString, QString>& configuration)
 {
 	Q_UNUSED(configuration)
 }
 
-uint Tagaro::GraphicsSource::lastModified() const
+uint KGame::GraphicsSource::lastModified() const
 {
 	//see documentation
 	return 0;
 }
 
-QRectF Tagaro::GraphicsSource::elementBounds(const QString& element) const
+QRectF KGame::GraphicsSource::elementBounds(const QString& element) const
 {
 	Q_UNUSED(element)
 	return QRectF();
 }
 
-int Tagaro::GraphicsSource::frameCount(const QString& element) const
+int KGame::GraphicsSource::frameCount(const QString& element) const
 {
 	//look for animated sprite first
 	const int fbi = d->m_config.frameBaseIndex();
@@ -113,7 +113,7 @@ int Tagaro::GraphicsSource::frameCount(const QString& element) const
 	return count;
 }
 
-QString Tagaro::GraphicsSource::frameElementKey(const QString& element, int frame, bool useFrameCount) const
+QString KGame::GraphicsSource::frameElementKey(const QString& element, int frame, bool useFrameCount) const
 {
 	//fast path for non-animated sprites
 	if (frame < 0)
@@ -138,12 +138,12 @@ QString Tagaro::GraphicsSource::frameElementKey(const QString& element, int fram
 	return element + d->m_config.frameSuffix().arg(frame);
 }
 
-//END Tagaro::GraphicsSource
-//BEGIN Tagaro::CachedProxyGraphicsSource
+//END KGame::GraphicsSource
+//BEGIN KGame::CachedProxyGraphicsSource
 
-struct Tagaro::CachedProxyGraphicsSource::Private
+struct KGame::CachedProxyGraphicsSource::Private
 {
-	Tagaro::GraphicsSource* m_source;
+	KGame::GraphicsSource* m_source;
 	//disk cache
 	KImageCache* m_cache;
 	//in-process cache
@@ -153,36 +153,36 @@ struct Tagaro::CachedProxyGraphicsSource::Private
 	bool m_valid, m_loaded, m_sourceLoaded, m_useCache;
 	//m_useCache refers to the disk cache only, not to the in-process cache
 
-	Private(Tagaro::GraphicsSource* source);
+	Private(KGame::GraphicsSource* source);
 
 	QRectF elementBounds(const QString& element);
 	QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint);
 };
 
-Tagaro::CachedProxyGraphicsSource::Private::Private(Tagaro::GraphicsSource* source)
+KGame::CachedProxyGraphicsSource::Private::Private(KGame::GraphicsSource* source)
 	: m_source(source)
 	, m_cache(0)
 	, m_valid(false)
 	, m_loaded(false)
 	, m_sourceLoaded(false)
-	, m_useCache(Tagaro::Settings::useDiskCache() && source->config().cacheSize() > 0)
+	, m_useCache(KGame::Settings::useDiskCache() && source->config().cacheSize() > 0)
 {
 }
 
-Tagaro::CachedProxyGraphicsSource::CachedProxyGraphicsSource(Tagaro::GraphicsSource* source)
-	: Tagaro::GraphicsSource(source->identifier(), source->config())
+KGame::CachedProxyGraphicsSource::CachedProxyGraphicsSource(KGame::GraphicsSource* source)
+	: KGame::GraphicsSource(source->identifier(), source->config())
 	, d(new Private(source))
 {
 }
 
-Tagaro::CachedProxyGraphicsSource::~CachedProxyGraphicsSource()
+KGame::CachedProxyGraphicsSource::~CachedProxyGraphicsSource()
 {
 	delete d->m_source;
 	delete d->m_cache;
 	delete d;
 }
 
-bool Tagaro::CachedProxyGraphicsSource::load()
+bool KGame::CachedProxyGraphicsSource::load()
 {
 	if (d->m_loaded)
 	{
@@ -250,7 +250,7 @@ bool Tagaro::CachedProxyGraphicsSource::load()
 //As you see, implementing an own pixmap cache saves us one conversion. We
 //therefore disable KIC's pixmap cache because we do not need it.
 
-QRectF Tagaro::CachedProxyGraphicsSource::Private::elementBounds(const QString& element)
+QRectF KGame::CachedProxyGraphicsSource::Private::elementBounds(const QString& element)
 {
 	if (!m_sourceLoaded)
 	{
@@ -260,7 +260,7 @@ QRectF Tagaro::CachedProxyGraphicsSource::Private::elementBounds(const QString& 
 	return m_valid ? m_source->elementBounds(element) : QRectF();
 }
 
-QRectF Tagaro::CachedProxyGraphicsSource::elementBounds(const QString& element) const
+QRectF KGame::CachedProxyGraphicsSource::elementBounds(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -303,7 +303,7 @@ QRectF Tagaro::CachedProxyGraphicsSource::elementBounds(const QString& element) 
 	return bounds;
 }
 
-bool Tagaro::CachedProxyGraphicsSource::elementExists(const QString& element) const
+bool KGame::CachedProxyGraphicsSource::elementExists(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -320,7 +320,7 @@ bool Tagaro::CachedProxyGraphicsSource::elementExists(const QString& element) co
 	return d->m_valid ? d->m_source->elementExists(element) : false;
 }
 
-QImage Tagaro::CachedProxyGraphicsSource::Private::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint)
+QImage KGame::CachedProxyGraphicsSource::Private::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint)
 {
 	if (!m_sourceLoaded)
 	{
@@ -330,7 +330,7 @@ QImage Tagaro::CachedProxyGraphicsSource::Private::elementImage(const QString& e
 	return m_valid ? m_source->elementImage(element, size, processingInstruction, timeConstraint) : QImage();
 }
 
-QImage Tagaro::CachedProxyGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
+QImage KGame::CachedProxyGraphicsSource::elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -362,7 +362,7 @@ QImage Tagaro::CachedProxyGraphicsSource::elementImage(const QString& element, c
 	return result;
 }
 
-int Tagaro::CachedProxyGraphicsSource::frameCount(const QString& element) const
+int KGame::CachedProxyGraphicsSource::frameCount(const QString& element) const
 {
 	//fast return if load() has not been called yet or if graphical source is invalid
 	if (!d->m_valid)
@@ -378,7 +378,7 @@ int Tagaro::CachedProxyGraphicsSource::frameCount(const QString& element) const
 	//if there's no slow cache...
 	if (!d->m_cache)
 	{
-		const int count = Tagaro::GraphicsSource::frameCount(element);
+		const int count = KGame::GraphicsSource::frameCount(element);
 		d->m_frameCountCache.insert(element, count);
 		return count;
 	}
@@ -390,10 +390,10 @@ int Tagaro::CachedProxyGraphicsSource::frameCount(const QString& element) const
 		return buffer.toInt();
 	}
 	//ask source and cache for following requests
-	const int count = Tagaro::GraphicsSource::frameCount(element);
+	const int count = KGame::GraphicsSource::frameCount(element);
 	d->m_cache->insert(key, QByteArray::number(count));
 	d->m_frameCountCache.insert(key, count);
 	return count;
 }
 
-//END Tagaro::CachedProxyGraphicsSource
+//END KGame::CachedProxyGraphicsSource

@@ -16,13 +16,13 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SPRITE_H
-#define TAGARO_SPRITE_H
+#ifndef KGAME_SPRITE_H
+#define KGAME_SPRITE_H
 
 #include <QtGui/QPixmap>
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class DeclarativeThemeProvider;
 class SpriteClient;
@@ -30,7 +30,7 @@ class SpriteFetcher;
 class ThemeProvider;
 
 /**
- * @class Tagaro::Sprite sprite.h <Tagaro/Sprite>
+ * @class KGame::Sprite sprite.h <KGame/Sprite>
  *
  * Sprites are basic graphical elements of an application. They need not be
  * graphical primitives like lines or circles, but they are primitive graphical
@@ -42,9 +42,9 @@ class ThemeProvider;
  * key in the theme file. The element keys for the pixmaps of an animated
  * sprite are produced by appending the renderer()'s frameSuffix().
  *
- * Tagaro::Sprite instances can be obtained from a Tagaro::ThemeProvider.
+ * KGame::Sprite instances can be obtained from a KGame::ThemeProvider.
  */
-class TAGARO_EXPORT Sprite
+class KGAME_EXPORT Sprite
 {
 	public:
 		///@return the bounding rectangle of this sprite
@@ -92,14 +92,14 @@ class TAGARO_EXPORT Sprite
 		class Private;
 		Private* const d;
 
-		friend class Tagaro::DeclarativeThemeProvider;
-		friend class Tagaro::SpriteClient;
-		friend class Tagaro::SpriteFetcher;
-		friend class Tagaro::ThemeProvider;
+		friend class KGame::DeclarativeThemeProvider;
+		friend class KGame::SpriteClient;
+		friend class KGame::SpriteFetcher;
+		friend class KGame::ThemeProvider;
 		Sprite();
 		~Sprite();
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_SPRITE_H
+#endif // KGAME_SPRITE_H

@@ -16,43 +16,43 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_GRAPHICSCONFIGDIALOG_H
-#define TAGARO_GRAPHICSCONFIGDIALOG_H
+#ifndef KGAME_GRAPHICSCONFIGDIALOG_H
+#define KGAME_GRAPHICSCONFIGDIALOG_H
 
 #include <libtagaro_export.h>
 
 #include <KDE/KPageDialog>
 
-namespace Tagaro {
+namespace KGame {
 
 class ThemeProvider;
 
 /**
- * @class Tagaro::GraphicsConfigDialog graphicsconfigdialog.h <Tagaro/GraphicsConfigDialog>
+ * @class KGame::GraphicsConfigDialog graphicsconfigdialog.h <KGame/GraphicsConfigDialog>
  *
  * This dialog provides convenience functions for configuring graphical
  * components.
  *
  * The following example code illustrates how to add a theme selector page:
  * @code
- * Tagaro::GraphicsConfigDialog dialog;
+ * KGame::GraphicsConfigDialog dialog;
  * dialog.addThemeSelector(themeProvider,
  *     i18n("Theme"), "games-config-theme",
  *     i18n("Choose a theme")
  * );
  * @endcode
- * Any Tagaro::Renderer instances connected to the @a themeProvider will pickup
+ * Any KGame::Renderer instances connected to the @a themeProvider will pickup
  * selection changes automatically. If you need to be informed about the
  * selection change for some other reason, use the theme provider's
  * selectedThemeChanged() signal.
  */
-class TAGARO_EXPORT GraphicsConfigDialog : public KPageDialog
+class KGAME_EXPORT GraphicsConfigDialog : public KPageDialog
 {
 	Q_OBJECT
 	public:
-		///Creates a new Tagaro::GraphicsConfigDialog.
+		///Creates a new KGame::GraphicsConfigDialog.
 		explicit GraphicsConfigDialog(const QString& title = QString(), QWidget* parent = 0);
-		///Destroys this Tagaro::ConfigDialog instance.
+		///Destroys this KGame::ConfigDialog instance.
 		virtual ~GraphicsConfigDialog();
 
 		///Adds a page to this dialog which allows to change a theme selection.
@@ -61,7 +61,7 @@ class TAGARO_EXPORT GraphicsConfigDialog : public KPageDialog
 		///@param icon     The icon that should be used if needed.
 		///@param header   The header text to be shown above the page (defaults
 		///                to the item name if nothing is given).
-		void addThemeSelector(Tagaro::ThemeProvider* provider, const QString& itemName, const KIcon& icon, const QString& header = QString());
+		void addThemeSelector(KGame::ThemeProvider* provider, const QString& itemName, const KIcon& icon, const QString& header = QString());
 	private:
 		class Private;
 		Private* const d;
@@ -69,6 +69,6 @@ class TAGARO_EXPORT GraphicsConfigDialog : public KPageDialog
 		Q_PRIVATE_SLOT(d, void _k_selectionChanged());
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_GRAPHICSCONFIGDIALOG_H
+#endif // KGAME_GRAPHICSCONFIGDIALOG_H

@@ -23,18 +23,18 @@
 #include <QtGui/QLayout>
 #include <KDE/KLocale>
 
-struct Tagaro::GraphicsConfigDialog::Private
+struct KGame::GraphicsConfigDialog::Private
 {
-	Tagaro::GraphicsConfigDialog* q;
-	QList<Tagaro::ThemeSelector*> m_selectors;
+	KGame::GraphicsConfigDialog* q;
+	QList<KGame::ThemeSelector*> m_selectors;
 
-	Private(Tagaro::GraphicsConfigDialog* q_) : q(q_) {}
+	Private(KGame::GraphicsConfigDialog* q_) : q(q_) {}
 
 	void _k_restoreDefault();
 	void _k_selectionChanged();
 };
 
-Tagaro::GraphicsConfigDialog::GraphicsConfigDialog(const QString& title, QWidget* parent)
+KGame::GraphicsConfigDialog::GraphicsConfigDialog(const QString& title, QWidget* parent)
 	: KPageDialog(parent)
 	, d(new Private(this))
 {
@@ -45,14 +45,14 @@ Tagaro::GraphicsConfigDialog::GraphicsConfigDialog(const QString& title, QWidget
 	connect(this, SIGNAL(defaultClicked()), SLOT(_k_restoreDefault()));
 }
 
-Tagaro::GraphicsConfigDialog::~GraphicsConfigDialog()
+KGame::GraphicsConfigDialog::~GraphicsConfigDialog()
 {
 	delete d;
 }
 
-void Tagaro::GraphicsConfigDialog::addThemeSelector(Tagaro::ThemeProvider* provider, const QString& itemName, const KIcon& icon, const QString& header)
+void KGame::GraphicsConfigDialog::addThemeSelector(KGame::ThemeProvider* provider, const QString& itemName, const KIcon& icon, const QString& header)
 {
-	Tagaro::ThemeSelector* selector = new Tagaro::ThemeSelector(provider);
+	KGame::ThemeSelector* selector = new KGame::ThemeSelector(provider);
 	//insert into dialog
 	selector->layout()->setMargin(0); //for embedding in the dialog's layout
 	KPageWidgetItem* page = addPage(selector, itemName);
@@ -60,21 +60,21 @@ void Tagaro::GraphicsConfigDialog::addThemeSelector(Tagaro::ThemeProvider* provi
 	page->setHeader(header);
 	//hook up to dialog
 	d->m_selectors << selector;
-	connect(provider, SIGNAL(selectedThemeChanged(const Tagaro::Theme*)), SLOT(_k_selectionChanged()));
+	connect(provider, SIGNAL(selectedThemeChanged(const KGame::Theme*)), SLOT(_k_selectionChanged()));
 	d->_k_selectionChanged(); //determine state of "Default" button
 }
 
-void Tagaro::GraphicsConfigDialog::Private::_k_restoreDefault()
+void KGame::GraphicsConfigDialog::Private::_k_restoreDefault()
 {
-	foreach (Tagaro::ThemeSelector* selector, m_selectors)
+	foreach (KGame::ThemeSelector* selector, m_selectors)
 	{
 		selector->provider()->setSelectedTheme(selector->provider()->defaultTheme());
 	}
 }
 
-void Tagaro::GraphicsConfigDialog::Private::_k_selectionChanged()
+void KGame::GraphicsConfigDialog::Private::_k_selectionChanged()
 {
-	foreach (Tagaro::ThemeSelector* selector, m_selectors)
+	foreach (KGame::ThemeSelector* selector, m_selectors)
 	{
 		if (selector->provider()->selectedTheme() != selector->provider()->defaultTheme())
 		{

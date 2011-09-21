@@ -24,7 +24,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsScene>
 
-Tagaro::Board::Board(QGraphicsItem* parent)
+KGame::Board::Board(QGraphicsItem* parent)
 	: QGraphicsObject(parent)
 	, d(new Private(this))
 {
@@ -35,24 +35,24 @@ Tagaro::Board::Board(QGraphicsItem* parent)
 	}
 }
 
-Tagaro::Board::~Board()
+KGame::Board::~Board()
 {
 	delete d;
 }
 
-Tagaro::Board::Private::~Private()
+KGame::Board::Private::~Private()
 {
-	QList<Tagaro::SpriteObjectItem*> m_items;
-	for(QList<Tagaro::SpriteObjectItem*>::const_iterator a = m_items.constBegin(); a != m_items.constEnd(); ++a)
+	QList<KGame::SpriteObjectItem*> m_items;
+	for(QList<KGame::SpriteObjectItem*>::const_iterator a = m_items.constBegin(); a != m_items.constEnd(); ++a)
 		(*a)->d->unsetBoard();
 }
 
-QSizeF Tagaro::Board::logicalSize() const
+QSizeF KGame::Board::logicalSize() const
 {
 	return d->m_logicalSize;
 }
 
-void Tagaro::Board::setLogicalSize(const QSizeF& size)
+void KGame::Board::setLogicalSize(const QSizeF& size)
 {
 	if (size.isValid() && d->m_logicalSize != size)
 	{
@@ -61,12 +61,12 @@ void Tagaro::Board::setLogicalSize(const QSizeF& size)
 	}
 }
 
-QSizeF Tagaro::Board::size() const
+QSizeF KGame::Board::size() const
 {
 	return d->m_size;
 }
 
-void Tagaro::Board::setSize(const QSizeF& size)
+void KGame::Board::setSize(const QSizeF& size)
 {
 	if (size.isValid() && d->m_size != size)
 	{
@@ -76,12 +76,12 @@ void Tagaro::Board::setSize(const QSizeF& size)
 	}
 }
 
-qreal Tagaro::Board::physicalSizeFactor() const
+qreal KGame::Board::physicalSizeFactor() const
 {
 	return d->m_physicalSizeFactor;
 }
 
-void Tagaro::Board::setPhysicalSizeFactor(qreal physicalSizeFactor)
+void KGame::Board::setPhysicalSizeFactor(qreal physicalSizeFactor)
 {
 	if (physicalSizeFactor > 0.0 && d->m_physicalSizeFactor != physicalSizeFactor)
 	{
@@ -90,12 +90,12 @@ void Tagaro::Board::setPhysicalSizeFactor(qreal physicalSizeFactor)
 	}
 }
 
-Qt::Alignment Tagaro::Board::alignment() const
+Qt::Alignment KGame::Board::alignment() const
 {
 	return d->m_alignment;
 }
 
-void Tagaro::Board::setAlignment(Qt::Alignment alignment)
+void KGame::Board::setAlignment(Qt::Alignment alignment)
 {
 	//filter Qt::AlignJustify which is not interpreted by this class
 	static const Qt::Alignment respectedFlags = (Qt::Alignment) ((Qt::AlignHorizontal_Mask & ~Qt::AlignJustify) | Qt::AlignVertical_Mask);
@@ -107,7 +107,7 @@ void Tagaro::Board::setAlignment(Qt::Alignment alignment)
 	}
 }
 
-void Tagaro::Board::Private::_k_update()
+void KGame::Board::Private::_k_update()
 {
 	//determine physical size
 	if (m_alignment)
@@ -158,21 +158,21 @@ void Tagaro::Board::Private::_k_update()
 	m_board->setTransform(QTransform::fromScale(m_renderSizeFactor.x(), m_renderSizeFactor.y()));
 	m_renderSizeFactor *= m_physicalSizeFactor;
 	//update items
-	QList<Tagaro::SpriteObjectItem*>::const_iterator it1 = m_items.constBegin(), it2 = m_items.constEnd();
+	QList<KGame::SpriteObjectItem*>::const_iterator it1 = m_items.constBegin(), it2 = m_items.constEnd();
 	for (; it1 != it2; ++it1)
 		update(*it1);
 }
 
-void Tagaro::Board::Private::_k_updateItem()
+void KGame::Board::Private::_k_updateItem()
 {
-	Tagaro::SpriteObjectItem* item = qobject_cast<Tagaro::SpriteObjectItem*>(m_board->sender());
+	KGame::SpriteObjectItem* item = qobject_cast<KGame::SpriteObjectItem*>(m_board->sender());
 	if (item)
 	{
 		update(item);
 	}
 }
 
-void Tagaro::Board::Private::update(Tagaro::SpriteObjectItem* item)
+void KGame::Board::Private::update(KGame::SpriteObjectItem* item)
 {
 	QSizeF size;
 	if (item->parentItem() == m_board)
@@ -188,30 +188,30 @@ void Tagaro::Board::Private::update(Tagaro::SpriteObjectItem* item)
 	item->setRenderSize(size.toSize());
 }
 
-QRectF Tagaro::Board::boundingRect() const
+QRectF KGame::Board::boundingRect() const
 {
 	return QRectF(QPointF(), d->m_size);
 }
 
-void Tagaro::Board::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void KGame::Board::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	Q_UNUSED(painter) Q_UNUSED(option) Q_UNUSED(widget)
 }
 
-void Tagaro::Board::Private::registerItem(Tagaro::SpriteObjectItem* item)
+void KGame::Board::Private::registerItem(KGame::SpriteObjectItem* item)
 {
 	m_items << item;
 	connect(item, SIGNAL(sizeChanged(QSizeF)), m_board, SLOT(_k_updateItem()));
 	update(item);
 }
 
-void Tagaro::Board::Private::unregisterItem(Tagaro::SpriteObjectItem* item)
+void KGame::Board::Private::unregisterItem(KGame::SpriteObjectItem* item)
 {
 	disconnect(item, 0, m_board, 0);
 	m_items.removeAll(item);
 }
 
-QVariant Tagaro::Board::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
+QVariant KGame::Board::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
 {
 	if (change == ItemSceneChange)
 	{

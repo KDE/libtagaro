@@ -16,20 +16,20 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_AUDIOSCENE_H
-#define TAGARO_AUDIOSCENE_H
+#ifndef KGAME_AUDIOSCENE_H
+#define KGAME_AUDIOSCENE_H
 
 #include <QtCore/QPointF>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 /**
- * @class Tagaro::AudioScene audioscene.h <Tagaro/AudioScene>
+ * @class KGame::AudioScene audioscene.h <KGame/AudioScene>
  *
  * This class exposes general properties of the audio playback context. Actual
- * sounds are represented in this context by Tagaro::Sound instances.
+ * sounds are represented in this context by KGame::Sound instances.
  *
  * The audio scene basically consists of a listener. The position of this
  * listener is relevant when sounds are played at certain positions: The audio
@@ -43,7 +43,7 @@ namespace Tagaro {
  *          is not supported, the getter will return a sensible default value
  *          and the setter will do nothing except for warning via kDebug().
  */
-class TAGARO_EXPORT AudioScene
+class KGAME_EXPORT AudioScene
 {
 	public:
 		///@return the position of the listener
@@ -64,6 +64,6 @@ class TAGARO_EXPORT AudioScene
 		Q_DISABLE_COPY(AudioScene)
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_AUDIOSCENE_H
+#endif // KGAME_AUDIOSCENE_H

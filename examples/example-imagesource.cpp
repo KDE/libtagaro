@@ -18,30 +18,30 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsView>
-#include <Tagaro/Board>
-#include <Tagaro/Scene>
-#include <Tagaro/SimpleThemeProvider>
-#include <Tagaro/SpriteObjectItem>
-#include <Tagaro/StandardTheme>
+#include <KGame/Board>
+#include <KGame/Scene>
+#include <KGame/SimpleThemeProvider>
+#include <KGame/SpriteObjectItem>
+#include <KGame/StandardTheme>
 
 int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
 
-	Tagaro::SimpleThemeProvider provider;
-	provider.addTheme(new Tagaro::StandardTheme("example-imagesource.desktop", &provider));
+	KGame::SimpleThemeProvider provider;
+	provider.addTheme(new KGame::StandardTheme("example-imagesource.desktop", &provider));
 
 	QGraphicsView view;
-	Tagaro::Scene scene(provider.sprite("background"));
+	KGame::Scene scene(provider.sprite("background"));
 	scene.setMainView(&view);
 
-	Tagaro::Board board;
+	KGame::Board board;
 	board.setLogicalSize(QSizeF(2, 2));
 	scene.addItem(&board);
-	(new Tagaro::SpriteObjectItem(provider.sprite("item1"), &board))->setPos(QPointF(0, 0));
-	(new Tagaro::SpriteObjectItem(provider.sprite("item2"), &board))->setPos(QPointF(0, 1));
-	(new Tagaro::SpriteObjectItem(provider.sprite("item3"), &board))->setPos(QPointF(1, 0));
-	(new Tagaro::SpriteObjectItem(provider.sprite("item4"), &board))->setPos(QPointF(1, 1));
+	(new KGame::SpriteObjectItem(provider.sprite("item1"), &board))->setPos(QPointF(0, 0));
+	(new KGame::SpriteObjectItem(provider.sprite("item2"), &board))->setPos(QPointF(0, 1));
+	(new KGame::SpriteObjectItem(provider.sprite("item3"), &board))->setPos(QPointF(1, 0));
+	(new KGame::SpriteObjectItem(provider.sprite("item4"), &board))->setPos(QPointF(1, 1));
 
 	view.show();
 	return app.exec();

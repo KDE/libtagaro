@@ -16,8 +16,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KCMTAGARO_KCMTAGARO_H
-#define KCMTAGARO_KCMTAGARO_H
+#ifndef KCMKGAME_KCMKGAME_H
+#define KCMKGAME_KCMKGAME_H
 
 #include <KDE/KCModule>
 
@@ -31,4 +31,4 @@ class KCMTagaro : public KCModule
 		Private* const d;
 };
 
-#endif // KCMTAGARO_KCMTAGARO_H
+#endif // KCMKGAME_KCMKGAME_H

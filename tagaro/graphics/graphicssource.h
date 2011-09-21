@@ -16,44 +16,44 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_GRAPHICSSOURCE_H
-#define TAGARO_GRAPHICSSOURCE_H
+#ifndef KGAME_GRAPHICSSOURCE_H
+#define KGAME_GRAPHICSSOURCE_H
 
 #include <QtGui/QImage>
 
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 class GraphicsSourceConfig;
 
 /**
- * @class Tagaro::GraphicsSource graphicssource.h <Tagaro/GraphicsSource>
+ * @class KGame::GraphicsSource graphicssource.h <KGame/GraphicsSource>
  *
  * A GraphicsSource represents a source of graphical elements, e.g. a graphics
  * file. (When we talk about "elements", we only mean renderable elements which
  * have been assigned a QString key.)
  *
- * @see Tagaro::CachedProxyGraphicsSource for sources with complex internal structure
+ * @see KGame::CachedProxyGraphicsSource for sources with complex internal structure
  *
  * Subclasses which load graphical elements from external resources (e.g.
  * files) shall not load these resources in the constructor, but in the load()
  * method. This allows the CachedProxyGraphicsSource to skip the loading when
  * the graphical elements or metadata are available from the cache.
  */
-class TAGARO_EXPORT GraphicsSource
+class KGAME_EXPORT GraphicsSource
 {
 	Q_DISABLE_COPY(GraphicsSource)
 	public:
-		///Creates a new Tagaro::GraphicsSource with the given @a config.
+		///Creates a new KGame::GraphicsSource with the given @a config.
 		///
 		///See identifier() for the meaning of the @a identifier.
-		GraphicsSource(const QString& identifier, const Tagaro::GraphicsSourceConfig& config);
-		///Destroys this Tagaro::GraphicsSource.
+		GraphicsSource(const QString& identifier, const KGame::GraphicsSourceConfig& config);
+		///Destroys this KGame::GraphicsSource.
 		virtual ~GraphicsSource();
 
 		///@return this source's config
-		const Tagaro::GraphicsSourceConfig& config() const;
+		const KGame::GraphicsSourceConfig& config() const;
 		///@return the source identifier
 		///
 		///The identifier is used by CachedProxyGraphicsSource to determine the
@@ -114,7 +114,7 @@ class TAGARO_EXPORT GraphicsSource
 		virtual QImage elementImage(const QString& element, const QSize& size, const QString& processingInstruction, bool timeConstraint) const = 0;
 		///@return the frame count of the given @a element
 		///
-		///The semantics are similar to Tagaro::Sprite::frameCount:
+		///The semantics are similar to KGame::Sprite::frameCount:
 		///@li Return -1 if the element does not exist at all.
 		///@li Return 0 if the element is not animated, i.e. the element
 		///    exists, but no frame elements exist for it.
@@ -146,19 +146,19 @@ class TAGARO_EXPORT GraphicsSource
 };
 
 /**
- * @class Tagaro::CachedProxyGraphicsSource graphicssource.h <Tagaro/CachedProxyGraphicsSource>
+ * @class KGame::CachedProxyGraphicsSource graphicssource.h <KGame/CachedProxyGraphicsSource>
  *
  * Provides disk caching for sources with complex graphics sources.
  * In-process caches are provided for element metadata, but not for images.
  */
-class TAGARO_EXPORT CachedProxyGraphicsSource : public Tagaro::GraphicsSource
+class KGAME_EXPORT CachedProxyGraphicsSource : public KGame::GraphicsSource
 {
 	public:
-		///Creates a new Tagaro::CachedProxyGraphicsSource. The given @a source
+		///Creates a new KGame::CachedProxyGraphicsSource. The given @a source
 		///will be used to actually do the rendering work. The proxy takes
 		///ownership of the given @a source.
-		explicit CachedProxyGraphicsSource(Tagaro::GraphicsSource* source);
-		///Destroys this Tagaro::CachedProxyGraphicsSource, and the source
+		explicit CachedProxyGraphicsSource(KGame::GraphicsSource* source);
+		///Destroys this KGame::CachedProxyGraphicsSource, and the source
 		///behind it.
 		virtual ~CachedProxyGraphicsSource();
 
@@ -173,6 +173,6 @@ class TAGARO_EXPORT CachedProxyGraphicsSource : public Tagaro::GraphicsSource
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-#endif // TAGARO_GRAPHICSSOURCE_H
+#endif // KGAME_GRAPHICSSOURCE_H

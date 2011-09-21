@@ -18,23 +18,23 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef LIBTAGARO_EXPORT_H
-#define LIBTAGARO_EXPORT_H
+#ifndef LIBKGAME_EXPORT_H
+#define LIBKGAME_EXPORT_H
 
 #include <kdemacros.h>
 
 //export macro for libtagaro
 
-#ifndef TAGARO_EXPORT
-#	if defined(MAKE_TAGARO_LIB)
-#		define TAGARO_EXPORT KDE_EXPORT //building the library
+#ifndef KGAME_EXPORT
+#	if defined(MAKE_KGAME_LIB)
+#		define KGAME_EXPORT KDE_EXPORT //building the library
 #	else
-#		define TAGARO_EXPORT KDE_IMPORT //using the library
+#		define KGAME_EXPORT KDE_IMPORT //using the library
 #	endif
 #endif
 
-#ifndef TAGARO_EXPORT_DEPRECATED
-#	define TAGARO_EXPORT_DEPRECATED KDE_DEPRECATED TAGARO_EXPORT
+#ifndef KGAME_EXPORT_DEPRECATED
+#	define KGAME_EXPORT_DEPRECATED KDE_DEPRECATED KGAME_EXPORT
 #endif
 
-#endif // LIBTAGARO_EXPORT_H
+#endif // LIBKGAME_EXPORT_H

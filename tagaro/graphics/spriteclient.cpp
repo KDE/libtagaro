@@ -22,9 +22,9 @@
 
 #include <QtCore/QTimer>
 
-//WARNING: d->m_sprite == 0 is allowed, and used actively by Tagaro::Scene.
+//WARNING: d->m_sprite == 0 is allowed, and used actively by KGame::Scene.
 
-Tagaro::SpriteClient::Private::Private(Tagaro::Sprite* sprite, Tagaro::SpriteClient* q)
+KGame::SpriteClient::Private::Private(KGame::Sprite* sprite, KGame::SpriteClient* q)
 	: q(q)
 	, m_sprite(sprite)
 	, m_fetcher(0)
@@ -32,7 +32,7 @@ Tagaro::SpriteClient::Private::Private(Tagaro::Sprite* sprite, Tagaro::SpriteCli
 {
 }
 
-Tagaro::SpriteClient::SpriteClient(Tagaro::Sprite* sprite)
+KGame::SpriteClient::SpriteClient(KGame::Sprite* sprite)
 	: d(new Private(sprite, this))
 {
 	if (sprite)
@@ -41,7 +41,7 @@ Tagaro::SpriteClient::SpriteClient(Tagaro::Sprite* sprite)
 	}
 }
 
-Tagaro::SpriteClient::~SpriteClient()
+KGame::SpriteClient::~SpriteClient()
 {
 	//This is setSprite(0), but that can't be called directly because this might
 	//call receivePixmap() which is pure virtual at this point.
@@ -56,12 +56,12 @@ Tagaro::SpriteClient::~SpriteClient()
 	delete d;
 }
 
-Tagaro::Sprite* Tagaro::SpriteClient::sprite() const
+KGame::Sprite* KGame::SpriteClient::sprite() const
 {
 	return d->m_sprite;
 }
 
-void Tagaro::SpriteClient::setSprite(Tagaro::Sprite* sprite)
+void KGame::SpriteClient::setSprite(KGame::Sprite* sprite)
 {
 	if (d->m_sprite != sprite)
 	{
@@ -91,12 +91,12 @@ void Tagaro::SpriteClient::setSprite(Tagaro::Sprite* sprite)
 	}
 }
 
-int Tagaro::SpriteClient::frame() const
+int KGame::SpriteClient::frame() const
 {
 	return d->m_frame;
 }
 
-void Tagaro::SpriteClient::setFrame(int frame)
+void KGame::SpriteClient::setFrame(int frame)
 {
 	if (d->m_frame != frame)
 	{
@@ -108,17 +108,17 @@ void Tagaro::SpriteClient::setFrame(int frame)
 	}
 }
 
-QString Tagaro::SpriteClient::processingInstruction() const
+QString KGame::SpriteClient::processingInstruction() const
 {
 	return d->m_processingInstruction;
 }
 
-void Tagaro::SpriteClient::setProcessingInstruction(const QString& processingInstruction)
+void KGame::SpriteClient::setProcessingInstruction(const QString& processingInstruction)
 {
 	if (d->m_processingInstruction != processingInstruction)
 	{
 		d->m_processingInstruction = processingInstruction;
-		Tagaro::SpriteFetcher* f = 0;
+		KGame::SpriteFetcher* f = 0;
 		if (d->m_sprite)
 		{
 			f = d->m_sprite->d->fetcher(d->m_size, processingInstruction);
@@ -127,17 +127,17 @@ void Tagaro::SpriteClient::setProcessingInstruction(const QString& processingIns
 	}
 }
 
-QSize Tagaro::SpriteClient::renderSize() const
+QSize KGame::SpriteClient::renderSize() const
 {
 	return d->m_size;
 }
 
-void Tagaro::SpriteClient::setRenderSize(const QSize& size)
+void KGame::SpriteClient::setRenderSize(const QSize& size)
 {
 	if (d->m_size != size)
 	{
 		d->m_size = size;
-		Tagaro::SpriteFetcher* f = 0;
+		KGame::SpriteFetcher* f = 0;
 		if (d->m_sprite)
 		{
 			f = d->m_sprite->d->fetcher(size, d->m_processingInstruction);
@@ -146,7 +146,7 @@ void Tagaro::SpriteClient::setRenderSize(const QSize& size)
 	}
 }
 
-void Tagaro::SpriteClient::Private::setFetcher(Tagaro::SpriteFetcher* fetcher)
+void KGame::SpriteClient::Private::setFetcher(KGame::SpriteFetcher* fetcher)
 {
 	if (m_fetcher == fetcher)
 	{
@@ -167,12 +167,12 @@ void Tagaro::SpriteClient::Private::setFetcher(Tagaro::SpriteFetcher* fetcher)
 	}
 }
 
-QPixmap Tagaro::SpriteClient::pixmap() const
+QPixmap KGame::SpriteClient::pixmap() const
 {
 	return d->m_pixmap;
 }
 
-void Tagaro::SpriteClient::Private::receivePixmap(const QPixmap& pixmap)
+void KGame::SpriteClient::Private::receivePixmap(const QPixmap& pixmap)
 {
 	m_pixmap = pixmap;
 	q->receivePixmap(pixmap);

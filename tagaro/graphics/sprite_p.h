@@ -16,15 +16,15 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SPRITE_P_H
-#define TAGARO_SPRITE_P_H
+#ifndef KGAME_SPRITE_P_H
+#define KGAME_SPRITE_P_H
 
 #include "sprite.h"
 #include "spriteclient.h"
 
 #include <QtCore/QHash>
 
-namespace Tagaro {
+namespace KGame {
 
 class GraphicsSource;
 class SpriteClient;
@@ -33,11 +33,11 @@ class SpriteFetcher : public QObject
 {
 	Q_OBJECT
 	public:
-		SpriteFetcher(const QSize& size, const QString& processingInstruction, Tagaro::Sprite::Private* d) : d(d), m_size(size), m_processingInstruction(processingInstruction) {}
+		SpriteFetcher(const QSize& size, const QString& processingInstruction, KGame::Sprite::Private* d) : d(d), m_size(size), m_processingInstruction(processingInstruction) {}
 
-		void addClient(Tagaro::SpriteClient* client);
-		void removeClient(Tagaro::SpriteClient* client);
-		void updateClient(Tagaro::SpriteClient* client);
+		void addClient(KGame::SpriteClient* client);
+		void removeClient(KGame::SpriteClient* client);
+		void updateClient(KGame::SpriteClient* client);
 		void updateAllClients();
 	public Q_SLOTS:
 		//If called with a null @a image, looks in the cache for the given
@@ -51,57 +51,57 @@ class SpriteFetcher : public QObject
 	private:
 		void startJob(int frame);
 
-		Tagaro::Sprite::Private* const d;
+		KGame::Sprite::Private* const d;
 		QSize m_size;
 		QString m_processingInstruction;
 
 		QHash<int, QPixmap> m_pixmapCache;
-		QList<Tagaro::SpriteClient*> m_clients; //FIXME: utterly broken
+		QList<KGame::SpriteClient*> m_clients; //FIXME: utterly broken
 };
 
 struct Sprite::Private
 {
 	public:
-		void setSource(const Tagaro::GraphicsSource* source, const QString& element);
+		void setSource(const KGame::GraphicsSource* source, const QString& element);
 
-		void addClient(Tagaro::SpriteClient* client);
-		void removeClient(Tagaro::SpriteClient* client);
-		Tagaro::SpriteFetcher* fetcher(const QSize& size, const QString& processingInstruction);
+		void addClient(KGame::SpriteClient* client);
+		void removeClient(KGame::SpriteClient* client);
+		KGame::SpriteFetcher* fetcher(const QSize& size, const QString& processingInstruction);
 	private:
-		friend class Tagaro::DeclarativeThemeProvider;
-		friend class Tagaro::Sprite;
-		friend class Tagaro::SpriteFetcher;
+		friend class KGame::DeclarativeThemeProvider;
+		friend class KGame::Sprite;
+		friend class KGame::SpriteFetcher;
 		Private();
 
-		const Tagaro::GraphicsSource* m_source;
+		const KGame::GraphicsSource* m_source;
 		QString m_element;
 	
 		QHash<QPair<QSize, QString>, SpriteFetcher*> m_fetchers; //key: size, processing instruction
-		QList<Tagaro::SpriteClient*> m_clients;
+		QList<KGame::SpriteClient*> m_clients;
 };
 
 struct SpriteClient::Private
 {
 	public:
-		Private(Tagaro::Sprite* sprite, Tagaro::SpriteClient* q);
-		void setFetcher(Tagaro::SpriteFetcher* fetcher);
+		Private(KGame::Sprite* sprite, KGame::SpriteClient* q);
+		void setFetcher(KGame::SpriteFetcher* fetcher);
 		void receivePixmap(const QPixmap& pixmap);
 	private:
-		friend class Tagaro::SpriteClient;
-		Tagaro::SpriteClient* q;
-		Tagaro::Sprite* m_sprite;
+		friend class KGame::SpriteClient;
+		KGame::SpriteClient* q;
+		KGame::Sprite* m_sprite;
 		QSize m_size;
 		QString m_processingInstruction;
-		Tagaro::SpriteFetcher* m_fetcher;
+		KGame::SpriteFetcher* m_fetcher;
 		int m_frame;
 		QPixmap m_pixmap;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
 inline uint qHash(const QSize& size)
 {
 	return qHash(qMakePair(size.width(), size.height()));
 }
 
-#endif // TAGARO_SPRITE_P_H
+#endif // KGAME_SPRITE_P_H

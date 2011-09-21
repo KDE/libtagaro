@@ -22,21 +22,21 @@
 #include <sndfile.hh> //TODO: use Phonon instead of libsndfile for decoding
 #include <KDE/KDebug>
 
-struct Tagaro::Sound::Private
+struct KGame::Sound::Private
 {
-	Tagaro::Sound::PlaybackType m_type;
+	KGame::Sound::PlaybackType m_type;
 	qreal m_volume;
 	QPointF m_pos;
 
 	bool m_valid;
 	ALuint m_buffer;
 
-	Private() : m_type(Tagaro::Sound::AmbientPlayback), m_volume(1.0), m_valid(false), m_buffer(AL_NONE) {}
+	Private() : m_type(KGame::Sound::AmbientPlayback), m_volume(1.0), m_valid(false), m_buffer(AL_NONE) {}
 };
 
-//BEGIN Tagaro::Sound
+//BEGIN KGame::Sound
 
-Tagaro::Sound::Sound(const QString& file, QObject* parent)
+KGame::Sound::Sound(const QString& file, QObject* parent)
 	: QObject(parent)
 	, d(new Private)
 {
@@ -75,7 +75,7 @@ Tagaro::Sound::Sound(const QString& file, QObject* parent)
 			return;
 	}
 	//make sure OpenAL is initialized; clear OpenAL error storage
-	Tagaro::OpenALRuntime::instance();
+	KGame::OpenALRuntime::instance();
 	int error; alGetError();
 	//create OpenAL buffer
 	alGenBuffers(1, &d->m_buffer);
@@ -95,81 +95,81 @@ Tagaro::Sound::Sound(const QString& file, QObject* parent)
 	d->m_valid = true;
 }
 
-Tagaro::Sound::~Sound()
+KGame::Sound::~Sound()
 {
 	if (d->m_valid)
 	{
 		stop();
-		Tagaro::OpenALRuntime::instance()->m_soundsEvents.remove(this);
+		KGame::OpenALRuntime::instance()->m_soundsEvents.remove(this);
 		alDeleteBuffers(1, &d->m_buffer);
 	}
 	delete d;
 }
 
-bool Tagaro::Sound::isValid() const
+bool KGame::Sound::isValid() const
 {
 	return d->m_valid;
 }
 
-Tagaro::Sound::PlaybackType Tagaro::Sound::playbackType() const
+KGame::Sound::PlaybackType KGame::Sound::playbackType() const
 {
 	return d->m_type;
 }
 
-void Tagaro::Sound::setPlaybackType(Tagaro::Sound::PlaybackType type)
+void KGame::Sound::setPlaybackType(KGame::Sound::PlaybackType type)
 {
 	d->m_type = type;
 }
 
-QPointF Tagaro::Sound::pos() const
+QPointF KGame::Sound::pos() const
 {
 	return d->m_pos;
 }
 
-void Tagaro::Sound::setPos(const QPointF& pos)
+void KGame::Sound::setPos(const QPointF& pos)
 {
 	d->m_pos = pos;
 }
 
-qreal Tagaro::Sound::volume() const
+qreal KGame::Sound::volume() const
 {
 	return d->m_volume;
 }
 
-void Tagaro::Sound::setVolume(qreal volume)
+void KGame::Sound::setVolume(qreal volume)
 {
 	d->m_volume = volume;
 }
 
-void Tagaro::Sound::start()
+void KGame::Sound::start()
 {
 	if (d->m_valid)
 	{
-		new Tagaro::PlaybackEvent(this, d->m_pos);
+		new KGame::PlaybackEvent(this, d->m_pos);
 	}
 }
 
-void Tagaro::Sound::start(const QPointF& pos)
+void KGame::Sound::start(const QPointF& pos)
 {
 	if (d->m_valid)
 	{
-		new Tagaro::PlaybackEvent(this, pos);
+		new KGame::PlaybackEvent(this, pos);
 	}
 }
 
-void Tagaro::Sound::stop()
+void KGame::Sound::stop()
 {
-	qDeleteAll(Tagaro::OpenALRuntime::instance()->m_soundsEvents.take(this));
+	qDeleteAll(KGame::OpenALRuntime::instance()->m_soundsEvents.take(this));
 }
 
-//END Tagaro::Sound
-//BEGIN Tagaro::PlaybackEvent
+//END KGame::Sound
+//BEGIN KGame::PlaybackEvent
 
-Tagaro::PlaybackEvent::PlaybackEvent(Tagaro::Sound* sound, const QPointF& pos)
+KGame::PlaybackEvent::PlaybackEvent(KGame::Sound* sound, const QPointF& pos)
 	: m_valid(false)
 {
 	//make sure OpenAL is initialized
-	Tagaro::OpenALRuntime* runtime = Tagaro::OpenALRuntime::instance();
+	KGame::OpenALRuntime* runtime = KGame::OpenALRuntime::instance();
 	//clear OpenAL error storage
 	int error; alGetError();
 	//create source for playback
@@ -187,9 +187,9 @@ Tagaro::PlaybackEvent::PlaybackEvent(Tagaro::Sound* sound, const QPointF& pos)
 	alSourcef(m_source, AL_PITCH, 1.5); //TODO: debug
 	alSourcef(m_source, AL_GAIN, sound->volume());
 	alSourcei(m_source, AL_BUFFER, sound->d->m_buffer);
-	const Tagaro::Sound::PlaybackType type = sound->playbackType();
-	alSourcef(m_source, AL_ROLLOFF_FACTOR, type == Tagaro::Sound::AmbientPlayback ? 0.0 : 1.0);
-	alSourcei(m_source, AL_SOURCE_RELATIVE, type == Tagaro::Sound::RelativePlayback ? AL_TRUE : AL_FALSE);
+	const KGame::Sound::PlaybackType type = sound->playbackType();
+	alSourcef(m_source, AL_ROLLOFF_FACTOR, type == KGame::Sound::AmbientPlayback ? 0.0 : 1.0);
+	alSourcei(m_source, AL_SOURCE_RELATIVE, type == KGame::Sound::RelativePlayback ? AL_TRUE : AL_FALSE);
 	if ((error = alGetError()) != AL_NO_ERROR)
 	{
 		kDebug() << "Failed to setup OpenAL source: Error code" << error;
@@ -199,7 +199,7 @@ Tagaro::PlaybackEvent::PlaybackEvent(Tagaro::Sound* sound, const QPointF& pos)
 	alSourcePlay(m_source);
 }
 
-Tagaro::PlaybackEvent::~PlaybackEvent()
+KGame::PlaybackEvent::~PlaybackEvent()
 {
 	if (m_valid)
 	{
@@ -208,13 +208,13 @@ Tagaro::PlaybackEvent::~PlaybackEvent()
 	}
 }
 
-bool Tagaro::PlaybackEvent::isRunning() const
+bool KGame::PlaybackEvent::isRunning() const
 {
 	ALint state;
 	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
 	return state == AL_PLAYING;
 }
 
-//END Tagaro::PlaybackEvent
+//END KGame::PlaybackEvent
 
 #include "sound.moc"

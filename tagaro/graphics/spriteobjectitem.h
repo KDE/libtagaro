@@ -16,8 +16,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGARO_SPRITEOBJECTITEM_H
-#define TAGARO_SPRITEOBJECTITEM_H
+#ifndef KGAME_SPRITEOBJECTITEM_H
+#define KGAME_SPRITEOBJECTITEM_H
 
 #include <QtCore/QObject>
 #include <QtGui/QGraphicsItem>
@@ -25,29 +25,29 @@
 #include "spriteclient.h"
 #include <libtagaro_export.h>
 
-namespace Tagaro {
+namespace KGame {
 
 /**
- * @class Tagaro::SpriteObjectItem spriteobjectitem.h <Tagaro/SpriteObjectItem>
- * @short A QGraphicsObject which displays pixmaps from a Tagaro::Sprite.
+ * @class KGame::SpriteObjectItem spriteobjectitem.h <KGame/SpriteObjectItem>
+ * @short A QGraphicsObject which displays pixmaps from a KGame::Sprite.
  *
- * This item displays a pixmap which is retrieved from a Tagaro::Sprite, and
- * is updated automatically when the corresponding Tagaro::ThemeProvider
+ * This item displays a pixmap which is retrieved from a KGame::Sprite, and
+ * is updated automatically when the corresponding KGame::ThemeProvider
  * changes the theme.
  *
  * The item has built-in handling for animated sprites (i.e. those with multiple
  * frames). It is a QGraphicsObject and exposes a "frame" property, so you can
  * easily run the animation by plugging in a QPropertyAnimation.
  *
- * The most important difference to Tagaro::SpriteItem, which is a classic
+ * The most important difference to KGame::SpriteItem, which is a classic
  * QGraphicsPixmapItem, is that the bounding rectangle of this item is fixed
  * to QRectF(offset(), size()). The rendered pixmap is scaled to fit into this
  * bounding rectangle, regardless of its render size.
  *
  * To automatically adjust the render size to the physical coordinate system of
- * a QGraphicsView, insert the Tagaro::SpriteObjectItem into a Tagaro::Board.
+ * a QGraphicsView, insert the KGame::SpriteObjectItem into a KGame::Board.
  */
-class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::SpriteClient
+class KGAME_EXPORT SpriteObjectItem : public QGraphicsObject, public KGame::SpriteClient
 {
 	Q_OBJECT
 	Q_PROPERTY(int frame READ frame WRITE setFrame)
@@ -55,8 +55,8 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Sp
 	Q_PROPERTY(QSize renderSize READ renderSize WRITE setRenderSize)
 	Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
 	public:
-		///Creates a new Tagaro::SpriteObjectItem which renders the given @sprite.
-		explicit SpriteObjectItem(Tagaro::Sprite* sprite, QGraphicsItem* parent = 0);
+		///Creates a new KGame::SpriteObjectItem which renders the given @sprite.
+		explicit SpriteObjectItem(KGame::Sprite* sprite, QGraphicsItem* parent = 0);
 		virtual ~SpriteObjectItem();
 
 		///@return the item's offset, which defines the point of the top-left
@@ -95,16 +95,16 @@ class TAGARO_EXPORT SpriteObjectItem : public QGraphicsObject, public Tagaro::Sp
 		Private* const d;
 };
 
-} //namespace Tagaro
+} //namespace KGame
 
-void Tagaro::SpriteObjectItem::setOffset(qreal x, qreal y)
+void KGame::SpriteObjectItem::setOffset(qreal x, qreal y)
 {
 	setOffset(QPointF(x, y));
 }
 
-void Tagaro::SpriteObjectItem::setSize(qreal w, qreal h)
+void KGame::SpriteObjectItem::setSize(qreal w, qreal h)
 {
 	setSize(QSizeF(w, h));
 }
 
-#endif // TAGARO_SPRITEOBJECTITEM_H
+#endif // KGAME_SPRITEOBJECTITEM_H
