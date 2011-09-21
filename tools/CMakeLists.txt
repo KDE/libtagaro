@@ -1,1 +1,1 @@
-add_subdirectory(kcmtagaro)
+add_subdirectory(kcmkdegames)

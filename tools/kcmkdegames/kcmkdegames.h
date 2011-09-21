@@ -16,38 +16,19 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#include "kcmtagaro.h"
+#ifndef KCMKGAME_KCMKGAME_H
+#define KCMKGAME_KCMKGAME_H
 
-#include <KDE/KAboutData>
-#include <KDE/KPluginFactory>
+#include <KDE/KCModule>
 
-#include <KGame/Settings>
-#include "ui_visuals.h"
-
-K_PLUGIN_FACTORY(KCMTagaroFactory, registerPlugin<KCMTagaro>();)
-K_EXPORT_PLUGIN(KCMTagaroFactory("kcmtagaro", "tagaro"))
-
-struct KCMTagaro::Private
+class KcmKdegames : public KCModule
 {
-	Ui_Visuals m_visualsUi;
+	public:
+		KcmKdegames(QWidget* parent, const QVariantList& args);
+		virtual ~KcmKdegames();
+	private:
+		class Private;
+		Private* const d;
 };
 
-KCMTagaro::KCMTagaro(QWidget* parent, const QVariantList& args)
-	: KCModule(KCMTagaroFactory::componentData(), parent, args)
-	, d(new Private)
-{
-	Q_UNUSED(args)
-	KAboutData* about = new KAboutData(
-		"kcmtagaro", "libtagaro", ki18nc("AboutData appname for KCM", "KDE games library configuration"),
-		"0.1", ki18nc("AboutData description for KCM", "Global configuration for KDE games"),
-		KAboutData::License_GPL, ki18n("Copyright 2010 Stefan Majewsky"));
-	setAboutData(about);
-	//setup configuration widgets
-	d->m_visualsUi.setupUi(this);
-	addConfig(KGame::Settings::self(), this);
-}
-
-KCMTagaro::~KCMTagaro()
-{
-	delete d;
-}
+#endif // KCMKGAME_KCMKGAME_H

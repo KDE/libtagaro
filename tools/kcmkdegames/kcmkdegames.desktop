@@ -1,12 +1,12 @@
 [Desktop Entry]
-Exec=kcmshell4 kcmtagaro
+Exec=kcmshell4 kcmkdegames
 Icon=games-config-custom
 
 X-DocPath=libkgame/index.html
 
 Type=Service
 X-KDE-ServiceTypes=KCModule
-X-KDE-Library=kcmtagaro
+X-KDE-Library=kcmkdegames
 X-KDE-ParentApp=kcontrol
 
 # TODO: correct categorization
