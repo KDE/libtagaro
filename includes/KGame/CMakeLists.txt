@@ -5,6 +5,8 @@ install(FILES
 	Board
 	CachedProxyGraphicsSource
 	DeclarativeThemeProvider
+	Difficulty
+	DifficultyLevel
 	GraphicsConfigDialog
 	GraphicsSource
 	GraphicsSourceConfig

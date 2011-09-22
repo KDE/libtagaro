@@ -11,6 +11,7 @@ set(kgame_LIB_SRCS
 	audio/audioscene-${KGAMEAUDIO_BACKEND}.cpp
 	audio/sound-${KGAMEAUDIO_BACKEND}.cpp
 	core/application.cpp
+	core/difficulty.cpp
 	graphics/declthemeprovider.cpp
 	graphics/graphicsconfigdialog.cpp
 	graphics/graphicsdelegate.cpp
@@ -54,6 +55,7 @@ DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/audio COMPONENT Devel)
 
 install(FILES
 	core/application.h
+	core/difficulty.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/core COMPONENT Devel)
 
 install(FILES
