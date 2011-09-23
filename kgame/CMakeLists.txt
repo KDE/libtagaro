@@ -8,6 +8,9 @@ kde4_no_enable_final(libkgame)
 configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 
 set(kgame_LIB_SRCS
+	active/pullhandlewidget.cpp
+	active/slidelayout.cpp
+	active/touchwindow.cpp
 	audio/audioscene-${KGAMEAUDIO_BACKEND}.cpp
 	audio/sound-${KGAMEAUDIO_BACKEND}.cpp
 	core/application.cpp
@@ -48,6 +51,10 @@ install(TARGETS kgame EXPORT KGameLibraryDepends ${INSTALL_TARGETS_DEFAULT_ARGS}
 install(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/settings.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/kgame COMPONENT Devel)
+
+install(FILES
+	active/touchwindow.h
+DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/active COMPONENT Devel)
 
 install(FILES
 	audio/audioscene.h

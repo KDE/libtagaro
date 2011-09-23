@@ -25,4 +25,5 @@ install(FILES
 	StandardThemeProvider
 	Theme
 	ThemeProvider
+	TouchWindow
 DESTINATION ${INCLUDE_INSTALL_DIR}/KGame COMPONENT Devel)
