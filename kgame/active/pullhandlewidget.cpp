@@ -88,7 +88,7 @@ void PullHandleWidget::resizeEvent(QResizeEvent* event)
 	QSizeF targetSize;
 	if (event)
 	{
-		targetSize = 0.9 * QSizeF(event->size());
+		targetSize = 0.7 * QSizeF(event->size());
 	}
 	else //just calculating the m_sizeHint
 	{
