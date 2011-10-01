@@ -7,6 +7,7 @@ install(FILES
 	DeclarativeThemeProvider
 	Difficulty
 	DifficultyLevel
+	DifficultySlider
 	GraphicsConfigDialog
 	GraphicsSource
 	GraphicsSourceConfig

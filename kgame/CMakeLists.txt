@@ -26,6 +26,7 @@ set(kgame_LIB_SRCS
 	graphics/themeprovider.cpp
 	graphics/themeselector.cpp
 	interface/board.cpp
+	interface/difficultyslider.cpp
 	interface/messageoverlay.cpp
 	interface/scene.cpp
 )
@@ -73,6 +74,7 @@ DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/graphics COMPONENT Devel)
 
 install(FILES
 	interface/board.h
+	interface/difficultyslider.h
 	interface/messageoverlay.h
 	interface/scene.h
 DESTINATION ${INCLUDE_INSTALL_DIR}/kgame/interface COMPONENT Devel)
