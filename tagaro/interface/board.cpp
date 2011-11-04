@@ -42,7 +42,6 @@ Tagaro::Board::~Board()
 
 Tagaro::Board::Private::~Private()
 {
-	QList<Tagaro::SpriteObjectItem*> m_items;
 	for(QList<Tagaro::SpriteObjectItem*>::const_iterator a = m_items.constBegin(); a != m_items.constEnd(); ++a)
 		(*a)->d->unsetBoard();
 }
