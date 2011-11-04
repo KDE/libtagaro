@@ -135,7 +135,10 @@ void Tagaro::SpriteFetcher::removeClient(Tagaro::SpriteClient* client)
 
 void Tagaro::SpriteFetcher::updateClient(Tagaro::SpriteClient* client)
 {
-	const int frame = client->frame();
+	const int frameCount = d->m_source->frameCount(d->m_element);
+	int frame = client->frame();
+	if (frameCount > 0)
+		frame %= frameCount;
 	//check if request can be served immediately
 	QHash<int, QPixmap>::const_iterator it = m_pixmapCache.find(frame);
 	if (it != m_pixmapCache.constEnd())
