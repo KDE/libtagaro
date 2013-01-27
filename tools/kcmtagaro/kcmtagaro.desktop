@@ -58,6 +58,7 @@ Comment[x-test]=xxConfigure general behavior of KDE gamesxx
 Comment[zh_CN]=配置 KDE 游戏的常规行为
 Comment[zh_TW]=設定 KDE 遊戲的一般行為
 X-KDE-Keywords=games,graphics,rendering,tagaro,libtagaro
+X-KDE-Keywords[de]=Spiele,Grafik,Rendering,tagaro,libtagaro
 X-KDE-Keywords[es]=juegos,gráficos,renderizado,tagaro,libtagaro
 X-KDE-Keywords[et]=mängud,graafika,renderdamine,tagaro,libtagaro
 X-KDE-Keywords[fi]=pelit,grafiikka,renderöinti,piirtäminen,tagaro,libtagaro
