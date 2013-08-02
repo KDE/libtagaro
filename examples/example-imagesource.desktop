@@ -1,6 +1,7 @@
 [Tagaro Theme]
 Name=Example theme
 Name[bg]=Примерна тема
+Name[bs]=Primjer teme
 Name[cs]=Ukázkový motiv
 Name[de]=Beispieldesign
 Name[es]=Tema de ejemplo
@@ -27,6 +28,7 @@ Name[zh_CN]=示例主题
 Name[zh_TW]=範例主題
 Description=Example theme
 Description[bg]=Примерна тема
+Description[bs]=Primjer teme
 Description[cs]=Ukázkový motiv
 Description[de]=Beispieldesign
 Description[es]=Tema de ejemplo
