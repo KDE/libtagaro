@@ -83,6 +83,6 @@ X-KDE-Keywords[sk]=hry,grafika,vykresľovanie,tagaro,libtagaro
 X-KDE-Keywords[sl]=igre,grafika,izrisovanje,tagaro,libtagaro
 X-KDE-Keywords[sv]=spel,grafik,återgivning,tagaro,libtagaro
 X-KDE-Keywords[tr]=oyunlar,grafikler,hazırlama,tagaro,libtagaro
-X-KDE-Keywords[uk]=games,graphics,rendering,tagaro,libtagaro,ігри,графіка,обробка,тагаро
+X-KDE-Keywords[uk]=games;graphics;rendering;tagaro;libtagaro;ігри;графіка;обробка;тагаро
 X-KDE-Keywords[x-test]=xxgames,graphics,rendering,tagaro,libtagaroxx
 Categories=Qt;KDE;X-KDE-settings-system;
